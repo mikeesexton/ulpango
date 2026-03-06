@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+
+# Unrelated local project was removed from the repo root.
+strike-timeline/

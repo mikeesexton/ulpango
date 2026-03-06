@@ -1,0 +1,8 @@
+{
+  "name": "ulpango",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "migrate:verbs": "node ./migrate-hebrew-verbs.mjs"
+  }
+}

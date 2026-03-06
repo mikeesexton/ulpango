@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ulpango | Advanced Hebrew Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Assistant:wght@400;600;700&family=Chivo:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260306b" />
+  </head>
+  <body data-theme="dark">
+    <div class="ambient ambient-a" aria-hidden="true"></div>
+    <div class="ambient ambient-b" aria-hidden="true"></div>
+    <div id="bootError" class="boot-error hidden" role="alert"></div>
+
+    <main class="app-shell">
+      <header class="topbar card">
+        <div>
+          <p class="eyebrow" data-i18n="top.eyebrow">Browser-Only Hebrew Mastery</p>
+          <h1 data-i18n="app.name">Ulpango</h1>
+          <p class="subhead" data-i18n="top.subhead">
+            Advanced vocabulary trainer inspired by Duolingo, tuned for real-world fluency.
+          </p>
+        </div>
+        <div class="badge-grid">
+          <div class="badge">
+            <span id="statAccuracy">0%</span>
+            <small data-i18n="top.accuracy">Accuracy</small>
+          </div>
+          <div class="badge">
+            <span id="statStreak">0</span>
+            <small data-i18n="top.streak">Current Streak</small>
+          </div>
+        </div>
+      </header>
+
+      <section class="layout-grid">
+        <aside class="controls card">
+          <section class="perf-panel" aria-label="Performance by vocabulary domain">
+            <p class="eyebrow" data-i18n="perf.eyebrow">Performance Snapshot</p>
+            <h3 data-i18n="perf.title">Vocabulary Type</h3>
+            <p class="small-note" data-i18n="perf.note">Since your last progress reset</p>
+            <div id="domainPerformance" class="domain-grid"></div>
+            <div id="modePerformance" class="mode-grid"></div>
+          </section>
+
+          <section class="lang-panel" aria-label="Interface options">
+            <p class="eyebrow" data-i18n="controls.interface">Interface</p>
+            <div class="interface-row">
+              <button id="langToggle" type="button" class="quiet">עברית</button>
+              <button type="button" id="niqqudToggle" class="quiet" data-i18n="prompt.showNiqqud">Show Nikud</button>
+              <button id="themeToggle" type="button" class="quiet">Light Mode</button>
+            </div>
+          </section>
+
+          <div class="control-actions">
+            <button id="resetProgress" type="button" class="quiet" data-i18n="controls.reset">Reset Progress</button>
+          </div>
+
+          <p class="small-note" id="poolMeta"></p>
+        </aside>
+
+        <section class="game card">
+          <div class="game-head">
+            <div>
+              <h2 id="modeTitle">10-Round Mixed Lesson</h2>
+            </div>
+            <div class="mode-actions">
+              <button type="button" id="homeBtn" class="quiet hidden" data-i18n="session.backHome">Back to Home</button>
+            </div>
+          </div>
+
+          <div class="status-row">
+            <span id="lessonStatus">Round: 0/10</span>
+            <span id="vocabCount" class="hidden"></span>
+            <span id="sessionScore">Score: 0</span>
+          </div>
+
+          <article class="prompt-card">
+            <p class="prompt-label" id="promptLabel">English</p>
+            <div class="prompt-line">
+              <h3 class="prompt-text" id="promptText">Press "Start Translation" to begin.</h3>
+            </div>
+          </article>
+
+          <section id="gamePicker" class="game-picker">
+            <button type="button" id="lessonBtn" class="game-tile">
+              <span class="game-tile-icon" aria-hidden="true">א</span>
+              <span class="game-tile-title" data-i18n="game.translationName">Translation</span>
+              <span class="game-tile-note" data-i18n="game.translationNote">Fast multiple-choice translation rounds.</span>
+            </button>
+            <button type="button" id="verbMatchBtn" class="game-tile">
+              <span class="game-tile-icon" aria-hidden="true">🔗</span>
+              <span class="game-tile-title" data-i18n="game.conjugationName">Conjugation</span>
+              <span class="game-tile-note" data-i18n="game.conjugationNote">Match English forms to Hebrew conjugations.</span>
+            </button>
+            <button type="button" id="abbreviationBtn" class="game-tile">
+              <span class="game-tile-icon" aria-hidden="true">⏩</span>
+              <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
+              <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
+            </button>
+          </section>
+
+          <div id="choiceContainer" class="choices"></div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="game-actions">
+            <button type="button" id="nextBtn" class="accent next-btn hidden" data-i18n="session.next">Next</button>
+            <button type="button" id="lastAnswerBtn" class="quiet last-answer-btn hidden" data-i18n="session.lastAnswer">
+              Last Answer
+            </button>
+            <button type="button" id="masterVerbBtn" class="quiet master-btn hidden" data-i18n="mastered.moveCurrent">
+              Move To Mastered
+            </button>
+          </div>
+        </section>
+
+        <aside class="leaderboard card">
+          <h2 data-i18n="missed.title">Most Missed</h2>
+          <p class="small-note" data-i18n="missed.note">Words you have missed most often.</p>
+          <ol id="mostMissedList" class="missed-list"></ol>
+          <p id="mostMissedEmpty" class="small-note" data-i18n="missed.empty">No misses yet.</p>
+          <div class="leaderboard-actions">
+            <button type="button" id="masteredOpenBtn" class="quiet" data-i18n="mastered.open">Mastered List</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <div id="lessonStartIntro" class="second-chance-intro hidden" aria-hidden="true">
+      <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Lesson start intro">
+        <p class="second-chance-bubble">בוא נלך!</p>
+        <button id="lessonStartContinue" type="button" class="accent second-chance-btn" data-i18n="session.start">
+          Start Translation
+        </button>
+      </div>
+    </div>
+
+    <div id="secondChanceIntro" class="second-chance-intro hidden" aria-hidden="true">
+      <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Second chance intro">
+        <p class="second-chance-bubble">בהצלחה!</p>
+        <button id="secondChanceContinue" type="button" class="accent second-chance-btn" data-i18n="session.secondChanceContinue">
+          Start Second Chance
+        </button>
+      </div>
+    </div>
+
+    <div id="verbMatchIntro" class="second-chance-intro hidden" aria-hidden="true">
+      <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Verb match intro">
+        <p class="second-chance-bubble">יאללה!</p>
+        <button id="verbMatchContinue" type="button" class="accent second-chance-btn" data-i18n="session.verbMatchStart">
+          Start Conjugation
+        </button>
+      </div>
+    </div>
+
+    <div id="abbreviationIntro" class="second-chance-intro hidden" aria-hidden="true">
+      <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Abbreviation intro">
+        <p class="second-chance-bubble" dir="rtl">יאללה בוא נתקתק!</p>
+        <button id="abbreviationContinue" type="button" class="accent second-chance-btn" data-i18n="session.abbreviationStart">
+          Start Abbreviation
+        </button>
+      </div>
+    </div>
+
+    <div id="masteredModal" class="mastered-modal hidden" aria-hidden="true">
+      <section class="mastered-dialog card" role="dialog" aria-modal="true" aria-label="Mastered words">
+        <div class="mastered-head">
+          <h3 data-i18n="mastered.title">Mastered Words</h3>
+          <button type="button" id="masteredCloseBtn" class="quiet" data-i18n="mastered.close">Close</button>
+        </div>
+        <p class="small-note" data-i18n="mastered.note">
+          Mastered words are excluded from Translation but still used in Conjugation.
+        </p>
+        <p class="small-note" data-i18n="mastered.selectHint">Select words to restore to translation testing.</p>
+        <div id="masteredList" class="mastered-list"></div>
+        <p id="masteredEmpty" class="small-note" data-i18n="mastered.empty">No mastered words yet.</p>
+        <div class="mastered-actions">
+          <button type="button" id="masteredRestoreBtn" class="accent" data-i18n="mastered.restoreSelected">
+            Restore Selected
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        var bootError = document.getElementById("bootError");
+        if (!bootError) return;
+
+        window.addEventListener(
+          "error",
+          function (event) {
+            var message = (event && event.message) || "Unexpected runtime error";
+            var file = (event && event.filename) || "";
+            var fromIvriQuest = /app\.js|vocab-data\.js|index\.html/.test(file);
+
+            if (!fromIvriQuest && message === "Script error.") {
+              return;
+            }
+
+            bootError.textContent = "App error: " + message;
+            bootError.classList.remove("hidden");
+          },
+          true
+        );
+
+        window.addEventListener("unhandledrejection", function (event) {
+          var reason = (event && event.reason && event.reason.message) || String(event.reason || "Unhandled rejection");
+          bootError.textContent = "App error: " + reason;
+          bootError.classList.remove("hidden");
+        });
+      })();
+    </script>
+    <script src="./vocab-data.js?v=20260306b"></script>
+    <script src="./abbreviation-data.js?v=20260306b"></script>
+    <script src="./hebrew-verbs.js?v=20260306b"></script>
+    <script src="./app.js?v=20260306b"></script>
+  </body>
+</html>

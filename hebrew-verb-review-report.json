@@ -1,0 +1,1005 @@
+{
+  "generated_safe_verbs": [
+    {
+      "lemma": "לקפל",
+      "glosses": [
+        "to fold"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-010-to-fold"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לתבל",
+      "glosses": [
+        "to season"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-018-to-season"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להרתיח",
+      "glosses": [
+        "to boil"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-021-to-boil"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להסמיך",
+      "glosses": [
+        "to thicken"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-037-to-thicken"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לדלל",
+      "glosses": [
+        "to dilute"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-038-to-dilute"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לסנן",
+      "glosses": [
+        "to strain"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-039-to-strain"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקרר",
+      "glosses": [
+        "to refrigerate"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-045-to-refrigerate"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לצנן",
+      "glosses": [
+        "to chill"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-046-to-chill"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקשט",
+      "glosses": [
+        "to garnish"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-047-to-garnish"
+      ],
+      "reason": "Explicit safe-for-generation override with a supported pattern.",
+      "conjugation_mode": "generated",
+      "regularity": "regular"
+    }
+  ],
+  "curated_verbs_needing_forms": [],
+  "ambiguous_verbs_needing_sense_splitting": [
+    {
+      "lemma": "לגרד",
+      "glosses": [
+        "to grate",
+        "to scrape"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-006-to-grate",
+        "cooking_verbs-064-to-scrape"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    },
+    {
+      "lemma": "לערבב",
+      "glosses": [
+        "to stir",
+        "to mix"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-008-to-stir",
+        "cooking_verbs-009-to-mix"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    },
+    {
+      "lemma": "להקציף",
+      "glosses": [
+        "to beat",
+        "to whip"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-011-to-beat",
+        "cooking_verbs-059-to-whip"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    },
+    {
+      "lemma": "לחלוט",
+      "glosses": [
+        "to poach",
+        "to blanch"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-023-to-poach",
+        "cooking_verbs-034-to-blanch"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    },
+    {
+      "lemma": "להקפיץ",
+      "glosses": [
+        "to saute",
+        "to toss"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-027-to-saute",
+        "cooking_verbs-072-to-toss"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    },
+    {
+      "lemma": "לצפות",
+      "glosses": [
+        "to coat"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-073-to-coat"
+      ],
+      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "ambiguous"
+    }
+  ],
+  "phrase_only_items": [
+    {
+      "lemma": "לחתוך לקוביות",
+      "glosses": [
+        "to dice"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-002-to-dice"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לקצוץ דק",
+      "glosses": [
+        "to mince"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-004-to-mince"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להשרות במרינדה",
+      "glosses": [
+        "to marinate"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-019-to-marinate"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לבשל על אש קטנה",
+      "glosses": [
+        "to simmer"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-022-to-simmer"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לטגן בשמן עמוק",
+      "glosses": [
+        "to deep-fry"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-026-to-deep-fry"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לצלות על גריל",
+      "glosses": [
+        "to grill"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-029-to-grill"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לצלות בתנור",
+      "glosses": [
+        "to broil"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-032-to-broil"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לחמם מראש",
+      "glosses": [
+        "to preheat"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-042-to-preheat"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לסדר בצלחת",
+      "glosses": [
+        "to plate"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-049-to-plate"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לתקן תיבול",
+      "glosses": [
+        "to adjust seasoning"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-051-to-adjust-seasoning"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לבשל יתר על המידה",
+      "glosses": [
+        "to overcook"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-052-to-overcook"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לבשל פחות מדי",
+      "glosses": [
+        "to undercook"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-053-to-undercook"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לרסק למחית",
+      "glosses": [
+        "to puree"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-061-to-puree"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להוציא ליבה",
+      "glosses": [
+        "to core"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-066-to-core"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לגרד קליפה",
+      "glosses": [
+        "to zest"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-068-to-zest"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לרפד תבנית",
+      "glosses": [
+        "to line a pan"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-070-to-line-a-pan"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לצפות בפירורים",
+      "glosses": [
+        "to breadcrumb"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-074-to-breadcrumb"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לבשל בנוזל מועט",
+      "glosses": [
+        "to braise"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-075-to-braise"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לבשל קדירה",
+      "glosses": [
+        "to stew"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-076-to-stew"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לסדר ולמיין",
+      "glosses": [
+        "to declutter"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-092-to-declutter"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להגדיר את הקשר",
+      "glosses": [
+        "to define the relationship"
+      ],
+      "source_word_ids": [
+        "dating_relationships-008-to-define-the-relationship"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להציב גבולות",
+      "glosses": [
+        "to set boundaries"
+      ],
+      "source_word_ids": [
+        "dating_relationships-014-to-set-boundaries"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להיפתח רגשית",
+      "glosses": [
+        "to open up emotionally"
+      ],
+      "source_word_ids": [
+        "dating_relationships-015-to-open-up-emotionally"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    }
+  ],
+  "blocked_items": [
+    {
+      "lemma": "ליירט",
+      "glosses": [
+        "to intercept"
+      ],
+      "source_word_ids": [
+        "core_advanced-096-to-intercept"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקצוץ",
+      "glosses": [
+        "to chop"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-001-to-chop"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לפרוס",
+      "glosses": [
+        "to slice"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-003-to-slice"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקלף",
+      "glosses": [
+        "to peel"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-005-to-peel"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לטרוף",
+      "glosses": [
+        "to whisk"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-007-to-whisk"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "ללוש",
+      "glosses": [
+        "to knead"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-012-to-knead"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לרדד",
+      "glosses": [
+        "to roll out"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-013-to-roll-out"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לנפות",
+      "glosses": [
+        "to sift"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-014-to-sift"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "למדוד",
+      "glosses": [
+        "to measure"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-015-to-measure"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "למזוג",
+      "glosses": [
+        "to pour"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-016-to-pour"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לזלף",
+      "glosses": [
+        "to drizzle"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-017-to-drizzle"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להשרות",
+      "glosses": [
+        "to soak"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-020-to-soak"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לאדות",
+      "glosses": [
+        "to steam"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-024-to-steam"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לטגן",
+      "glosses": [
+        "to fry"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-025-to-fry"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לצרוב",
+      "glosses": [
+        "to sear"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-028-to-sear"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לצלות",
+      "glosses": [
+        "to roast"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-030-to-roast"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לאפות",
+      "glosses": [
+        "to bake"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-031-to-bake"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקלות",
+      "glosses": [
+        "to toast"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-033-to-toast"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לקרמל",
+      "glosses": [
+        "to caramelize"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-035-to-caramelize"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לצמצם",
+      "glosses": [
+        "to reduce"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-036-to-reduce"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לנקז",
+      "glosses": [
+        "to drain"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-040-to-drain"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לשטוף",
+      "glosses": [
+        "to rinse"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-041-to-rinse"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להפשיר",
+      "glosses": [
+        "to defrost"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-043-to-defrost"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להקפיא",
+      "glosses": [
+        "to freeze"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-044-to-freeze"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להגיש",
+      "glosses": [
+        "to serve"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-048-to-serve"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לטעום",
+      "glosses": [
+        "to taste"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-050-to-taste"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לשרוף",
+      "glosses": [
+        "to burn"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-054-to-burn"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להצית",
+      "glosses": [
+        "to ignite"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-055-to-ignite"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לעשן",
+      "glosses": [
+        "to smoke"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-056-to-smoke"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להתסיס",
+      "glosses": [
+        "to ferment"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-057-to-ferment"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לכבוש",
+      "glosses": [
+        "to pickle"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-058-to-pickle"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לטחון",
+      "glosses": [
+        "to blend"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-060-to-blend"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לרסק",
+      "glosses": [
+        "to crush"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-062-to-crush"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "למעוך",
+      "glosses": [
+        "to mash"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-063-to-mash"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לשפד",
+      "glosses": [
+        "to skewer"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-065-to-skewer"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לגלען",
+      "glosses": [
+        "to pit"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-067-to-pit"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לשמן",
+      "glosses": [
+        "to grease"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-069-to-grease"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להפוך",
+      "glosses": [
+        "to flip"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-071-to-flip"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לפטר",
+      "glosses": [
+        "to fire (dismiss)"
+      ],
+      "source_word_ids": [
+        "work_business-066-to-fire-dismiss"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להרכיב",
+      "glosses": [
+        "to assemble"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-056-to-assemble"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לפרק",
+      "glosses": [
+        "to disassemble"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-057-to-disassemble"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להלבין",
+      "glosses": [
+        "to whiten"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-087-to-whiten"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להיעלם",
+      "glosses": [
+        "to ghost"
+      ],
+      "source_word_ids": [
+        "dating_relationships-007-to-ghost"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להדיח",
+      "glosses": [
+        "to oust"
+      ],
+      "source_word_ids": [
+        "politics_society_expanded-017-to-oust"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    }
+  ]
+}

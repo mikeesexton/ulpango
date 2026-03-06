@@ -1,0 +1,3026 @@
+[
+  {
+    "id": "ליירט-blocked",
+    "lemma": "ליירט",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to intercept",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: core_advanced-096-to-intercept. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 64,
+    "category": "core_advanced",
+    "source_word_ids": [
+      "core_advanced-096-to-intercept"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקצוץ-blocked",
+    "lemma": "לקצוץ",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to chop",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-001-to-chop. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 96,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-001-to-chop"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לחתוך-לקוביות-phrase-only",
+    "lemma": "לחתוך לקוביות",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to dice",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-002-to-dice. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 96,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-002-to-dice"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לפרוס-blocked",
+    "lemma": "לפרוס",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to slice",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-003-to-slice. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 95,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-003-to-slice"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקצוץ-דק-phrase-only",
+    "lemma": "לקצוץ דק",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to mince",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-004-to-mince. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 95,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-004-to-mince"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקלף-blocked",
+    "lemma": "לקלף",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to peel",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-005-to-peel. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 94,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-005-to-peel"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לגרד-ambiguous",
+    "lemma": "לגרד",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to grate",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      },
+      {
+        "gloss": "to scrape",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab items: cooking_verbs-006-to-grate, cooking_verbs-064-to-scrape. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 94,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-006-to-grate",
+      "cooking_verbs-064-to-scrape"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לטרוף-blocked",
+    "lemma": "לטרוף",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to whisk",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-007-to-whisk. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 93,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-007-to-whisk"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לערבב-ambiguous",
+    "lemma": "לערבב",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to stir",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      },
+      {
+        "gloss": "to mix",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab items: cooking_verbs-008-to-stir, cooking_verbs-009-to-mix. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 92,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-008-to-stir",
+      "cooking_verbs-009-to-mix"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקפל-generated",
+    "lemma": "לקפל",
+    "root": [
+      "ק",
+      "פ",
+      "ל"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to fold",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מקפל",
+        "feminine_singular": "מקפלת",
+        "masculine_plural": "מקפלים",
+        "feminine_plural": "מקפלות"
+      },
+      "past": {
+        "first_person_singular": "קיפלתי",
+        "second_person_masculine_singular": "קיפלת",
+        "second_person_feminine_singular": "קיפלת",
+        "third_person_masculine_singular": "קיפל",
+        "third_person_feminine_singular": "קיפלה",
+        "first_person_plural": "קיפלנו",
+        "second_person_masculine_plural": "קיפלתם",
+        "second_person_feminine_plural": "קיפלתן",
+        "third_person_plural": "קיפלו"
+      },
+      "future": {
+        "first_person_singular": "אקפל",
+        "second_person_masculine_singular": "תקפל",
+        "second_person_feminine_singular": "תקפלי",
+        "third_person_masculine_singular": "יקפל",
+        "third_person_feminine_singular": "תקפל",
+        "first_person_plural": "נקפל",
+        "second_person_plural": "תקפלו",
+        "third_person_plural": "יקפלו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-010-to-fold. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 80,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-010-to-fold"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להקציף-ambiguous",
+    "lemma": "להקציף",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to beat",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      },
+      {
+        "gloss": "to whip",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab items: cooking_verbs-011-to-beat, cooking_verbs-059-to-whip. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 91,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-011-to-beat",
+      "cooking_verbs-059-to-whip"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "ללוש-blocked",
+    "lemma": "ללוש",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to knead",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-012-to-knead. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 90,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-012-to-knead"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לרדד-blocked",
+    "lemma": "לרדד",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to roll out",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-013-to-roll-out. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 89,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-013-to-roll-out"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לנפות-blocked",
+    "lemma": "לנפות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to sift",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-014-to-sift. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 89,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-014-to-sift"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "למדוד-blocked",
+    "lemma": "למדוד",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to measure",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-015-to-measure. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 88,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-015-to-measure"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "למזוג-blocked",
+    "lemma": "למזוג",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to pour",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-016-to-pour. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 88,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-016-to-pour"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לזלף-blocked",
+    "lemma": "לזלף",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to drizzle",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-017-to-drizzle. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 87,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-017-to-drizzle"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לתבל-generated",
+    "lemma": "לתבל",
+    "root": [
+      "ת",
+      "ב",
+      "ל"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to season",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מתבל",
+        "feminine_singular": "מתבלת",
+        "masculine_plural": "מתבלים",
+        "feminine_plural": "מתבלות"
+      },
+      "past": {
+        "first_person_singular": "תיבלתי",
+        "second_person_masculine_singular": "תיבלת",
+        "second_person_feminine_singular": "תיבלת",
+        "third_person_masculine_singular": "תיבל",
+        "third_person_feminine_singular": "תיבלה",
+        "first_person_plural": "תיבלנו",
+        "second_person_masculine_plural": "תיבלתם",
+        "second_person_feminine_plural": "תיבלתן",
+        "third_person_plural": "תיבלו"
+      },
+      "future": {
+        "first_person_singular": "אתבל",
+        "second_person_masculine_singular": "תתבל",
+        "second_person_feminine_singular": "תתבלי",
+        "third_person_masculine_singular": "יתבל",
+        "third_person_feminine_singular": "תתבל",
+        "first_person_plural": "נתבל",
+        "second_person_plural": "תתבלו",
+        "third_person_plural": "יתבלו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-018-to-season. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 85,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-018-to-season"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להשרות-במרינדה-phrase-only",
+    "lemma": "להשרות במרינדה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to marinate",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-019-to-marinate. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 86,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-019-to-marinate"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להשרות-blocked",
+    "lemma": "להשרות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to soak",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-020-to-soak. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 85,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-020-to-soak"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להרתיח-generated",
+    "lemma": "להרתיח",
+    "root": [
+      "ר",
+      "ת",
+      "ח"
+    ],
+    "binyan": "hifil",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to boil",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מרתיח",
+        "feminine_singular": "מרתיחה",
+        "masculine_plural": "מרתיחים",
+        "feminine_plural": "מרתיחות"
+      },
+      "past": {
+        "first_person_singular": "הרתחתי",
+        "second_person_masculine_singular": "הרתחת",
+        "second_person_feminine_singular": "הרתחת",
+        "third_person_masculine_singular": "הרתיח",
+        "third_person_feminine_singular": "הרתיחה",
+        "first_person_plural": "הרתחנו",
+        "second_person_masculine_plural": "הרתחתם",
+        "second_person_feminine_plural": "הרתחתן",
+        "third_person_plural": "הרתיחו"
+      },
+      "future": {
+        "first_person_singular": "ארתיח",
+        "second_person_masculine_singular": "תרתיח",
+        "second_person_feminine_singular": "תרתיחי",
+        "third_person_masculine_singular": "ירתיח",
+        "third_person_feminine_singular": "תרתיח",
+        "first_person_plural": "נרתיח",
+        "second_person_plural": "תרתיחו",
+        "third_person_plural": "ירתיחו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-021-to-boil. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 79,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-021-to-boil"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לבשל-על-אש-קטנה-phrase-only",
+    "lemma": "לבשל על אש קטנה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to simmer",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-022-to-simmer. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 84,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-022-to-simmer"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לחלוט-ambiguous",
+    "lemma": "לחלוט",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to poach",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      },
+      {
+        "gloss": "to blanch",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab items: cooking_verbs-023-to-poach, cooking_verbs-034-to-blanch. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 83,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-023-to-poach",
+      "cooking_verbs-034-to-blanch"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לאדות-blocked",
+    "lemma": "לאדות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to steam",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-024-to-steam. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 83,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-024-to-steam"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לטגן-blocked",
+    "lemma": "לטגן",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to fry",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-025-to-fry. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 82,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-025-to-fry"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לטגן-בשמן-עמוק-phrase-only",
+    "lemma": "לטגן בשמן עמוק",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to deep-fry",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-026-to-deep-fry. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 82,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-026-to-deep-fry"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להקפיץ-ambiguous",
+    "lemma": "להקפיץ",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to saute",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      },
+      {
+        "gloss": "to toss",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab items: cooking_verbs-027-to-saute, cooking_verbs-072-to-toss. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 81,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-027-to-saute",
+      "cooking_verbs-072-to-toss"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצרוב-blocked",
+    "lemma": "לצרוב",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to sear",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-028-to-sear. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 81,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-028-to-sear"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצלות-על-גריל-phrase-only",
+    "lemma": "לצלות על גריל",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to grill",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-029-to-grill. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 80,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-029-to-grill"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצלות-blocked",
+    "lemma": "לצלות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to roast",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-030-to-roast. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 79,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-030-to-roast"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לאפות-blocked",
+    "lemma": "לאפות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to bake",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-031-to-bake. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 79,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-031-to-bake"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצלות-בתנור-phrase-only",
+    "lemma": "לצלות בתנור",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to broil",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-032-to-broil. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 78,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-032-to-broil"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקלות-blocked",
+    "lemma": "לקלות",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to toast",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-033-to-toast. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 78,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-033-to-toast"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקרמל-blocked",
+    "lemma": "לקרמל",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to caramelize",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-035-to-caramelize. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 76,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-035-to-caramelize"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצמצם-blocked",
+    "lemma": "לצמצם",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to reduce",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-036-to-reduce. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 76,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-036-to-reduce"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להסמיך-generated",
+    "lemma": "להסמיך",
+    "root": [
+      "ס",
+      "מ",
+      "כ"
+    ],
+    "binyan": "hifil",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to thicken",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מסמיכ",
+        "feminine_singular": "מסמיכה",
+        "masculine_plural": "מסמיכים",
+        "feminine_plural": "מסמיכות"
+      },
+      "past": {
+        "first_person_singular": "הסמכתי",
+        "second_person_masculine_singular": "הסמכת",
+        "second_person_feminine_singular": "הסמכת",
+        "third_person_masculine_singular": "הסמיכ",
+        "third_person_feminine_singular": "הסמיכה",
+        "first_person_plural": "הסמכנו",
+        "second_person_masculine_plural": "הסמכתם",
+        "second_person_feminine_plural": "הסמכתן",
+        "third_person_plural": "הסמיכו"
+      },
+      "future": {
+        "first_person_singular": "אסמיכ",
+        "second_person_masculine_singular": "תסמיכ",
+        "second_person_feminine_singular": "תסמיכי",
+        "third_person_masculine_singular": "יסמיכ",
+        "third_person_feminine_singular": "תסמיכ",
+        "first_person_plural": "נסמיכ",
+        "second_person_plural": "תסמיכו",
+        "third_person_plural": "יסמיכו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-037-to-thicken. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 70,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-037-to-thicken"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לדלל-generated",
+    "lemma": "לדלל",
+    "root": [
+      "ד",
+      "ל",
+      "ל"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to dilute",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מדלל",
+        "feminine_singular": "מדללת",
+        "masculine_plural": "מדללים",
+        "feminine_plural": "מדללות"
+      },
+      "past": {
+        "first_person_singular": "דיללתי",
+        "second_person_masculine_singular": "דיללת",
+        "second_person_feminine_singular": "דיללת",
+        "third_person_masculine_singular": "דילל",
+        "third_person_feminine_singular": "דיללה",
+        "first_person_plural": "דיללנו",
+        "second_person_masculine_plural": "דיללתם",
+        "second_person_feminine_plural": "דיללתן",
+        "third_person_plural": "דיללו"
+      },
+      "future": {
+        "first_person_singular": "אדלל",
+        "second_person_masculine_singular": "תדלל",
+        "second_person_feminine_singular": "תדללי",
+        "third_person_masculine_singular": "ידלל",
+        "third_person_feminine_singular": "תדלל",
+        "first_person_plural": "נדלל",
+        "second_person_plural": "תדללו",
+        "third_person_plural": "ידללו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-038-to-dilute. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 74,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-038-to-dilute"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לסנן-generated",
+    "lemma": "לסנן",
+    "root": [
+      "ס",
+      "נ",
+      "נ"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to strain",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מסננ",
+        "feminine_singular": "מסננת",
+        "masculine_plural": "מסננים",
+        "feminine_plural": "מסננות"
+      },
+      "past": {
+        "first_person_singular": "סיננתי",
+        "second_person_masculine_singular": "סיננת",
+        "second_person_feminine_singular": "סיננת",
+        "third_person_masculine_singular": "סיננ",
+        "third_person_feminine_singular": "סיננה",
+        "first_person_plural": "סינננו",
+        "second_person_masculine_plural": "סיננתם",
+        "second_person_feminine_plural": "סיננתן",
+        "third_person_plural": "סיננו"
+      },
+      "future": {
+        "first_person_singular": "אסננ",
+        "second_person_masculine_singular": "תסננ",
+        "second_person_feminine_singular": "תסנני",
+        "third_person_masculine_singular": "יסננ",
+        "third_person_feminine_singular": "תסננ",
+        "first_person_plural": "נסננ",
+        "second_person_plural": "תסננו",
+        "third_person_plural": "יסננו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-039-to-strain. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 78,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-039-to-strain"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לנקז-blocked",
+    "lemma": "לנקז",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to drain",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-040-to-drain. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 73,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-040-to-drain"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לשטוף-blocked",
+    "lemma": "לשטוף",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to rinse",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-041-to-rinse. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 73,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-041-to-rinse"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לחמם-מראש-phrase-only",
+    "lemma": "לחמם מראש",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to preheat",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-042-to-preheat. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 72,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-042-to-preheat"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להפשיר-blocked",
+    "lemma": "להפשיר",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to defrost",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-043-to-defrost. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 72,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-043-to-defrost"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להקפיא-blocked",
+    "lemma": "להקפיא",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to freeze",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-044-to-freeze. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 71,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-044-to-freeze"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקרר-generated",
+    "lemma": "לקרר",
+    "root": [
+      "ק",
+      "ר",
+      "ר"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to refrigerate",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מקרר",
+        "feminine_singular": "מקררת",
+        "masculine_plural": "מקררים",
+        "feminine_plural": "מקררות"
+      },
+      "past": {
+        "first_person_singular": "קיררתי",
+        "second_person_masculine_singular": "קיררת",
+        "second_person_feminine_singular": "קיררת",
+        "third_person_masculine_singular": "קירר",
+        "third_person_feminine_singular": "קיררה",
+        "first_person_plural": "קיררנו",
+        "second_person_masculine_plural": "קיררתם",
+        "second_person_feminine_plural": "קיררתן",
+        "third_person_plural": "קיררו"
+      },
+      "future": {
+        "first_person_singular": "אקרר",
+        "second_person_masculine_singular": "תקרר",
+        "second_person_feminine_singular": "תקררי",
+        "third_person_masculine_singular": "יקרר",
+        "third_person_feminine_singular": "תקרר",
+        "first_person_plural": "נקרר",
+        "second_person_plural": "תקררו",
+        "third_person_plural": "יקררו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-045-to-refrigerate. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 73,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-045-to-refrigerate"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצנן-generated",
+    "lemma": "לצנן",
+    "root": [
+      "צ",
+      "נ",
+      "נ"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to chill",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מצננ",
+        "feminine_singular": "מצננת",
+        "masculine_plural": "מצננים",
+        "feminine_plural": "מצננות"
+      },
+      "past": {
+        "first_person_singular": "ציננתי",
+        "second_person_masculine_singular": "ציננת",
+        "second_person_feminine_singular": "ציננת",
+        "third_person_masculine_singular": "ציננ",
+        "third_person_feminine_singular": "ציננה",
+        "first_person_plural": "צינננו",
+        "second_person_masculine_plural": "ציננתם",
+        "second_person_feminine_plural": "ציננתן",
+        "third_person_plural": "ציננו"
+      },
+      "future": {
+        "first_person_singular": "אצננ",
+        "second_person_masculine_singular": "תצננ",
+        "second_person_feminine_singular": "תצנני",
+        "third_person_masculine_singular": "יצננ",
+        "third_person_feminine_singular": "תצננ",
+        "first_person_plural": "נצננ",
+        "second_person_plural": "תצננו",
+        "third_person_plural": "יצננו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-046-to-chill. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 72,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-046-to-chill"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לקשט-generated",
+    "lemma": "לקשט",
+    "root": [
+      "ק",
+      "ש",
+      "ט"
+    ],
+    "binyan": "piel",
+    "regularity": "regular",
+    "conjugation_mode": "generated",
+    "senses": [
+      {
+        "gloss": "to garnish",
+        "usage_pattern": null,
+        "safe_for_generation": true
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {
+      "present": {
+        "masculine_singular": "מקשט",
+        "feminine_singular": "מקשטת",
+        "masculine_plural": "מקשטים",
+        "feminine_plural": "מקשטות"
+      },
+      "past": {
+        "first_person_singular": "קישטתי",
+        "second_person_masculine_singular": "קישטת",
+        "second_person_feminine_singular": "קישטת",
+        "third_person_masculine_singular": "קישט",
+        "third_person_feminine_singular": "קישטה",
+        "first_person_plural": "קישטנו",
+        "second_person_masculine_plural": "קישטתם",
+        "second_person_feminine_plural": "קישטתן",
+        "third_person_plural": "קישטו"
+      },
+      "future": {
+        "first_person_singular": "אקשט",
+        "second_person_masculine_singular": "תקשט",
+        "second_person_feminine_singular": "תקשטי",
+        "third_person_masculine_singular": "יקשט",
+        "third_person_feminine_singular": "תקשט",
+        "first_person_plural": "נקשט",
+        "second_person_plural": "תקשטו",
+        "third_person_plural": "יקשטו"
+      }
+    },
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-047-to-garnish. Explicitly whitelisted as safe for limited generation.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "generated_safe"
+    ],
+    "personal_priority": 76,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-047-to-garnish"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להגיש-blocked",
+    "lemma": "להגיש",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to serve",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-048-to-serve. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 69,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-048-to-serve"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לסדר-בצלחת-phrase-only",
+    "lemma": "לסדר בצלחת",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to plate",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-049-to-plate. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 68,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-049-to-plate"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לטעום-blocked",
+    "lemma": "לטעום",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to taste",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-050-to-taste. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 67,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-050-to-taste"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לתקן-תיבול-phrase-only",
+    "lemma": "לתקן תיבול",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to adjust seasoning",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-051-to-adjust-seasoning. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 67,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-051-to-adjust-seasoning"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לבשל-יתר-על-המידה-phrase-only",
+    "lemma": "לבשל יתר על המידה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to overcook",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-052-to-overcook. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 66,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-052-to-overcook"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לבשל-פחות-מדי-phrase-only",
+    "lemma": "לבשל פחות מדי",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to undercook",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-053-to-undercook. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 66,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-053-to-undercook"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לשרוף-blocked",
+    "lemma": "לשרוף",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to burn",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-054-to-burn. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 65,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-054-to-burn"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להצית-blocked",
+    "lemma": "להצית",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to ignite",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-055-to-ignite. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 65,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-055-to-ignite"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לעשן-blocked",
+    "lemma": "לעשן",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to smoke",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-056-to-smoke. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 64,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-056-to-smoke"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להתסיס-blocked",
+    "lemma": "להתסיס",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to ferment",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-057-to-ferment. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 63,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-057-to-ferment"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לכבוש-blocked",
+    "lemma": "לכבוש",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to pickle",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-058-to-pickle. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 63,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-058-to-pickle"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לטחון-blocked",
+    "lemma": "לטחון",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to blend",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-060-to-blend. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 62,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-060-to-blend"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לרסק-למחית-phrase-only",
+    "lemma": "לרסק למחית",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to puree",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-061-to-puree. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 61,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-061-to-puree"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לרסק-blocked",
+    "lemma": "לרסק",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to crush",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-062-to-crush. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 60,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-062-to-crush"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "למעוך-blocked",
+    "lemma": "למעוך",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to mash",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-063-to-mash. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 60,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-063-to-mash"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לשפד-blocked",
+    "lemma": "לשפד",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to skewer",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-065-to-skewer. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 59,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-065-to-skewer"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להוציא-ליבה-phrase-only",
+    "lemma": "להוציא ליבה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to core",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-066-to-core. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 58,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-066-to-core"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לגלען-blocked",
+    "lemma": "לגלען",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to pit",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-067-to-pit. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 57,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-067-to-pit"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לגרד-קליפה-phrase-only",
+    "lemma": "לגרד קליפה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to zest",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-068-to-zest. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 57,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-068-to-zest"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לשמן-blocked",
+    "lemma": "לשמן",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to grease",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-069-to-grease. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 56,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-069-to-grease"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לרפד-תבנית-phrase-only",
+    "lemma": "לרפד תבנית",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to line a pan",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-070-to-line-a-pan. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 56,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-070-to-line-a-pan"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להפוך-blocked",
+    "lemma": "להפוך",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to flip",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-071-to-flip. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 55,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-071-to-flip"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצפות-ambiguous",
+    "lemma": "לצפות",
+    "root": null,
+    "binyan": null,
+    "regularity": "ambiguous",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to coat",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-073-to-coat. Ambiguous lemma requires sense splitting before conjugation mode.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "ambiguous"
+    ],
+    "personal_priority": 54,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-073-to-coat"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לצפות-בפירורים-phrase-only",
+    "lemma": "לצפות בפירורים",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to breadcrumb",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-074-to-breadcrumb. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 53,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-074-to-breadcrumb"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לבשל-בנוזל-מועט-phrase-only",
+    "lemma": "לבשל בנוזל מועט",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to braise",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-075-to-braise. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 53,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-075-to-braise"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לבשל-קדירה-phrase-only",
+    "lemma": "לבשל קדירה",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to stew",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: cooking_verbs-076-to-stew. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 52,
+    "category": "cooking_verbs",
+    "source_word_ids": [
+      "cooking_verbs-076-to-stew"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לפטר-blocked",
+    "lemma": "לפטר",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to fire (dismiss)",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: work_business-066-to-fire-dismiss. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 53,
+    "category": "work_business",
+    "source_word_ids": [
+      "work_business-066-to-fire-dismiss"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להרכיב-blocked",
+    "lemma": "להרכיב",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to assemble",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: home_everyday_life-056-to-assemble. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 64,
+    "category": "home_everyday_life",
+    "source_word_ids": [
+      "home_everyday_life-056-to-assemble"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לפרק-blocked",
+    "lemma": "לפרק",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to disassemble",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: home_everyday_life-057-to-disassemble. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 63,
+    "category": "home_everyday_life",
+    "source_word_ids": [
+      "home_everyday_life-057-to-disassemble"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להלבין-blocked",
+    "lemma": "להלבין",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to whiten",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: home_everyday_life-087-to-whiten. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 50,
+    "category": "home_everyday_life",
+    "source_word_ids": [
+      "home_everyday_life-087-to-whiten"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "לסדר-ולמיין-phrase-only",
+    "lemma": "לסדר ולמיין",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to declutter",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: home_everyday_life-092-to-declutter. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 48,
+    "category": "home_everyday_life",
+    "source_word_ids": [
+      "home_everyday_life-092-to-declutter"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להיעלם-blocked",
+    "lemma": "להיעלם",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to ghost",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: dating_relationships-007-to-ghost. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 56,
+    "category": "dating_relationships",
+    "source_word_ids": [
+      "dating_relationships-007-to-ghost"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להגדיר-את-הקשר-phrase-only",
+    "lemma": "להגדיר את הקשר",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to define the relationship",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: dating_relationships-008-to-define-the-relationship. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 53,
+    "category": "dating_relationships",
+    "source_word_ids": [
+      "dating_relationships-008-to-define-the-relationship"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להציב-גבולות-phrase-only",
+    "lemma": "להציב גבולות",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to set boundaries",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: dating_relationships-014-to-set-boundaries. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 36,
+    "category": "dating_relationships",
+    "source_word_ids": [
+      "dating_relationships-014-to-set-boundaries"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להיפתח-רגשית-phrase-only",
+    "lemma": "להיפתח רגשית",
+    "root": null,
+    "binyan": null,
+    "regularity": "phrase",
+    "conjugation_mode": "phrase_only",
+    "senses": [
+      {
+        "gloss": "to open up emotionally",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: dating_relationships-015-to-open-up-emotionally. Multi-word Hebrew item kept in vocabulary mode only.",
+    "examples": [],
+    "difficulty_level": 2,
+    "tags": [
+      "migrated",
+      "phrase_only"
+    ],
+    "personal_priority": 33,
+    "category": "dating_relationships",
+    "source_word_ids": [
+      "dating_relationships-015-to-open-up-emotionally"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  },
+  {
+    "id": "להדיח-blocked",
+    "lemma": "להדיח",
+    "root": null,
+    "binyan": null,
+    "regularity": "regular",
+    "conjugation_mode": "blocked",
+    "senses": [
+      {
+        "gloss": "to oust",
+        "usage_pattern": null,
+        "safe_for_generation": false
+      }
+    ],
+    "usage_pattern": null,
+    "forms": {},
+    "generated_forms": {},
+    "review_status": "unreviewed",
+    "notes": "Migrated from vocab item: politics_society_expanded-017-to-oust. No authoritative forms and no approved generation path.",
+    "examples": [],
+    "difficulty_level": 3,
+    "tags": [
+      "migrated",
+      "blocked"
+    ],
+    "personal_priority": 20,
+    "category": "politics_society_expanded",
+    "source_word_ids": [
+      "politics_society_expanded-017-to-oust"
+    ],
+    "source": "vocab-migration",
+    "generation_pattern": null
+  }
+]
