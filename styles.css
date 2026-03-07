@@ -451,12 +451,12 @@ body[data-ui-lang="he"] .home-option-value {
   text-align: right;
 }
 
-.home-option-value[dir="rtl"] {
+body .home-option-value[dir="rtl"] {
   text-align: right;
   direction: rtl;
 }
 
-.home-option-value[dir="ltr"] {
+body .home-option-value[dir="ltr"] {
   text-align: left;
   direction: ltr;
 }
