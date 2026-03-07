@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307j";
+const APP_BUILD = "20260307k";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -680,7 +680,7 @@ const LEITNER_INTERVALS = [
 ];
 const LESSON_ROUNDS = 10;
 const ABBREVIATION_ROUNDS = 10;
-const VERB_MATCH_ROUNDS = 5;
+const VERB_MATCH_ROUNDS = 1;
 const MATCH_MAX_PAIRS = 12;
 const MATCH_VISIBLE_ROWS = 5;
 const CONJUGATION_MASTER_STREAK = 10;

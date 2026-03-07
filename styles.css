@@ -1525,6 +1525,14 @@ body[data-ui-lang="he"] .mastered-row input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .match-card {
+    text-align: left;
+  }
+
+  .match-card.hebrew {
+    text-align: right;
+  }
+
   .sticky-lesson-actions {
     position: static;
     grid-template-columns: 1fr auto;

@@ -464,8 +464,8 @@ test("conjugation sessions are capped to a small verb set so results are reachab
   const { startVerbMatch, state } = loadAppHarness(vocabulary, [], verbDeck);
   startVerbMatch();
 
-  assert.equal(state.match.totalVerbs, 5);
-  assert.equal(state.match.verbQueue.length, 5);
+  assert.equal(state.match.totalVerbs, 1);
+  assert.equal(state.match.verbQueue.length, 1);
 });
 
 test("active learn sessions stay pinned to home and restored intros auto-advance into gameplay", async () => {
