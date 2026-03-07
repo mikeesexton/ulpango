@@ -302,6 +302,36 @@ test("generated-safe verbs may use the limited generator", () => {
   assert.equal(result.forms.future.first_person_singular.plain, "אתבל");
 });
 
+test("generated forms normalize final-letter variants at token end", () => {
+  const result = verbApi.resolveLearnerFacingForms(
+    {
+      id: "test-lehasmich",
+      lemma: "להסמיך",
+      root: ["ס", "מ", "כ"],
+      binyan: "hifil",
+      regularity: "regular",
+      conjugation_mode: "generated",
+      senses: [sense("to thicken", null, true)],
+      forms: {},
+      generated_forms: {},
+      review_status: "approved",
+      notes: "",
+      examples: [],
+      difficulty_level: 2,
+      tags: ["test"],
+      personal_priority: 70,
+    },
+    sense("to thicken", null, true),
+    {}
+  );
+
+  assert.ok(result);
+  assert.equal(result.source, "generated");
+  assert.equal(result.forms.present.masculine_singular.plain, "מסמיך");
+  assert.equal(result.forms.past.third_person_masculine_singular.plain, "הסמיך");
+  assert.equal(result.forms.future.first_person_singular.plain, "אסמיך");
+});
+
 test("authoritative forms always override generated forms", () => {
   const result = verbApi.resolveLearnerFacingForms(
     {

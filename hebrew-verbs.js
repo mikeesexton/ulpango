@@ -85,6 +85,20 @@ const RECOGNIZED_REVIEW_STATUS = new Set(["unreviewed", "approved", "edited", "r
 const STRONG_ROOT_WEAK_LETTERS = new Set(["א", "ה", "ו", "י"]);
 const BLOCKED_GLOSSES = new Set(["to be honest"]);
 const KNOWN_AMBIGUOUS_LEMMAS = new Set(["לצפות"]);
+const HEBREW_FINAL_TO_MEDIAL = Object.freeze({
+  ך: "כ",
+  ם: "מ",
+  ן: "נ",
+  ף: "פ",
+  ץ: "צ",
+});
+const HEBREW_MEDIAL_TO_FINAL = Object.freeze({
+  כ: "ך",
+  מ: "ם",
+  נ: "ן",
+  פ: "ף",
+  צ: "ץ",
+});
 const KNOWN_CURATED_LEMMAS = new Map([
   ["לבוא", { root: ["ב", "ו", "א"], binyan: "paal", difficulty_level: 4 }],
   ["להיות", { root: ["ה", "י", "ה"], binyan: "paal", difficulty_level: 5 }],
@@ -845,7 +859,7 @@ function normalizeFormValue(raw) {
   if (!raw) return null;
 
   if (typeof raw === "string") {
-    const plain = normalizeWhitespace(raw);
+    const plain = normalizeHebrewSofitForms(normalizeWhitespace(raw));
     if (!plain) return null;
     return {
       plain,
@@ -854,9 +868,9 @@ function normalizeFormValue(raw) {
   }
 
   if (typeof raw === "object") {
-    const plain = normalizeWhitespace(raw.plain || raw.valuePlain || raw.he || "");
+    const plain = normalizeHebrewSofitForms(normalizeWhitespace(raw.plain || raw.valuePlain || raw.he || ""));
     if (!plain) return null;
-    const niqqud = normalizeWhitespace(raw.niqqud || raw.valueNiqqud || plain);
+    const niqqud = normalizeHebrewSofitForms(normalizeWhitespace(raw.niqqud || raw.valueNiqqud || plain));
     return {
       plain,
       niqqud: niqqud || plain,
@@ -1282,7 +1296,9 @@ function getFormSlots(includeFormalFuturePlural) {
 
 function normalizeRoot(root) {
   if (!Array.isArray(root) || root.length !== 3) return null;
-  const normalized = root.map((letter) => normalizeWhitespace(String(letter || ""))).filter(Boolean);
+  const normalized = root
+    .map((letter) => toMedialHebrewLetter(normalizeWhitespace(String(letter || ""))))
+    .filter(Boolean);
   if (normalized.length !== 3) return null;
   if (!normalized.every((letter) => /^[א-ת]$/.test(letter))) return null;
   return normalized;
@@ -1308,6 +1324,39 @@ function containsWhitespace(text) {
 
 function normalizeWhitespace(text) {
   return String(text || "").trim().replace(/\s+/g, " ");
+}
+
+function toMedialHebrewLetter(letter) {
+  return HEBREW_FINAL_TO_MEDIAL[letter] || letter;
+}
+
+function isHebrewLetter(char) {
+  return /[א-תךםןףץ]/.test(String(char || ""));
+}
+
+function isNiqqudMark(char) {
+  return /[\u0591-\u05c7]/.test(String(char || ""));
+}
+
+function hasHebrewLetterAhead(chars, idx) {
+  let i = idx + 1;
+  while (i < chars.length && isNiqqudMark(chars[i])) {
+    i += 1;
+  }
+  return i < chars.length && isHebrewLetter(chars[i]);
+}
+
+function normalizeHebrewSofitForms(text) {
+  const chars = String(text || "").normalize("NFC").split("");
+  for (let i = 0; i < chars.length; i += 1) {
+    const char = chars[i];
+    if (!isHebrewLetter(char)) continue;
+
+    const medial = toMedialHebrewLetter(char);
+    const atTokenEnd = !hasHebrewLetterAhead(chars, i);
+    chars[i] = atTokenEnd && HEBREW_MEDIAL_TO_FINAL[medial] ? HEBREW_MEDIAL_TO_FINAL[medial] : medial;
+  }
+  return chars.join("");
 }
 
 function stripNiqqud(text) {

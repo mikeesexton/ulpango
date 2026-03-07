@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ulpango | Advanced Hebrew Trainer</title>
+    <title>Ivritelite | Advanced Hebrew Trainer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Assistant:wght@400;600;700&family=Chivo:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260306b" />
+    <link rel="stylesheet" href="./styles.css?v=20260307b" />
   </head>
   <body data-theme="dark">
     <div class="ambient ambient-a" aria-hidden="true"></div>
@@ -18,154 +18,280 @@
     <div id="bootError" class="boot-error hidden" role="alert"></div>
 
     <main class="app-shell">
-      <header class="topbar card">
-        <div>
-          <p class="eyebrow" data-i18n="top.eyebrow">Browser-Only Hebrew Mastery</p>
-          <h1 data-i18n="app.name">Ulpango</h1>
-          <p class="subhead" data-i18n="top.subhead">
-            Advanced vocabulary trainer inspired by Duolingo, tuned for real-world fluency.
-          </p>
-        </div>
-        <div class="badge-grid">
-          <div class="badge">
-            <span id="statAccuracy">0%</span>
-            <small data-i18n="top.accuracy">Accuracy</small>
-          </div>
-          <div class="badge">
-            <span id="statStreak">0</span>
-            <small data-i18n="top.streak">Current Streak</small>
-          </div>
+      <header class="shell-topbar card">
+        <div class="shell-brand shell-brand-title">
+          <span class="shell-logo" aria-hidden="true">ע</span>
+          <h1 data-i18n="app.name">Ivritelite</h1>
         </div>
       </header>
 
-      <section class="layout-grid">
-        <aside class="controls card">
-          <section class="perf-panel" aria-label="Performance by vocabulary domain">
-            <p class="eyebrow" data-i18n="perf.eyebrow">Performance Snapshot</p>
-            <h3 data-i18n="perf.title">Vocabulary Type</h3>
-            <p class="small-note" data-i18n="perf.note">Since your last progress reset</p>
-            <div id="domainPerformance" class="domain-grid"></div>
-            <div id="modePerformance" class="mode-grid"></div>
-          </section>
+      <section class="shell-body">
+        <nav class="desktop-nav card" aria-label="Primary">
+          <button type="button" class="nav-link" data-route="home">
+            <span class="nav-link-icon" aria-hidden="true">⌂</span>
+            <span data-i18n="nav.home">Home</span>
+          </button>
+          <button type="button" class="nav-link" data-route="review">
+            <span class="nav-link-icon" aria-hidden="true">↺</span>
+            <span data-i18n="nav.review">Review</span>
+          </button>
+          <button type="button" class="nav-link" data-route="settings">
+            <span class="nav-link-icon" aria-hidden="true">⚙</span>
+            <span data-i18n="nav.settings">Settings</span>
+          </button>
+        </nav>
 
-          <section class="lang-panel" aria-label="Interface options">
-            <p class="eyebrow" data-i18n="controls.interface">Interface</p>
-            <div class="interface-row">
-              <button id="langToggle" type="button" class="quiet">עברית</button>
-              <button type="button" id="niqqudToggle" class="quiet" data-i18n="prompt.showNiqqud">Show Nikud</button>
-              <button id="themeToggle" type="button" class="quiet">Light Mode</button>
+        <section class="page-stack">
+          <section id="homeView" class="page-view">
+            <div class="home-workspace">
+              <div class="home-primary">
+                <div id="homeDashboard" class="page-grid home-grid">
+                  <article class="page-card home-lessons-card">
+                    <div class="section-head">
+                      <h2 data-i18n="dashboard.lessonsTitle">Choose Your Lesson</h2>
+                    </div>
+                    <div class="home-lesson-grid">
+                      <button type="button" id="homeLessonBtn" class="game-tile home-game-tile">
+                        <span class="game-tile-icon" aria-hidden="true">א</span>
+                        <span class="game-tile-title" data-i18n="game.translationName">Translation</span>
+                        <span class="game-tile-note" data-i18n="game.translationNote">Fast multiple-choice translation rounds.</span>
+                      </button>
+                      <button type="button" id="homeVerbMatchBtn" class="game-tile home-game-tile">
+                        <span class="game-tile-icon" aria-hidden="true">🔗</span>
+                        <span class="game-tile-title" data-i18n="game.conjugationName">Conjugation</span>
+                        <span class="game-tile-note" data-i18n="game.conjugationNote">Match English forms to Hebrew conjugations.</span>
+                      </button>
+                      <button type="button" id="homeAbbreviationBtn" class="game-tile home-game-tile">
+                        <span class="game-tile-icon" aria-hidden="true">⏩</span>
+                        <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
+                        <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
+                      </button>
+                    </div>
+                  </article>
+                </div>
+
+                <article id="homeLessonStage" class="lesson-shell home-lesson-stage hidden">
+                  <header class="lesson-header">
+                    <div class="lesson-header-main">
+                      <div class="lesson-title-row">
+                        <div>
+                          <h2 id="modeTitle">10-Round Mixed Lesson</h2>
+                        </div>
+                        <button type="button" id="homeBtn" class="quiet home-emoji-btn" aria-label="Back to Home" title="Back to Home">🏠</button>
+                      </div>
+
+                      <div class="status-row">
+                        <span id="lessonStatus">Round: 0/10</span>
+                        <span id="vocabCount" class="hidden"></span>
+                        <span id="sessionScore">Score: 0</span>
+                      </div>
+
+                      <div class="progress-strip" aria-hidden="true">
+                        <span id="lessonProgressFill" class="progress-fill"></span>
+                      </div>
+                    </div>
+                  </header>
+
+                  <article class="prompt-card">
+                    <p class="prompt-label" id="promptLabel">English</p>
+                    <div class="prompt-line">
+                      <h3 class="prompt-text" id="promptText">Press "Start Translation" to begin.</h3>
+                    </div>
+                  </article>
+
+                  <section id="gamePicker" class="game-picker">
+                    <button type="button" id="lessonBtn" class="game-tile">
+                      <span class="game-tile-icon" aria-hidden="true">א</span>
+                      <span class="game-tile-title" data-i18n="game.translationName">Translation</span>
+                      <span class="game-tile-note" data-i18n="game.translationNote">Fast multiple-choice translation rounds.</span>
+                    </button>
+                    <button type="button" id="verbMatchBtn" class="game-tile">
+                      <span class="game-tile-icon" aria-hidden="true">🔗</span>
+                      <span class="game-tile-title" data-i18n="game.conjugationName">Conjugation</span>
+                      <span class="game-tile-note" data-i18n="game.conjugationNote">Match English forms to Hebrew conjugations.</span>
+                    </button>
+                    <button type="button" id="abbreviationBtn" class="game-tile">
+                      <span class="game-tile-icon" aria-hidden="true">⏩</span>
+                      <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
+                      <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
+                    </button>
+                  </section>
+
+                  <div id="choiceContainer" class="choices"></div>
+                  <p id="feedback" class="feedback" aria-live="polite"></p>
+
+                  <div id="stickyLessonActions" class="sticky-lesson-actions">
+                    <button type="button" id="nextBtn" class="accent next-btn hidden" data-i18n="session.next">Next</button>
+                    <button type="button" id="masterVerbBtn" class="quiet master-btn hidden" data-i18n="mastered.moveCurrent">
+                      Move To Mastered
+                    </button>
+                  </div>
+                </article>
+              </div>
+
+              <aside class="home-utility-rail" aria-label="Home tools">
+                <article class="page-card home-controls-card">
+                  <div class="section-head">
+                    <div>
+                      <p class="eyebrow" data-i18n="dashboard.modeEyebrow">Interface</p>
+                      <h2 data-i18n="dashboard.modeTitle">Options</h2>
+                    </div>
+                    <p id="poolMeta" class="section-copy"></p>
+                  </div>
+
+                  <div class="home-option-list">
+                    <button type="button" id="homeLangToggle" class="settings-block home-option-btn">
+                      <span class="settings-label" data-i18n="dashboard.language">Language</span>
+                      <span id="homeLangValue" class="home-option-value">English</span>
+                    </button>
+                    <button type="button" id="homeThemeToggle" class="settings-block home-option-btn">
+                      <span class="settings-label" data-i18n="dashboard.theme">Theme</span>
+                      <span id="homeThemeValue" class="home-option-value">Dark Mode</span>
+                    </button>
+                    <button type="button" id="homeNiqqudToggle" class="settings-block home-option-btn">
+                      <span class="settings-label" data-i18n="dashboard.niqqud">Nikud</span>
+                      <span id="homeNiqqudValue" class="home-option-value">Off</span>
+                    </button>
+                  </div>
+                </article>
+
+                <article class="page-card home-analytics-card">
+                  <div class="section-head">
+                    <div>
+                      <p class="eyebrow" data-i18n="review.analyticsEyebrow">Category Analytics</p>
+                      <h2 data-i18n="review.analyticsTitle">Category Performance</h2>
+                    </div>
+                  </div>
+                  <div id="homeDomainPerformance" class="domain-grid"></div>
+                  <div id="homeModePerformance" class="mode-grid"></div>
+                </article>
+              </aside>
             </div>
           </section>
 
-          <div class="control-actions">
-            <button id="resetProgress" type="button" class="quiet" data-i18n="controls.reset">Reset Progress</button>
-          </div>
-
-          <p class="small-note" id="poolMeta"></p>
-        </aside>
-
-        <section class="game card">
-          <div class="game-head">
-            <div>
-              <h2 id="modeTitle">10-Round Mixed Lesson</h2>
-            </div>
-            <div class="mode-actions">
-              <button type="button" id="homeBtn" class="quiet hidden" data-i18n="session.backHome">Back to Home</button>
-            </div>
-          </div>
-
-          <div class="status-row">
-            <span id="lessonStatus">Round: 0/10</span>
-            <span id="vocabCount" class="hidden"></span>
-            <span id="sessionScore">Score: 0</span>
-          </div>
-
-          <article class="prompt-card">
-            <p class="prompt-label" id="promptLabel">English</p>
-            <div class="prompt-line">
-              <h3 class="prompt-text" id="promptText">Press "Start Translation" to begin.</h3>
-            </div>
-          </article>
-
-          <section id="gamePicker" class="game-picker">
-            <button type="button" id="lessonBtn" class="game-tile">
-              <span class="game-tile-icon" aria-hidden="true">א</span>
-              <span class="game-tile-title" data-i18n="game.translationName">Translation</span>
-              <span class="game-tile-note" data-i18n="game.translationNote">Fast multiple-choice translation rounds.</span>
-            </button>
-            <button type="button" id="verbMatchBtn" class="game-tile">
-              <span class="game-tile-icon" aria-hidden="true">🔗</span>
-              <span class="game-tile-title" data-i18n="game.conjugationName">Conjugation</span>
-              <span class="game-tile-note" data-i18n="game.conjugationNote">Match English forms to Hebrew conjugations.</span>
-            </button>
-            <button type="button" id="abbreviationBtn" class="game-tile">
-              <span class="game-tile-icon" aria-hidden="true">⏩</span>
-              <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
-              <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
-            </button>
+          <section id="resultsView" class="page-view">
+            <article class="page-card results-card">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow" data-i18n="summary.resultsHeader">Session Results</p>
+                  <h2 id="resultsTitle">Translation Complete</h2>
+                </div>
+                <p id="resultsNote" class="section-copy"></p>
+              </div>
+              <div id="resultsSummary" class="results-summary"></div>
+              <div class="results-actions">
+                <button id="resultsContinueBtn" type="button" class="accent" data-i18n="results.continue">Continue</button>
+                <button id="resultsReviewBtn" type="button" class="quiet" data-i18n="dashboard.review">Review Mistakes</button>
+                <button id="resultsHomeBtn" type="button" class="quiet" data-i18n="session.backHome">Back to Home</button>
+              </div>
+            </article>
           </section>
 
-          <div id="choiceContainer" class="choices"></div>
+          <section id="reviewView" class="page-view">
+            <div class="page-grid review-grid">
+              <article class="page-card">
+                <div class="section-head">
+                  <h2 data-i18n="missed.title">Most Missed</h2>
+                </div>
+                <ol id="mostMissedList" class="missed-list"></ol>
+                <p id="mostMissedEmpty" class="small-note" data-i18n="missed.empty">No misses yet.</p>
+              </article>
 
-          <p id="feedback" class="feedback" aria-live="polite"></p>
+              <article class="page-card">
+                <div class="section-head">
+                  <h2 data-i18n="review.analyticsEyebrow">Category Analytics</h2>
+                </div>
+                <div id="reviewDomainPerformance" class="domain-grid"></div>
+                <div id="reviewModePerformance" class="mode-grid"></div>
+              </article>
+            </div>
+          </section>
 
-          <div class="game-actions">
-            <button type="button" id="nextBtn" class="accent next-btn hidden" data-i18n="session.next">Next</button>
-            <button type="button" id="lastAnswerBtn" class="quiet last-answer-btn hidden" data-i18n="session.lastAnswer">
-              Last Answer
-            </button>
-            <button type="button" id="masterVerbBtn" class="quiet master-btn hidden" data-i18n="mastered.moveCurrent">
-              Move To Mastered
-            </button>
-          </div>
+          <section id="settingsView" class="page-view">
+            <article class="page-card settings-card">
+              <div class="section-head">
+                <h2 data-i18n="settings.title">Settings</h2>
+              </div>
+
+              <div class="settings-list">
+                <section class="settings-block">
+                  <p class="settings-label" data-i18n="settings.language">Language</p>
+                  <button id="langToggle" type="button" class="quiet">עברית</button>
+                </section>
+
+                <section class="settings-block">
+                  <p class="settings-label" data-i18n="settings.niqqud">Inline Nikud</p>
+                  <button type="button" id="niqqudToggle" class="quiet" data-i18n="prompt.showNiqqud">Show Nikud</button>
+                </section>
+
+                <section class="settings-block">
+                  <p class="settings-label" data-i18n="settings.theme">Theme</p>
+                  <button id="themeToggle" type="button" class="quiet">Light Mode</button>
+                </section>
+
+                <section class="settings-block danger-block">
+                  <p class="small-note" data-i18n="settings.resetNote">Clear saved spacing, streaks, and review data.</p>
+                  <button id="resetProgress" type="button" class="quiet" data-i18n="controls.reset">Reset Progress</button>
+                </section>
+              </div>
+            </article>
+          </section>
         </section>
-
-        <aside class="leaderboard card">
-          <h2 data-i18n="missed.title">Most Missed</h2>
-          <p class="small-note" data-i18n="missed.note">Words you have missed most often.</p>
-          <ol id="mostMissedList" class="missed-list"></ol>
-          <p id="mostMissedEmpty" class="small-note" data-i18n="missed.empty">No misses yet.</p>
-          <div class="leaderboard-actions">
-            <button type="button" id="masteredOpenBtn" class="quiet" data-i18n="mastered.open">Mastered List</button>
-          </div>
-        </aside>
       </section>
+
+      <nav id="mobileBottomNav" class="mobile-bottom-nav card" aria-label="Primary">
+        <button type="button" class="nav-link mobile-nav-link" data-route="home">
+          <span class="nav-link-icon" aria-hidden="true">⌂</span>
+          <span data-i18n="nav.home">Home</span>
+        </button>
+        <button type="button" class="nav-link mobile-nav-link" data-route="review">
+          <span class="nav-link-icon" aria-hidden="true">↺</span>
+          <span data-i18n="nav.review">Review</span>
+        </button>
+        <button type="button" class="nav-link mobile-nav-link" data-route="settings">
+          <span class="nav-link-icon" aria-hidden="true">⚙</span>
+          <span data-i18n="nav.settings">Settings</span>
+        </button>
+      </nav>
     </main>
 
     <div id="lessonStartIntro" class="second-chance-intro hidden" aria-hidden="true">
       <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Lesson start intro">
-        <p class="second-chance-bubble">בוא נלך!</p>
-        <button id="lessonStartContinue" type="button" class="accent second-chance-btn" data-i18n="session.start">
-          Start Translation
-        </button>
+        <p class="second-chance-bubble" dir="rtl">יאללה!</p>
+        <p class="second-chance-note" data-i18n="session.starting">Starting...</p>
       </div>
     </div>
 
     <div id="secondChanceIntro" class="second-chance-intro hidden" aria-hidden="true">
       <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Second chance intro">
         <p class="second-chance-bubble">בהצלחה!</p>
-        <button id="secondChanceContinue" type="button" class="accent second-chance-btn" data-i18n="session.secondChanceContinue">
-          Start Second Chance
-        </button>
+        <p class="second-chance-note" data-i18n="session.starting">Starting...</p>
       </div>
     </div>
 
     <div id="verbMatchIntro" class="second-chance-intro hidden" aria-hidden="true">
       <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Verb match intro">
-        <p class="second-chance-bubble">יאללה!</p>
-        <button id="verbMatchContinue" type="button" class="accent second-chance-btn" data-i18n="session.verbMatchStart">
-          Start Conjugation
-        </button>
+        <p class="second-chance-bubble" dir="rtl">בוא נלך!</p>
+        <p class="second-chance-note" data-i18n="session.starting">Starting...</p>
       </div>
     </div>
 
     <div id="abbreviationIntro" class="second-chance-intro hidden" aria-hidden="true">
       <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Abbreviation intro">
         <p class="second-chance-bubble" dir="rtl">יאללה בוא נתקתק!</p>
-        <button id="abbreviationContinue" type="button" class="accent second-chance-btn" data-i18n="session.abbreviationStart">
-          Start Abbreviation
-        </button>
+        <p class="second-chance-note" data-i18n="session.starting">Starting...</p>
       </div>
+    </div>
+
+    <div id="leaveSessionConfirm" class="session-leave-modal hidden" aria-hidden="true">
+      <section class="session-leave-dialog card" role="dialog" aria-modal="true" aria-labelledby="leaveSessionTitle">
+        <h3 id="leaveSessionTitle" data-i18n="session.leaveTitle">Leave this game?</h3>
+        <p class="small-note" data-i18n="session.leaveBody">If you go home now, you'll lose your progress so far.</p>
+        <div class="session-leave-actions">
+          <button id="leaveSessionStayBtn" type="button" class="quiet" data-i18n="session.keepPlaying">Keep Playing</button>
+          <button id="leaveSessionConfirmBtn" type="button" class="accent" data-i18n="session.leaveGame">Lose Progress</button>
+        </div>
+      </section>
     </div>
 
     <div id="masteredModal" class="mastered-modal hidden" aria-hidden="true">
@@ -217,9 +343,9 @@
         });
       })();
     </script>
-    <script src="./vocab-data.js?v=20260306b"></script>
-    <script src="./abbreviation-data.js?v=20260306b"></script>
-    <script src="./hebrew-verbs.js?v=20260306b"></script>
-    <script src="./app.js?v=20260306b"></script>
+    <script src="./vocab-data.js?v=20260306d"></script>
+    <script src="./abbreviation-data.js?v=20260306d"></script>
+    <script src="./hebrew-verbs.js?v=20260306d"></script>
+    <script src="./app.js?v=20260307b"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260306b";
+const APP_BUILD = "20260307b";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -169,8 +169,15 @@ const expansionTrackCount = Object.values(expansionTracks).reduce(
 const I18N = {
   en: {
     app: {
-      title: "Ulpango | Advanced Hebrew Trainer",
-      name: "Ulpango",
+      title: "Ivritelite | Advanced Hebrew Trainer",
+      name: "Ivritelite",
+    },
+    nav: {
+      home: "Home",
+      learn: "Learn",
+      review: "Review",
+      settings: "Settings",
+      results: "Results",
     },
     top: {
       eyebrow: "Browser-Only Hebrew Mastery",
@@ -211,10 +218,14 @@ const I18N = {
       abbreviationRestart: "Restart Abbreviation",
       nextVerb: "Next Verb",
       skip: "Skip",
+      submit: "Submit",
       next: "Next",
-      lastAnswer: "Last Answer",
-      backToCurrent: "Back To Current",
       backHome: "Back to Home",
+      leaveTitle: "Leave this game?",
+      leaveBody: "If you go home now, you'll lose your progress so far.",
+      keepPlaying: "Keep Playing",
+      leaveGame: "Lose Progress",
+      starting: "Starting...",
       playAgain: "Play Again",
     },
     home: {
@@ -222,6 +233,36 @@ const I18N = {
       status: "Pick a mode to start.",
       label: "Homepage",
       prompt: "Choose one of the three game modes below.",
+    },
+    dashboard: {
+      eyebrow: "Daily Focus",
+      greeting: "Welcome back",
+      lessonsEyebrow: "Lesson Options",
+      lessonsTitle: "Choose Your Lesson",
+      statsEyebrow: "Stats Summary",
+      statsTitle: "Current Snapshot",
+      user: "Learner",
+      userPlaceholder: "You",
+      learned: "Total Vocab Learned",
+      modeEyebrow: "Interface",
+      modeTitle: "Options",
+      continue: "Continue Lesson",
+      review: "Review Mistakes",
+      settings: "Open Settings",
+      ready: "Ready to jump back in.",
+      active: "Lesson in progress.",
+      idle: "No lesson in progress.",
+      activeMode: "Current focus",
+      currentMode: "Mode",
+      language: "Language",
+      theme: "Theme",
+      niqqud: "Nikud",
+      on: "On",
+      off: "Off",
+    },
+    learn: {
+      idleLabel: "Learn",
+      idlePrompt: "Pick a mode to start a focused session.",
     },
     game: {
       translationName: "Translation",
@@ -242,7 +283,7 @@ const I18N = {
       noVocabTitle: "No vocabulary loaded",
       noVocabBody: "Ask the agent to update vocab-data.js, then reload.",
       masteredOnlyTitle: "Translation pool is empty",
-      masteredOnlyBody: 'All words are mastered for translation. Open "Mastered List" to restore words.',
+      masteredOnlyBody: "All words are currently mastered for translation. Reset progress in Settings to restore them.",
       showNiqqud: "Show Nikud",
       hideNiqqud: "Hide Nikud",
       toEnglish: "Translate to English",
@@ -255,7 +296,6 @@ const I18N = {
       wrong: "Not quite. Correct answer: {answer} ({english})",
       abbreviationCorrect: "Correct: {english} | {expansion}",
       abbreviationWrong: "Not quite. Correct answer: {english} | {expansion}",
-      lastAnswerMissing: "No previous answer yet in this game.",
       lessonDone: "Lesson complete. Final score {score}/{total}.",
       reviewAdded: "Second chance rounds included: {count}.",
       startAnother: 'Press "Start Translation" to run another round.',
@@ -274,6 +314,33 @@ const I18N = {
       matchNote: "Verbs: {verbs} | Best combo: {combo} | Time: {seconds}s",
       abbreviationNote: "Rounds: {rounds} | Time: {seconds}s",
       thumbsText: "Great work",
+    },
+    review: {
+      queueEyebrow: "Revenge Queue",
+      queueTitle: "Review Queue",
+      queueEmpty: "No review items waiting.",
+      pending: "{count} items waiting for revenge mode.",
+      empty: "Nothing is waiting in the current review queue.",
+      analyticsEyebrow: "Category Analytics",
+      analyticsTitle: "Category Performance",
+      missedTitle: "Mistakes To Revenge",
+    },
+    settings: {
+      title: "Settings",
+      note: "Adjust language, theme, and inline nikud.",
+      language: "Language",
+      niqqud: "Inline Nikud",
+      theme: "Theme",
+      resetTitle: "Reset Progress",
+      resetNote: "Clear saved spacing, streaks, and review data.",
+    },
+    results: {
+      continue: "Continue",
+      correct: "Correct",
+      incorrect: "Incorrect",
+      time: "Time",
+      mistakes: "Session Mistakes",
+      noMistakes: "No mistakes in this session.",
     },
     match: {
       prompt: "Match the pairs",
@@ -324,8 +391,15 @@ const I18N = {
   },
   he: {
     app: {
-      title: "אולפנגו | מאמן עברית מתקדם",
-      name: "אולפנגו",
+      title: "עברית עילית | מאמן עברית מתקדם",
+      name: "עברית עילית",
+    },
+    nav: {
+      home: "בית",
+      learn: "לומדים",
+      review: "סקירה",
+      settings: "הגדרות",
+      results: "תוצאות",
     },
     top: {
       eyebrow: "שליטה בעברית בדפדפן בלבד",
@@ -366,10 +440,14 @@ const I18N = {
       abbreviationRestart: "התחל קיצורים מחדש",
       nextVerb: "לפועל הבא",
       skip: "דלג",
+      submit: "שלח",
       next: "הבא",
-      lastAnswer: "תשובה אחרונה",
-      backToCurrent: "חזרה לנוכחי",
       backHome: "חזרה לעמוד הבית",
+      leaveTitle: "לצאת מהמשחק?",
+      leaveBody: "אם תחזור עכשיו לעמוד הבית, תאבד את ההתקדמות שלך עד כה.",
+      keepPlaying: "להמשיך לשחק",
+      leaveGame: "לאבד התקדמות",
+      starting: "מתחיל...",
       playAgain: "שחק שוב",
     },
     home: {
@@ -377,6 +455,36 @@ const I18N = {
       status: "בחר מצב כדי להתחיל.",
       label: "דף הבית",
       prompt: "בחר אחד משלושת מצבי המשחק כאן למטה.",
+    },
+    dashboard: {
+      eyebrow: "פוקוס יומי",
+      greeting: "ברוך שובך",
+      lessonsEyebrow: "אפשרויות שיעור",
+      lessonsTitle: "בחר שיעור",
+      statsEyebrow: "סיכום נתונים",
+      statsTitle: "תמונת מצב נוכחית",
+      user: "לומד",
+      userPlaceholder: "אתה",
+      learned: "סך אוצר מילים שנלמד",
+      modeEyebrow: "ממשק",
+      modeTitle: "אפשרויות",
+      continue: "המשך שיעור",
+      review: "סקור טעויות",
+      settings: "פתח הגדרות",
+      ready: "מוכן לחזור לתרגול.",
+      active: "יש שיעור פעיל.",
+      idle: "אין כרגע שיעור פעיל.",
+      activeMode: "פוקוס נוכחי",
+      currentMode: "מצב",
+      language: "שפה",
+      theme: "ערכת נושא",
+      niqqud: "ניקוד",
+      on: "פועל",
+      off: "כבוי",
+    },
+    learn: {
+      idleLabel: "לומדים",
+      idlePrompt: "בחר מצב כדי להתחיל סשן ממוקד.",
     },
     game: {
       translationName: "תרגום",
@@ -397,7 +505,7 @@ const I18N = {
       noVocabTitle: "אין אוצר מילים טעון",
       noVocabBody: "בקש מהסוכן לעדכן את vocab-data.js ואז טען מחדש.",
       masteredOnlyTitle: "אין מילים זמינות לתרגום",
-      masteredOnlyBody: 'כל המילים תויגו כ"מנוסה". פתח את "רשימת מנוסות" כדי להחזיר מילים לתרגול תרגום.',
+      masteredOnlyBody: "כל המילים כרגע מנוסות לתרגום. אפס את ההתקדמות בהגדרות כדי להחזיר אותן.",
       showNiqqud: "הצג ניקוד",
       hideNiqqud: "הסתר ניקוד",
       toEnglish: "תרגם לאנגלית",
@@ -410,7 +518,6 @@ const I18N = {
       wrong: "לא מדויק. התשובה הנכונה: {answer} ({english})",
       abbreviationCorrect: "נכון: {english} | {expansion}",
       abbreviationWrong: "לא מדויק. התשובה הנכונה: {english} | {expansion}",
-      lastAnswerMissing: "עדיין אין תשובה קודמת במשחק הזה.",
       lessonDone: "השיעור הושלם. ציון סופי {score}/{total}.",
       reviewAdded: "נכללו סבבי הזדמנות שנייה: {count}.",
       startAnother: 'לחץ על "התחל תרגום" כדי להתחיל עוד סבב.',
@@ -429,6 +536,33 @@ const I18N = {
       matchNote: "פעלים: {verbs} | קומבו שיא: {combo} | זמן: {seconds}ש׳",
       abbreviationNote: "סבבים: {rounds} | זמן: {seconds}ש׳",
       thumbsText: "כל הכבוד",
+    },
+    review: {
+      queueEyebrow: "תור נקמה",
+      queueTitle: "תור סקירה",
+      queueEmpty: "אין פריטים שמחכים כרגע.",
+      pending: "{count} פריטים מחכים למצב נקמה.",
+      empty: "אין כרגע פריטים בתור הסקירה הפעיל.",
+      analyticsEyebrow: "ניתוח קטגוריות",
+      analyticsTitle: "ביצועים לפי קטגוריה",
+      missedTitle: "טעויות לנקמה",
+    },
+    settings: {
+      title: "הגדרות",
+      note: "התאם שפה, ערכת נושא וניקוד מובנה.",
+      language: "שפה",
+      niqqud: "ניקוד מובנה",
+      theme: "ערכת נושא",
+      resetTitle: "איפוס התקדמות",
+      resetNote: "נקה שמירות, רצפים ונתוני סקירה.",
+    },
+    results: {
+      continue: "המשך",
+      correct: "נכון",
+      incorrect: "שגוי",
+      time: "זמן",
+      mistakes: "טעויות מהסשן",
+      noMistakes: "לא היו טעויות בסשן הזה.",
     },
     match: {
       prompt: "התאם בין הזוגות",
@@ -483,9 +617,13 @@ const STORAGE_KEYS = {
   progress: "ivriquest-progress-v1",
   language: "ivriquest-language-v1",
   theme: "ivriquest-theme-v1",
+  ui: "ivriquest-ui-v1",
+  session: "ivriquest-session-v1",
 };
 
 const storage = getStorage();
+const restoredUi = loadJson(STORAGE_KEYS.ui, {});
+const restoredSession = loadJson(STORAGE_KEYS.session, null);
 
 const LEITNER_INTERVALS = [
   0,
@@ -497,7 +635,6 @@ const LEITNER_INTERVALS = [
   7 * 24 * 60 * 60 * 1000,
   14 * 24 * 60 * 60 * 1000,
 ];
-
 const LESSON_ROUNDS = 10;
 const ABBREVIATION_ROUNDS = 10;
 const MATCH_MAX_PAIRS = 12;
@@ -600,16 +737,36 @@ const verbFormDeck = typeof verbApi.buildVerbConjugationDeck === "function"
   : [];
 
 const el = {
+  appShell: document.querySelector(".app-shell"),
+  routeButtons: Array.from(document.querySelectorAll("[data-route]")),
+  homeView: document.querySelector("#homeView"),
+  homeDashboard: document.querySelector("#homeDashboard"),
+  homeLessonStage: document.querySelector("#homeLessonStage"),
+  reviewView: document.querySelector("#reviewView"),
+  settingsView: document.querySelector("#settingsView"),
+  resultsView: document.querySelector("#resultsView"),
+  shellRouteSummary: document.querySelector("#shellRouteSummary"),
+  shellRouteChip: document.querySelector("#shellRouteChip"),
+  homeLessonBtn: document.querySelector("#homeLessonBtn"),
+  homeVerbMatchBtn: document.querySelector("#homeVerbMatchBtn"),
+  homeAbbreviationBtn: document.querySelector("#homeAbbreviationBtn"),
   lessonBtn: document.querySelector("#lessonBtn"),
   verbMatchBtn: document.querySelector("#verbMatchBtn"),
   abbreviationBtn: document.querySelector("#abbreviationBtn"),
   homeBtn: document.querySelector("#homeBtn"),
   gamePicker: document.querySelector("#gamePicker"),
   statusRow: document.querySelector(".status-row"),
+  homeLangToggle: document.querySelector("#homeLangToggle"),
+  homeLangValue: document.querySelector("#homeLangValue"),
+  homeThemeToggle: document.querySelector("#homeThemeToggle"),
+  homeThemeValue: document.querySelector("#homeThemeValue"),
+  homeNiqqudToggle: document.querySelector("#homeNiqqudToggle"),
+  homeNiqqudValue: document.querySelector("#homeNiqqudValue"),
+  poolMeta: document.querySelector("#poolMeta"),
   langToggle: document.querySelector("#langToggle"),
   themeToggle: document.querySelector("#themeToggle"),
   lessonStatus: document.querySelector("#lessonStatus"),
-  poolMeta: document.querySelector("#poolMeta"),
+  lessonProgressFill: document.querySelector("#lessonProgressFill"),
   modeTitle: document.querySelector("#modeTitle"),
   promptCard: document.querySelector(".prompt-card"),
   promptLabel: document.querySelector("#promptLabel"),
@@ -620,16 +777,20 @@ const el = {
   vocabCount: document.querySelector("#vocabCount"),
   sessionScore: document.querySelector("#sessionScore"),
   nextBtn: document.querySelector("#nextBtn"),
-  lastAnswerBtn: document.querySelector("#lastAnswerBtn"),
   masterVerbBtn: document.querySelector("#masterVerbBtn"),
   resetProgress: document.querySelector("#resetProgress"),
-  domainPerformance: document.querySelector("#domainPerformance"),
-  modePerformance: document.querySelector("#modePerformance"),
-  statAccuracy: document.querySelector("#statAccuracy"),
-  statStreak: document.querySelector("#statStreak"),
+  homeDomainPerformance: document.querySelector("#homeDomainPerformance"),
+  homeModePerformance: document.querySelector("#homeModePerformance"),
+  reviewDomainPerformance: document.querySelector("#reviewDomainPerformance"),
+  reviewModePerformance: document.querySelector("#reviewModePerformance"),
   mostMissedList: document.querySelector("#mostMissedList"),
   mostMissedEmpty: document.querySelector("#mostMissedEmpty"),
-  masteredOpenBtn: document.querySelector("#masteredOpenBtn"),
+  resultsTitle: document.querySelector("#resultsTitle"),
+  resultsNote: document.querySelector("#resultsNote"),
+  resultsSummary: document.querySelector("#resultsSummary"),
+  resultsContinueBtn: document.querySelector("#resultsContinueBtn"),
+  resultsReviewBtn: document.querySelector("#resultsReviewBtn"),
+  resultsHomeBtn: document.querySelector("#resultsHomeBtn"),
   masteredModal: document.querySelector("#masteredModal"),
   masteredCloseBtn: document.querySelector("#masteredCloseBtn"),
   masteredList: document.querySelector("#masteredList"),
@@ -643,6 +804,9 @@ const el = {
   verbMatchContinue: document.querySelector("#verbMatchContinue"),
   abbreviationIntro: document.querySelector("#abbreviationIntro"),
   abbreviationContinue: document.querySelector("#abbreviationContinue"),
+  leaveSessionConfirm: document.querySelector("#leaveSessionConfirm"),
+  leaveSessionStayBtn: document.querySelector("#leaveSessionStayBtn"),
+  leaveSessionConfirmBtn: document.querySelector("#leaveSessionConfirmBtn"),
   translatable: Array.from(document.querySelectorAll("[data-i18n]")),
 };
 
@@ -650,21 +814,16 @@ const state = {
   progress: loadJson(STORAGE_KEYS.progress, {}),
   language: loadLanguagePreference(),
   theme: loadThemePreference(),
+  route: restoredUi.route || "home",
+  lastPlayedMode: restoredUi.lastPlayedMode || "lesson",
   mode: "home",
   currentQuestion: null,
   sessionScore: 0,
   sessionStreak: 0,
   showNiqqudInline: false,
+  leaveConfirmOpen: false,
   masteredModalOpen: false,
   masteredSelection: new Set(),
-  lastAnswer: {
-    lesson: null,
-    abbreviation: null,
-  },
-  lastAnswerView: {
-    active: false,
-    mode: "",
-  },
   summary: {
     active: false,
     game: "",
@@ -674,6 +833,10 @@ const state = {
     scoreVars: {},
     noteKey: "",
     noteVars: {},
+    correctCount: 0,
+    incorrectCount: 0,
+    elapsedSeconds: 0,
+    mistakes: [],
   },
   lesson: {
     active: false,
@@ -691,6 +854,8 @@ const state = {
     lessonStartIntroActive: false,
     secondChanceIntroActive: false,
     optionHistory: {},
+    wrongAnswers: 0,
+    sessionMistakeIds: [],
   },
   abbreviation: {
     active: false,
@@ -701,6 +866,8 @@ const state = {
     askedEntryIds: [],
     introActive: false,
     currentQuestion: null,
+    wrongAnswers: 0,
+    sessionMistakeIds: [],
   },
   match: {
     active: false,
@@ -731,45 +898,66 @@ const state = {
     sessionTotalPairs: 0,
     currentVerbHadMismatch: false,
     eligibleMasterWordId: "",
+    mismatchCount: 0,
+    sessionMistakeIds: [],
   },
 };
 
+const INTRO_AUTO_ADVANCE_MS = Math.max(0, Number(global.__IVRIQUEST_TEST_CONFIG__?.introAutoAdvanceMs ?? 900));
+let introAutoAdvanceTimerId = null;
+
 if (usingFallbackVocab) {
   // Keep app usable even when vocab-data.js fails to load.
-  console.warn("Ulpango: using fallback vocabulary because vocab-data.js was unavailable.");
+  console.warn("Ivritelite: using fallback vocabulary because vocab-data.js was unavailable.");
 }
 
 if (usingFallbackAbbreviations) {
   // Keep abbreviation mode available even when abbreviation-data.js fails to load.
-  console.warn("Ulpango: using fallback abbreviations because abbreviation-data.js was unavailable.");
+  console.warn("Ivritelite: using fallback abbreviations because abbreviation-data.js was unavailable.");
 }
 
 sanitizeState();
+restoreSessionState(restoredSession);
+state.route = resolveInitialRoute(state.route, { initializing: true });
 applyTheme();
 applyLanguage();
 bindUi();
+resumeActiveTimers();
 renderAll();
 
 function bindUi() {
+  el.routeButtons.forEach((button) => {
+    button.addEventListener("click", () => navigateTo(button.dataset.route || "home"));
+  });
+  el.homeLessonBtn?.addEventListener("click", () => openHomeLesson("lesson"));
+  el.homeVerbMatchBtn?.addEventListener("click", () => openHomeLesson("verbMatch"));
+  el.homeAbbreviationBtn?.addEventListener("click", () => openHomeLesson("abbreviation"));
   el.lessonBtn.addEventListener("click", () => {
+    state.lastPlayedMode = "lesson";
     state.mode = "lesson";
     startLesson();
   });
   el.verbMatchBtn?.addEventListener("click", () => {
+    state.lastPlayedMode = "verbMatch";
     state.mode = "verbMatch";
     startVerbMatch();
   });
   el.abbreviationBtn?.addEventListener("click", () => {
+    state.lastPlayedMode = "abbreviation";
     state.mode = "abbreviation";
     startAbbreviation();
   });
   el.nextBtn.addEventListener("click", () => handleNextAction());
-  el.lastAnswerBtn?.addEventListener("click", () => showLastAnswer());
   el.masterVerbBtn?.addEventListener("click", () => moveEligibleVerbToMastered());
-  el.homeBtn?.addEventListener("click", () => goHome());
+  el.homeBtn?.addEventListener("click", () => requestGoHome());
+  el.homeLangToggle?.addEventListener("click", () => toggleLanguage());
+  el.homeThemeToggle?.addEventListener("click", () => toggleTheme());
+  el.homeNiqqudToggle?.addEventListener("click", () => toggleNiqqudPreference());
   el.langToggle?.addEventListener("click", () => toggleLanguage());
   el.themeToggle?.addEventListener("click", () => toggleTheme());
-  el.masteredOpenBtn?.addEventListener("click", () => openMasteredModal());
+  el.resultsContinueBtn?.addEventListener("click", () => continueFromResults());
+  el.resultsReviewBtn?.addEventListener("click", () => navigateTo("review"));
+  el.resultsHomeBtn?.addEventListener("click", () => goHome());
   el.masteredCloseBtn?.addEventListener("click", () => closeMasteredModal());
   el.masteredRestoreBtn?.addEventListener("click", () => restoreSelectedMasteredWords());
   el.masteredModal?.addEventListener("click", (event) => {
@@ -783,39 +971,14 @@ function bindUi() {
     }
   });
 
-  el.niqqudToggle.addEventListener("click", () => {
-    if (state.mode === "home" || state.mode === "summary") {
-      return;
-    }
-    if (state.mode === "verbMatch") {
-      state.showNiqqudInline = !state.showNiqqudInline;
-      if (state.match.active) {
-        renderVerbMatchCards();
-        renderPromptText();
-      } else {
-        renderVerbMatchIdleState();
-      }
-      return;
-    }
-    if (state.mode === "abbreviation") {
-      state.showNiqqudInline = !state.showNiqqudInline;
-      if (state.abbreviation.active) {
-        renderAbbreviationQuestion();
-      } else {
-        renderAbbreviationIdleState();
-      }
-      return;
-    }
-    state.showNiqqudInline = !state.showNiqqudInline;
-    renderPromptText();
-    if (state.currentQuestion) {
-      renderChoices(state.currentQuestion);
-    }
+  [el.lessonStartIntro, el.secondChanceIntro, el.verbMatchIntro, el.abbreviationIntro].forEach((overlay) => {
+    overlay?.addEventListener("pointerdown", stopIntroOverlayInteraction);
+    overlay?.addEventListener("click", stopIntroOverlayInteraction);
   });
-  el.lessonStartContinue?.addEventListener("click", () => beginLessonFromIntro());
-  el.secondChanceContinue?.addEventListener("click", () => beginSecondChanceFromIntro());
-  el.verbMatchContinue?.addEventListener("click", () => beginVerbMatchFromIntro());
-  el.abbreviationContinue?.addEventListener("click", () => beginAbbreviationFromIntro());
+
+  el.niqqudToggle?.addEventListener("click", () => toggleNiqqudPreference());
+  el.leaveSessionStayBtn?.addEventListener("click", () => closeLeaveSessionConfirm());
+  el.leaveSessionConfirmBtn?.addEventListener("click", () => confirmLeaveSession());
 
   el.resetProgress.addEventListener("click", () => {
     const ok = window.confirm(t("controls.resetConfirm"));
@@ -836,6 +999,118 @@ function bindUi() {
   });
 }
 
+function stopIntroOverlayInteraction(event) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+function openHomeLesson(mode) {
+  if (isModeSessionActive(mode)) {
+    state.mode = mode;
+    navigateTo("home");
+    return;
+  }
+
+  if (mode === "verbMatch") {
+    state.lastPlayedMode = "verbMatch";
+    state.mode = "verbMatch";
+    startVerbMatch();
+    return;
+  }
+
+  if (mode === "abbreviation") {
+    state.lastPlayedMode = "abbreviation";
+    state.mode = "abbreviation";
+    startAbbreviation();
+    return;
+  }
+
+  state.lastPlayedMode = "lesson";
+  state.mode = "lesson";
+  startLesson();
+}
+
+function continueFromResults() {
+  if (state.summary.game === "verbMatch") {
+    startVerbMatch();
+    return;
+  }
+  if (state.summary.game === "abbreviation") {
+    startAbbreviation();
+    return;
+  }
+  startLesson();
+}
+
+function hasActiveLearnSession() {
+  return Boolean(
+    state.lesson.active ||
+      state.lesson.lessonStartIntroActive ||
+      state.lesson.secondChanceIntroActive ||
+      state.abbreviation.active ||
+      state.abbreviation.introActive ||
+      state.match.active ||
+      state.match.verbIntroActive
+  );
+}
+
+function isModeSessionActive(mode) {
+  if (mode === "verbMatch") {
+    return Boolean(state.match.active || state.match.verbIntroActive);
+  }
+  if (mode === "abbreviation") {
+    return Boolean(state.abbreviation.active || state.abbreviation.introActive);
+  }
+  return Boolean(state.lesson.active || state.lesson.lessonStartIntroActive || state.lesson.secondChanceIntroActive);
+}
+
+function resolveInitialRoute(candidate, options = {}) {
+  const valid = new Set(["home", "review", "settings", "results"]);
+  if (state.summary.active) {
+    return valid.has(candidate) ? candidate : "results";
+  }
+  if (hasActiveLearnSession()) {
+    return "home";
+  }
+  return valid.has(candidate) && candidate !== "results" ? candidate : "home";
+}
+
+function navigateTo(route) {
+  state.route = resolveInitialRoute(route);
+  renderAll();
+}
+
+function resumeActiveTimers() {
+  restorePendingOverlays();
+
+  if (state.lesson.active && state.lesson.startMs && !state.lesson.lessonStartIntroActive && !state.lesson.secondChanceIntroActive) {
+    state.lesson.elapsedSeconds = Math.max(0, Math.floor((Date.now() - state.lesson.startMs) / 1000));
+    startLessonTimer();
+  }
+  if (state.abbreviation.active && state.abbreviation.startMs && !state.abbreviation.introActive) {
+    state.abbreviation.elapsedSeconds = Math.max(0, Math.floor((Date.now() - state.abbreviation.startMs) / 1000));
+    startAbbreviationTimer();
+  }
+  if (state.match.active && state.match.startMs && !state.match.verbIntroActive) {
+    state.match.elapsedSeconds = Math.max(0, Math.floor((Date.now() - state.match.startMs) / 1000));
+    startVerbMatchTimer();
+  }
+
+  updateUiLockState();
+}
+
+function restorePendingOverlays() {
+  if (state.lesson.secondChanceIntroActive) {
+    playSecondChanceIntro();
+  } else if (state.lesson.lessonStartIntroActive) {
+    playLessonStartIntro();
+  } else if (state.abbreviation.introActive) {
+    playAbbreviationIntro();
+  } else if (state.match.verbIntroActive) {
+    playVerbMatchIntro();
+  }
+}
+
 function sanitizeState() {
   // Remove legacy keys from older versions.
   if (storage) {
@@ -846,6 +1121,96 @@ function sanitizeState() {
       // ignore
     }
   }
+}
+
+function clearIntroAutoAdvance() {
+  if (!introAutoAdvanceTimerId) return;
+  global.clearTimeout(introAutoAdvanceTimerId);
+  introAutoAdvanceTimerId = null;
+}
+
+function scheduleIntroAutoAdvance(action) {
+  clearIntroAutoAdvance();
+  if (typeof action !== "function") return;
+
+  introAutoAdvanceTimerId = global.setTimeout(() => {
+    introAutoAdvanceTimerId = null;
+    action();
+  }, INTRO_AUTO_ADVANCE_MS);
+}
+
+function isUiLocked() {
+  return Boolean(
+    state.lesson.lessonStartIntroActive ||
+      state.lesson.secondChanceIntroActive ||
+      state.abbreviation.introActive ||
+      state.match.verbIntroActive ||
+      state.leaveConfirmOpen ||
+      state.masteredModalOpen
+  );
+}
+
+function updateUiLockState() {
+  const locked = isUiLocked();
+  const learnSessionActive = hasActiveLearnSession();
+  global.document.body?.setAttribute("data-ui-locked", locked ? "true" : "false");
+  global.document.body?.setAttribute("data-learn-session", learnSessionActive ? "true" : "false");
+
+  el.routeButtons.forEach((button) => {
+    button.disabled = learnSessionActive;
+    if (learnSessionActive) {
+      button.setAttribute("aria-disabled", "true");
+      button.setAttribute("tabindex", "-1");
+    } else {
+      button.removeAttribute("aria-disabled");
+      button.removeAttribute("tabindex");
+    }
+  });
+
+  if (!el.appShell) return;
+  if (locked) {
+    el.appShell.setAttribute("inert", "");
+  } else {
+    el.appShell.removeAttribute("inert");
+  }
+}
+
+function showBlockingOverlay(node) {
+  if (!node) {
+    updateUiLockState();
+    return;
+  }
+  node.classList.remove("hidden");
+  node.classList.add("active");
+  node.setAttribute("aria-hidden", "false");
+  updateUiLockState();
+}
+
+function hideBlockingOverlay(node) {
+  if (!node) {
+    updateUiLockState();
+    return;
+  }
+  node.classList.remove("active");
+  node.classList.add("hidden");
+  node.setAttribute("aria-hidden", "true");
+  updateUiLockState();
+}
+
+function getVisibleVerbMatchRows() {
+  const viewportWidth = Number(global.innerWidth || 0);
+  if (viewportWidth > 0 && viewportWidth <= 767) {
+    return 5;
+  }
+  return MATCH_VISIBLE_ROWS;
+}
+
+function renderHomeButton() {
+  if (!el.homeBtn) return;
+  const label = t("session.backHome");
+  el.homeBtn.textContent = "🏠";
+  el.homeBtn.setAttribute("aria-label", label);
+  el.homeBtn.setAttribute("title", label);
 }
 
 function applyLanguage() {
@@ -863,6 +1228,7 @@ function applyLanguage() {
     el.langToggle.textContent = state.language === "en" ? "עברית" : "English";
   }
 
+  renderHomeButton();
   renderThemeToggle();
 }
 
@@ -884,6 +1250,12 @@ function toggleTheme() {
   state.theme = state.theme === "light" ? "dark" : "light";
   saveThemePreference(state.theme);
   applyTheme();
+  renderAll();
+}
+
+function toggleNiqqudPreference() {
+  state.showNiqqudInline = !state.showNiqqudInline;
+  renderAll();
 }
 
 function getLocaleBundle() {
@@ -900,39 +1272,6 @@ function t(key, vars = {}) {
   const template = typeof fromSelected === "string" ? fromSelected : typeof fromEnglish === "string" ? fromEnglish : key;
 
   return template.replace(/\{(\w+)\}/g, (_, token) => String(vars[token] != null ? vars[token] : ""));
-}
-
-function isViewingLastAnswer(mode = state.mode) {
-  return state.lastAnswerView.active && state.lastAnswerView.mode === mode;
-}
-
-function clearLastAnswerView() {
-  state.lastAnswerView.active = false;
-  state.lastAnswerView.mode = "";
-}
-
-function getDisplayedLessonQuestion() {
-  if (isViewingLastAnswer("lesson") && state.lastAnswer.lesson) {
-    return state.lastAnswer.lesson;
-  }
-  return state.currentQuestion;
-}
-
-function getDisplayedAbbreviationQuestion() {
-  if (isViewingLastAnswer("abbreviation") && state.lastAnswer.abbreviation) {
-    return state.lastAnswer.abbreviation;
-  }
-  return state.abbreviation.currentQuestion;
-}
-
-function isFirstLessonQuestion() {
-  if (!state.lesson.active || state.lesson.inReview) return false;
-  return state.lesson.currentRound <= 1;
-}
-
-function isFirstAbbreviationQuestion() {
-  if (!state.abbreviation.active) return false;
-  return state.abbreviation.currentRound <= 1;
 }
 
 function renderNiqqudToggle() {
@@ -957,74 +1296,101 @@ function setPromptCardVisibility(visible) {
 
 function renderAll() {
   applyLanguage();
-  renderSessionHeader();
+  state.route = resolveInitialRoute(state.route);
+  renderShellChrome();
   renderPoolMeta();
   renderDomainPerformance();
   renderMostMissed();
   renderMasteredModal();
-  if (state.mode === "home") {
-    renderHomeState();
+  renderHomeState();
+  renderReviewState();
+  renderSettingsState();
+  renderSummaryState();
+  renderLearnState();
+  renderRouteVisibility();
+  updateUiLockState();
+  persistUiState();
+  persistSessionState();
+}
+
+function renderRouteVisibility() {
+  el.homeView?.classList.toggle("active", state.route === "home");
+  el.reviewView?.classList.toggle("active", state.route === "review");
+  el.settingsView?.classList.toggle("active", state.route === "settings");
+  el.resultsView?.classList.toggle("active", state.route === "results" && state.summary.active);
+}
+
+function renderShellChrome() {
+  const routeKey = state.route === "results" ? "nav.results" : `nav.${state.route}`;
+  if (el.shellRouteChip) {
+    el.shellRouteChip.textContent = t(routeKey);
+  }
+  if (el.shellRouteSummary) {
+    if (state.route === "home") {
+      el.shellRouteSummary.textContent = hasActiveLearnSession() ? t("dashboard.active") : t("dashboard.ready");
+    } else {
+      el.shellRouteSummary.textContent = state.summary.active && state.route === "results" ? t("summary.thumbsText") : t(routeKey);
+    }
+  }
+
+  el.routeButtons.forEach((button) => {
+    const buttonRoute = button.dataset.route || "home";
+    button.classList.toggle("active", buttonRoute === state.route);
+  });
+}
+
+function renderLearnState() {
+  if (state.summary.active) {
     return;
   }
-  if (state.mode === "summary" && state.summary.active) {
-    renderSummaryState();
-    return;
-  }
+
   if (state.mode === "verbMatch") {
-    if (state.match.active) {
+    if (state.match.active && state.match.currentVerb) {
       renderVerbMatchRound();
     } else {
       renderVerbMatchIdleState();
     }
     return;
   }
+
   if (state.mode === "abbreviation") {
-    if (state.abbreviation.active) {
+    if (state.abbreviation.active && state.abbreviation.currentQuestion) {
       renderAbbreviationQuestion();
     } else {
       renderAbbreviationIdleState();
     }
     return;
   }
-  if (state.lesson.active) {
-    renderQuestion();
-  } else {
-    renderHomeState();
-  }
-}
 
-function renderSessionHeader() {
-  const attempts = Object.values(state.progress).reduce((sum, rec) => sum + (rec.attempts || 0), 0);
-  const correct = Object.values(state.progress).reduce((sum, rec) => sum + (rec.correct || 0), 0);
-
-  const accuracy = attempts ? Math.round((correct / attempts) * 100) : 0;
-  el.statAccuracy.textContent = `${accuracy}%`;
-  el.statStreak.textContent = String(state.sessionStreak);
-  el.sessionScore.textContent = t("session.score", { score: state.sessionScore });
-  el.homeBtn?.classList.toggle("hidden", state.mode === "home");
-  el.statusRow?.classList.toggle("hidden", state.mode === "home");
-  el.vocabCount.textContent = "";
-  el.vocabCount.classList.add("hidden");
-  el.masterVerbBtn?.classList.add("hidden");
-  if (el.lastAnswerBtn) {
-    el.lastAnswerBtn.disabled = true;
-    el.lastAnswerBtn.textContent = t("session.lastAnswer");
-    el.lastAnswerBtn.classList.add("hidden");
-  }
-
-  if (state.mode === "home") {
-    el.modeTitle.textContent = t("home.title");
-    el.lessonStatus.textContent = "";
-    el.sessionScore.textContent = "";
-    el.nextBtn.classList.add("hidden");
+  if (state.lesson.active || state.mode === "lesson") {
+    if (state.lesson.active && state.currentQuestion) {
+      renderQuestion();
+    } else {
+      renderIdleLessonState();
+    }
     return;
   }
 
+  renderIdleLessonState();
+}
+
+function renderSessionHeader() {
+  if (el.sessionScore) {
+    el.sessionScore.textContent = t("session.score", { score: state.sessionScore });
+  }
+  el.homeBtn?.classList.toggle("hidden", false);
+  el.statusRow?.classList.toggle("hidden", false);
+  el.vocabCount.textContent = "";
+  el.vocabCount.classList.add("hidden");
+  el.masterVerbBtn?.classList.add("hidden");
+  updateLessonProgress(0);
+
   if (state.mode === "summary" && state.summary.active) {
-    el.modeTitle.textContent = t("summary.resultsHeader");
+    el.modeTitle.textContent = t(state.summary.titleKey || "summary.resultsHeader", state.summary.titleVars);
     el.lessonStatus.textContent = "";
-    el.sessionScore.textContent = t("summary.thumbsText");
+    el.sessionScore.textContent = "";
     el.nextBtn.classList.add("hidden");
+    persistSessionState();
     return;
   }
 
@@ -1046,6 +1412,7 @@ function renderSessionHeader() {
     el.vocabCount.classList.remove("hidden");
     el.vocabCount.textContent = t("match.timer", { seconds: state.match.elapsedSeconds });
     el.sessionScore.textContent = t("match.combo", { count: state.match.bestCombo });
+    updateLessonProgress(state.match.totalPairs ? Math.round((state.match.matchedCount / state.match.totalPairs) * 100) : 0);
 
     const canAdvanceVerb = state.match.active && state.match.totalPairs > 0 && state.match.matchedCount >= state.match.totalPairs;
     el.nextBtn.disabled = !canAdvanceVerb;
@@ -1060,16 +1427,13 @@ function renderSessionHeader() {
       el.masterVerbBtn.textContent = t("mastered.moveCurrent");
       el.masterVerbBtn.classList.toggle("hidden", !showMasterAction);
     }
+    persistSessionState();
     return;
   }
 
   if (state.mode === "abbreviation") {
     const targetRounds = getAbbreviationRoundTarget() || ABBREVIATION_ROUNDS;
-    const isViewing = isViewingLastAnswer("abbreviation");
-    const displayedQuestion = getDisplayedAbbreviationQuestion();
-    const hasQuestion = state.abbreviation.active && Boolean(displayedQuestion);
-    const canAdvance = !isViewing && hasQuestion && Boolean(state.abbreviation.currentQuestion?.locked);
-    const canReviewLastAnswer = hasQuestion && Boolean(state.lastAnswer.abbreviation) && !isFirstAbbreviationQuestion();
+    const hasQuestion = state.abbreviation.active && Boolean(state.abbreviation.currentQuestion);
     el.modeTitle.textContent = state.abbreviation.active ? t("session.abbreviationTitle") : t("session.abbreviationStart");
     el.lessonStatus.textContent = t("session.round", {
       current: state.abbreviation.currentRound,
@@ -1077,23 +1441,16 @@ function renderSessionHeader() {
     });
     el.vocabCount.classList.remove("hidden");
     el.vocabCount.textContent = t("session.timer", { seconds: state.abbreviation.elapsedSeconds });
-    el.nextBtn.disabled = !canAdvance;
-    el.nextBtn.textContent = t("session.next");
-    el.nextBtn.classList.toggle("hidden", !hasQuestion || isViewing);
-    if (el.lastAnswerBtn) {
-      el.lastAnswerBtn.disabled = !canReviewLastAnswer;
-      el.lastAnswerBtn.textContent = isViewing ? t("session.backToCurrent") : t("session.lastAnswer");
-      el.lastAnswerBtn.classList.toggle("hidden", !canReviewLastAnswer);
-    }
+    updateLessonProgress(targetRounds ? Math.round((state.abbreviation.currentRound / targetRounds) * 100) : 0);
+    el.nextBtn.disabled = questionNeedsSelection(state.abbreviation.currentQuestion);
+    el.nextBtn.textContent = hasQuestion && !state.abbreviation.currentQuestion?.locked ? t("session.submit") : t("session.next");
+    el.nextBtn.classList.toggle("hidden", !hasQuestion);
+    persistSessionState();
     return;
   }
 
   const inSecondChance = Boolean(state.lesson.inReview);
-  const isViewing = isViewingLastAnswer("lesson");
-  const displayedQuestion = getDisplayedLessonQuestion();
-  const hasQuestion = state.lesson.active && Boolean(displayedQuestion);
-  const canAdvance = !isViewing && hasQuestion && Boolean(state.currentQuestion?.locked);
-  const canReviewLastAnswer = hasQuestion && Boolean(state.lastAnswer.lesson) && !isFirstLessonQuestion();
+  const hasQuestion = state.lesson.active && Boolean(state.currentQuestion);
   el.modeTitle.textContent = inSecondChance ? t("session.secondChanceTitle") : t("session.mixedTitle", { rounds: LESSON_ROUNDS });
   el.lessonStatus.textContent = inSecondChance
     ? t("session.secondChanceProgress", {
@@ -1106,19 +1463,78 @@ function renderSessionHeader() {
       });
   el.vocabCount.classList.remove("hidden");
   el.vocabCount.textContent = t("session.timer", { seconds: state.lesson.elapsedSeconds });
-  el.nextBtn.disabled = !canAdvance;
-  el.nextBtn.textContent = t("session.next");
-  el.nextBtn.classList.toggle("hidden", !hasQuestion || isViewing);
-  if (el.lastAnswerBtn) {
-    el.lastAnswerBtn.disabled = !canReviewLastAnswer;
-    el.lastAnswerBtn.textContent = isViewing ? t("session.backToCurrent") : t("session.lastAnswer");
-    el.lastAnswerBtn.classList.toggle("hidden", !canReviewLastAnswer);
-  }
+  updateLessonProgress(inSecondChance ? 100 : Math.round((state.lesson.currentRound / LESSON_ROUNDS) * 100));
+  el.nextBtn.disabled = questionNeedsSelection(state.currentQuestion);
+  el.nextBtn.textContent = hasQuestion && !state.currentQuestion?.locked ? t("session.submit") : t("session.next");
+  el.nextBtn.classList.toggle("hidden", !hasQuestion);
+  persistSessionState();
+}
+
+function questionNeedsSelection(question) {
+  if (!question) return true;
+  if (question.locked) return false;
+  return !question.selectedOptionId;
+}
+
+function updateLessonProgress(percent) {
+  if (!el.lessonProgressFill) return;
+  el.lessonProgressFill.style.width = `${Math.max(0, Math.min(100, percent || 0))}%`;
+}
+
+function getMostMissedRanked() {
+  const wordsById = new Map(getAllVocabulary().map((word) => [word.id, word]));
+  return Object.entries(state.progress)
+    .map(([wordId, rec]) => {
+      const missed = getMissCountForRecord(rec);
+      return { wordId, missed };
+    })
+    .filter((item) => item.missed > 0 && wordsById.has(item.wordId))
+    .sort((a, b) => {
+      if (b.missed !== a.missed) return b.missed - a.missed;
+      const aWord = wordsById.get(a.wordId);
+      const bWord = wordsById.get(b.wordId);
+      return String(aWord?.en || "").localeCompare(String(bWord?.en || ""));
+    })
+    .slice(0, 10);
+}
+
+function buildLessonMistakeSummary() {
+  const lookup = new Map(getAllVocabulary().map((word) => [word.id, word]));
+  return state.lesson.sessionMistakeIds
+    .map((wordId) => lookup.get(wordId))
+    .filter(Boolean)
+    .map((word) => ({
+      primary: getHebrewText(word, true),
+      secondary: word.en,
+    }));
+}
+
+function buildAbbreviationMistakeSummary() {
+  const lookup = new Map(abbreviationDeck.map((entry) => [entry.id, entry]));
+  return state.abbreviation.sessionMistakeIds
+    .map((entryId) => lookup.get(entryId))
+    .filter(Boolean)
+    .map((entry) => ({
+      primary: entry.abbr,
+      secondary: `${entry.english} | ${entry.expansionHe}`,
+    }));
+}
+
+function buildVerbMatchMistakeSummary() {
+  const lookup = new Map(getAllVocabulary().map((word) => [word.id, word]));
+  return state.match.sessionMistakeIds
+    .map((wordId) => lookup.get(wordId))
+    .filter(Boolean)
+    .map((word) => ({
+      primary: getHebrewText(word, true),
+      secondary: word.en,
+    }));
 }
 
 function renderPoolMeta() {
   const pool = getSelectedPool();
   const all = getAllVocabulary();
+  if (!el.poolMeta) return;
   el.poolMeta.textContent = t("pool.summary", { pool: pool.length, total: all.length });
 
   if (!storage) {
@@ -1131,21 +1547,9 @@ function renderPoolMeta() {
 }
 
 function renderDomainPerformance() {
-  if (!el.domainPerformance) return;
-
   const stats = calculateDomainStats();
-  el.domainPerformance.innerHTML = "";
-
-  stats.forEach((domain) => {
-    appendPerformanceCard(el.domainPerformance, {
-      emoji: domain.emoji,
-      title: t(`domain.${domain.id}`),
-      attempts: domain.attempts,
-      correct: domain.correct,
-      wrong: domain.wrong,
-    });
-  });
-
+  renderPerformanceCardsInto(el.homeDomainPerformance, stats);
+  renderPerformanceCardsInto(el.reviewDomainPerformance, stats);
   renderGameModePerformance();
 }
 
@@ -1180,11 +1584,7 @@ function calculateDomainStats() {
 }
 
 function renderGameModePerformance() {
-  if (!el.modePerformance) return;
-
   const stats = calculateGameModeStats();
-  el.modePerformance.innerHTML = "";
-
   const cards = [
     {
       emoji: "🔗",
@@ -1202,7 +1602,22 @@ function renderGameModePerformance() {
     },
   ];
 
-  cards.forEach((card) => appendPerformanceCard(el.modePerformance, card));
+  renderPerformanceCardsInto(el.homeModePerformance, cards);
+  renderPerformanceCardsInto(el.reviewModePerformance, cards);
+}
+
+function renderPerformanceCardsInto(container, cards) {
+  if (!container) return;
+  container.innerHTML = "";
+  cards.forEach((card) => {
+    appendPerformanceCard(container, {
+      emoji: card.emoji,
+      title: card.title || t(`domain.${card.id}`),
+      attempts: card.attempts,
+      correct: card.correct,
+      wrong: card.wrong,
+    });
+  });
 }
 
 function calculateGameModeStats() {
@@ -1287,12 +1702,40 @@ function clearSummaryState() {
   state.summary.scoreVars = {};
   state.summary.noteKey = "";
   state.summary.noteVars = {};
+  state.summary.correctCount = 0;
+  state.summary.incorrectCount = 0;
+  state.summary.elapsedSeconds = 0;
+  state.summary.mistakes = [];
+}
+
+function openLeaveSessionConfirm() {
+  state.leaveConfirmOpen = true;
+  showBlockingOverlay(el.leaveSessionConfirm);
+}
+
+function closeLeaveSessionConfirm() {
+  state.leaveConfirmOpen = false;
+  hideBlockingOverlay(el.leaveSessionConfirm);
+}
+
+function confirmLeaveSession() {
+  closeLeaveSessionConfirm();
+  goHome();
+}
+
+function requestGoHome() {
+  if (!hasActiveLearnSession()) {
+    goHome();
+    return;
+  }
+  openLeaveSessionConfirm();
 }
 
 function goHome() {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
+  closeLeaveSessionConfirm();
   closeMasteredModal();
   clearLessonStartIntro();
   clearSecondChanceIntro();
@@ -1304,33 +1747,27 @@ function goHome() {
   state.lesson.active = false;
   state.lesson.inReview = false;
   state.currentQuestion = null;
-  state.lastAnswer.lesson = null;
-  state.lastAnswer.abbreviation = null;
-  clearLastAnswerView();
   clearSummaryState();
   state.mode = "home";
+  state.route = "home";
   clearFeedback();
+  clearPersistedSession();
   renderAll();
 }
 
 function renderHomeState() {
-  state.mode = "home";
-  clearSummaryState();
-  setGamePickerVisibility(true);
-  setPromptCardVisibility(true);
-  el.choiceContainer.classList.remove("summary-grid");
-  el.promptLabel.textContent = t("home.label");
-  el.promptText.classList.remove("hebrew");
-  el.promptText.textContent = t("home.prompt");
-  el.choiceContainer.innerHTML = "";
-  el.choiceContainer.classList.remove("match-grid");
-  renderNiqqudToggle();
+  const showLesson = hasActiveLearnSession();
+  el.homeDashboard?.classList.toggle("hidden", showLesson);
+  el.homeLessonStage?.classList.toggle("hidden", !showLesson);
+  renderHomeLessonButtons();
+  renderHomeOptions();
 }
 
 function showSessionSummary(config = {}) {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
+  closeLeaveSessionConfirm();
   clearLessonStartIntro();
   clearSecondChanceIntro();
   clearVerbMatchIntro();
@@ -1341,7 +1778,6 @@ function showSessionSummary(config = {}) {
   state.match.active = false;
   state.abbreviation.active = false;
   state.abbreviation.currentQuestion = null;
-  clearLastAnswerView();
   state.mode = "summary";
   state.summary.active = true;
   state.summary.game = String(config.game || "");
@@ -1351,97 +1787,166 @@ function showSessionSummary(config = {}) {
   state.summary.scoreVars = config.scoreVars || {};
   state.summary.noteKey = String(config.noteKey || "");
   state.summary.noteVars = config.noteVars || {};
+  state.summary.correctCount = Math.max(0, Number(config.correctCount || 0));
+  state.summary.incorrectCount = Math.max(0, Number(config.incorrectCount || 0));
+  state.summary.elapsedSeconds = Math.max(0, Number(config.elapsedSeconds || 0));
+  state.summary.mistakes = Array.isArray(config.mistakes) ? config.mistakes : [];
+  state.route = "results";
   clearFeedback();
   renderAll();
 }
 
 function renderSummaryState() {
-  setGamePickerVisibility(false);
-  setPromptCardVisibility(false);
-  el.promptLabel.textContent = "";
-  el.promptText.classList.remove("hebrew");
-  el.promptText.textContent = "";
-  el.choiceContainer.innerHTML = "";
-  el.choiceContainer.classList.remove("match-grid");
-  el.choiceContainer.classList.add("summary-grid");
-
-  const titleText = state.summary.titleKey ? t(state.summary.titleKey, state.summary.titleVars) : t("home.title");
-  const scoreText = state.summary.scoreKey ? t(state.summary.scoreKey, state.summary.scoreVars) : "";
+  if (!el.resultsSummary || !el.resultsTitle || !el.resultsNote) return;
+  const titleText = state.summary.titleKey ? t(state.summary.titleKey, state.summary.titleVars) : t("summary.resultsHeader");
   const noteText = state.summary.noteKey ? t(state.summary.noteKey, state.summary.noteVars) : t("summary.thumbsText");
+  const scoreText = state.summary.scoreKey ? t(state.summary.scoreKey, state.summary.scoreVars) : "";
 
-  const card = document.createElement("article");
-  card.className = "session-summary";
+  el.resultsTitle.textContent = titleText;
+  el.resultsNote.textContent = noteText;
+  el.resultsSummary.innerHTML = "";
 
-  const icon = document.createElement("p");
-  icon.className = "summary-icon";
-  icon.textContent = "👍";
+  const metrics = document.createElement("div");
+  metrics.className = "results-metrics";
+  [
+    { label: scoreText || t("summary.resultsHeader"), value: scoreText || t("summary.thumbsText") },
+    { label: t("results.correct"), value: String(state.summary.correctCount) },
+    { label: t("results.incorrect"), value: String(state.summary.incorrectCount) },
+    { label: t("results.time"), value: t("session.timer", { seconds: state.summary.elapsedSeconds }) },
+  ].forEach((metric) => metrics.append(createResultsMetric(metric.label, metric.value)));
 
-  const title = document.createElement("p");
-  title.className = "summary-title";
-  title.textContent = titleText;
+  const mistakesWrap = document.createElement("div");
+  mistakesWrap.className = "results-mistakes";
+  const heading = document.createElement("p");
+  heading.className = "eyebrow";
+  heading.textContent = t("results.mistakes");
+  mistakesWrap.append(heading);
 
-  const score = document.createElement("p");
-  score.className = "summary-score";
-  score.textContent = scoreText;
+  if (!state.summary.mistakes.length) {
+    const empty = document.createElement("p");
+    empty.className = "small-note";
+    empty.textContent = t("results.noMistakes");
+    mistakesWrap.append(empty);
+  } else {
+    state.summary.mistakes.forEach((item) => {
+      mistakesWrap.append(
+        createCompactRow({
+          title: item.primary || item.title || "",
+          note: item.secondary || item.note || "",
+        })
+      );
+    });
+  }
 
-  const note = document.createElement("p");
-  note.className = "summary-note";
-  note.textContent = noteText;
+  el.resultsSummary.append(metrics, mistakesWrap);
+  if (el.resultsReviewBtn) {
+    el.resultsReviewBtn.disabled = !state.summary.mistakes.length;
+  }
+}
 
-  const actions = document.createElement("div");
-  actions.className = "summary-actions";
+function renderReviewState() {
+}
 
-  const replayBtn = document.createElement("button");
-  replayBtn.type = "button";
-  replayBtn.className = "accent";
-  replayBtn.textContent = t("session.playAgain");
-  replayBtn.addEventListener("click", () => {
-    if (state.summary.game === "verbMatch") {
-      startVerbMatch();
-      return;
-    }
-    if (state.summary.game === "abbreviation") {
-      startAbbreviation();
-      return;
-    }
-    startLesson();
-  });
-
-  const backBtn = document.createElement("button");
-  backBtn.type = "button";
-  backBtn.className = "quiet";
-  backBtn.textContent = t("session.backHome");
-  backBtn.addEventListener("click", () => goHome());
-
-  actions.append(replayBtn, backBtn);
-  card.append(icon, title, score, note, actions);
-  el.choiceContainer.append(card);
+function renderSettingsState() {
+  renderThemeToggle();
   renderNiqqudToggle();
 }
 
+function createCompactRow({ title, note }) {
+  const row = document.createElement("article");
+  row.className = "compact-row";
+
+  const titleNode = document.createElement("p");
+  titleNode.className = "compact-row-title";
+  titleNode.textContent = title;
+
+  const noteNode = document.createElement("p");
+  noteNode.className = "compact-row-note";
+  noteNode.textContent = note;
+
+  row.append(titleNode, noteNode);
+  return row;
+}
+
+function createResultsMetric(label, value) {
+  const card = document.createElement("article");
+  card.className = "results-metric";
+
+  const labelNode = document.createElement("p");
+  labelNode.className = "results-metric-label";
+  labelNode.textContent = label;
+
+  const valueNode = document.createElement("p");
+  valueNode.className = "results-metric-value";
+  valueNode.textContent = value;
+
+  card.append(labelNode, valueNode);
+  return card;
+}
+
 function renderIdleLessonState() {
-  state.mode = "lesson";
+  state.mode = hasActiveLearnSession() ? state.mode : "lesson";
   setGamePickerVisibility(false);
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
-  el.promptLabel.textContent = t("prompt.lesson");
+  el.promptLabel.textContent = t("learn.idleLabel");
   el.promptText.classList.remove("hebrew");
-  el.promptText.textContent = t("prompt.start");
+  el.promptText.textContent = t("learn.idlePrompt");
   el.choiceContainer.innerHTML = "";
   el.choiceContainer.classList.remove("match-grid");
+  clearFeedback();
   renderNiqqudToggle();
+}
+
+function getModeLabelForState(mode) {
+  if (mode === "verbMatch") return t("game.conjugationName");
+  if (mode === "abbreviation") return t("game.abbreviationName");
+  return t("game.translationName");
+}
+
+function renderHomeLessonButtons() {
+  const highlightedMode = hasActiveLearnSession() ? state.mode : state.lastPlayedMode || "lesson";
+  setHomeLessonState(el.homeLessonBtn, highlightedMode === "lesson");
+  setHomeLessonState(el.homeVerbMatchBtn, highlightedMode === "verbMatch");
+  setHomeLessonState(el.homeAbbreviationBtn, highlightedMode === "abbreviation");
+}
+
+function setHomeLessonState(button, isCurrent) {
+  if (!button) return;
+  button.classList.toggle("is-current", isCurrent);
+  button.setAttribute("aria-current", isCurrent ? "true" : "false");
+}
+
+function renderHomeOptions() {
+  if (el.homeLangValue) {
+    el.homeLangValue.textContent = state.language === "he" ? "עברית" : "English";
+  }
+  if (el.homeThemeValue) {
+    el.homeThemeValue.textContent = state.theme === "light" ? t("controls.lightMode") : t("controls.darkMode");
+  }
+  if (el.homeNiqqudValue) {
+    el.homeNiqqudValue.textContent = state.showNiqqudInline ? t("dashboard.on") : t("dashboard.off");
+  }
+  if (el.homeThemeToggle) {
+    el.homeThemeToggle.setAttribute("aria-pressed", String(state.theme === "dark"));
+  }
+  if (el.homeNiqqudToggle) {
+    el.homeNiqqudToggle.setAttribute("aria-pressed", String(state.showNiqqudInline));
+  }
 }
 
 function startLesson() {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
+  closeLeaveSessionConfirm();
   closeMasteredModal();
   resetVerbMatchState();
   resetAbbreviationState();
   state.mode = "lesson";
+  state.route = "home";
+  state.lastPlayedMode = "lesson";
   clearSummaryState();
   clearLessonStartIntro();
   clearSecondChanceIntro();
@@ -1456,18 +1961,18 @@ function startLesson() {
   state.lesson.currentRound = 0;
   state.lesson.secondChanceCurrent = 0;
   state.lesson.secondChanceTotal = 0;
+  state.lesson.wrongAnswers = 0;
+  state.lesson.sessionMistakeIds = [];
   state.lesson.startMs = 0;
   state.lesson.elapsedSeconds = 0;
   state.lesson.askedWordIds = [];
   state.lesson.domainCounts = {};
   state.currentQuestion = null;
-  state.lastAnswer.lesson = null;
-  clearLastAnswerView();
   el.choiceContainer.innerHTML = "";
   el.choiceContainer.classList.remove("match-grid");
   clearFeedback();
-  renderIdleLessonState();
   playLessonStartIntro();
+  renderAll();
 }
 
 function finishLesson() {
@@ -1491,6 +1996,10 @@ function finishLesson() {
     },
     noteKey: reviewRounds > 0 ? "summary.lessonNote" : "summary.lessonNoteNone",
     noteVars: reviewRounds > 0 ? { count: reviewRounds } : {},
+    correctCount: Math.max(0, LESSON_ROUNDS + reviewRounds - state.lesson.wrongAnswers),
+    incorrectCount: state.lesson.wrongAnswers,
+    elapsedSeconds: state.lesson.elapsedSeconds,
+    mistakes: buildLessonMistakeSummary(),
   });
 }
 
@@ -1505,7 +2014,6 @@ function renderAbbreviationIdleState() {
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
   el.promptLabel.textContent = t("prompt.abbreviation");
   el.promptText.classList.remove("hebrew");
   el.promptText.textContent = t("prompt.abbreviationStart");
@@ -1518,6 +2026,7 @@ function startAbbreviation() {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
+  closeLeaveSessionConfirm();
   closeMasteredModal();
   clearLessonStartIntro();
   clearSecondChanceIntro();
@@ -1527,12 +2036,12 @@ function startAbbreviation() {
   state.lesson.active = false;
   state.lesson.inReview = false;
   state.currentQuestion = null;
-  state.lastAnswer.abbreviation = null;
-  clearLastAnswerView();
   resetSessionCounters();
   resetVerbMatchState();
   resetAbbreviationState();
   state.mode = "abbreviation";
+  state.route = "home";
+  state.lastPlayedMode = "abbreviation";
   setGamePickerVisibility(false);
   el.choiceContainer.innerHTML = "";
   el.choiceContainer.classList.remove("match-grid");
@@ -1549,8 +2058,8 @@ function startAbbreviation() {
   }
 
   state.abbreviation.active = true;
-  renderAbbreviationIdleState();
   playAbbreviationIntro();
+  renderAll();
 }
 
 function finishAbbreviation() {
@@ -1580,6 +2089,10 @@ function finishAbbreviation() {
       rounds: roundsDone || targetRounds,
       seconds: elapsed,
     },
+    correctCount: Math.max(0, (roundsDone || targetRounds) - state.abbreviation.wrongAnswers),
+    incorrectCount: state.abbreviation.wrongAnswers,
+    elapsedSeconds: elapsed,
+    mistakes: buildAbbreviationMistakeSummary(),
   });
 }
 
@@ -1593,19 +2106,14 @@ function resetAbbreviationState() {
   state.abbreviation.askedEntryIds = [];
   state.abbreviation.introActive = false;
   state.abbreviation.currentQuestion = null;
-  state.lastAnswer.abbreviation = null;
-  if (state.lastAnswerView.mode === "abbreviation") {
-    clearLastAnswerView();
-  }
+  state.abbreviation.wrongAnswers = 0;
+  state.abbreviation.sessionMistakeIds = [];
 }
 
 function clearAbbreviationIntro() {
   state.abbreviation.introActive = false;
-
-  if (!el.abbreviationIntro) return;
-  el.abbreviationIntro.classList.remove("active");
-  el.abbreviationIntro.classList.add("hidden");
-  el.abbreviationIntro.setAttribute("aria-hidden", "true");
+  clearIntroAutoAdvance();
+  hideBlockingOverlay(el.abbreviationIntro);
 }
 
 function playAbbreviationIntro() {
@@ -1616,13 +2124,13 @@ function playAbbreviationIntro() {
 
   clearAbbreviationIntro();
   state.abbreviation.introActive = true;
-  el.abbreviationIntro.classList.remove("hidden");
-  el.abbreviationIntro.classList.add("active");
-  el.abbreviationIntro.setAttribute("aria-hidden", "false");
+  showBlockingOverlay(el.abbreviationIntro);
+  scheduleIntroAutoAdvance(() => beginAbbreviationFromIntro());
 }
 
 function beginAbbreviationFromIntro() {
   if (!state.abbreviation.active) return;
+  if (!state.abbreviation.introActive && state.abbreviation.currentQuestion) return;
   if (state.abbreviation.introActive) {
     clearAbbreviationIntro();
   }
@@ -1637,9 +2145,6 @@ function beginAbbreviationFromIntro() {
 
 function nextAbbreviationQuestion() {
   if (state.mode !== "abbreviation") return;
-  if (state.lastAnswerView.mode === "abbreviation") {
-    clearLastAnswerView();
-  }
   if (!state.abbreviation.active) {
     goHome();
     return;
@@ -1669,19 +2174,17 @@ function nextAbbreviationQuestion() {
     locked: false,
     selectedOptionId: null,
   };
-  state.showNiqqudInline = false;
   clearFeedback();
   renderAbbreviationQuestion();
 }
 
 function renderAbbreviationQuestion() {
-  const question = getDisplayedAbbreviationQuestion();
+  const question = state.abbreviation.currentQuestion;
 
   setGamePickerVisibility(false);
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
   el.choiceContainer.classList.remove("match-grid");
 
   if (!question) return;
@@ -1691,9 +2194,6 @@ function renderAbbreviationQuestion() {
   el.promptText.textContent = question.prompt;
   renderAbbreviationChoices(question);
   renderNiqqudToggle();
-  if (isViewingLastAnswer("abbreviation")) {
-    renderLastAnswerFeedback("abbreviation", question);
-  }
 }
 
 function renderAbbreviationChoices(question) {
@@ -1706,9 +2206,10 @@ function renderAbbreviationChoices(question) {
     btn.textContent = option.label;
     btn.addEventListener("click", () => {
       if (question.locked) return;
-      const isCorrect = option.id === question.entry.id;
-      applyAbbreviationAnswer(isCorrect, option.id);
+      question.selectedOptionId = option.id;
+      renderAbbreviationQuestion();
     });
+    btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
     el.choiceContainer.append(btn);
   });
 
@@ -1728,6 +2229,11 @@ function applyAbbreviationAnswer(isCorrect, selectedId = null) {
   state.sessionStreak = isCorrect ? state.sessionStreak + 1 : 0;
   if (isCorrect) {
     state.sessionScore += 1;
+  } else {
+    state.abbreviation.wrongAnswers += 1;
+    if (!state.abbreviation.sessionMistakeIds.includes(entry.id)) {
+      state.abbreviation.sessionMistakeIds.push(entry.id);
+    }
   }
 
   const expansion = `${entry.expansionHe} (${entry.abbr})`;
@@ -1739,12 +2245,10 @@ function applyAbbreviationAnswer(isCorrect, selectedId = null) {
   );
 
   question.selectedOptionId = selectedId ?? null;
-  rememberAbbreviationLastAnswer(question, isCorrect, question.selectedOptionId);
   markAbbreviationChoiceResults(question);
 
   saveProgress();
   renderSessionHeader();
-  renderPoolMeta();
   renderDomainPerformance();
   renderMostMissed();
 }
@@ -1860,11 +2364,8 @@ function stopAbbreviationTimer() {
 
 function clearLessonStartIntro() {
   state.lesson.lessonStartIntroActive = false;
-
-  if (!el.lessonStartIntro) return;
-  el.lessonStartIntro.classList.remove("active");
-  el.lessonStartIntro.classList.add("hidden");
-  el.lessonStartIntro.setAttribute("aria-hidden", "true");
+  clearIntroAutoAdvance();
+  hideBlockingOverlay(el.lessonStartIntro);
 }
 
 function playLessonStartIntro() {
@@ -1875,12 +2376,13 @@ function playLessonStartIntro() {
 
   clearLessonStartIntro();
   state.lesson.lessonStartIntroActive = true;
-  el.lessonStartIntro.classList.remove("hidden");
-  el.lessonStartIntro.classList.add("active");
-  el.lessonStartIntro.setAttribute("aria-hidden", "false");
+  showBlockingOverlay(el.lessonStartIntro);
+  scheduleIntroAutoAdvance(() => beginLessonFromIntro());
 }
 
 function beginLessonFromIntro() {
+  if (!state.lesson.active) return;
+  if (!state.lesson.lessonStartIntroActive && state.currentQuestion) return;
   if (state.lesson.lessonStartIntroActive) {
     clearLessonStartIntro();
   }
@@ -1894,11 +2396,8 @@ function beginLessonFromIntro() {
 
 function clearSecondChanceIntro() {
   state.lesson.secondChanceIntroActive = false;
-
-  if (!el.secondChanceIntro) return;
-  el.secondChanceIntro.classList.remove("active");
-  el.secondChanceIntro.classList.add("hidden");
-  el.secondChanceIntro.setAttribute("aria-hidden", "true");
+  clearIntroAutoAdvance();
+  hideBlockingOverlay(el.secondChanceIntro);
 }
 
 function playSecondChanceIntro() {
@@ -1909,24 +2408,20 @@ function playSecondChanceIntro() {
 
   clearSecondChanceIntro();
   state.lesson.secondChanceIntroActive = true;
-  el.secondChanceIntro.classList.remove("hidden");
-  el.secondChanceIntro.classList.add("active");
-  el.secondChanceIntro.setAttribute("aria-hidden", "false");
+  showBlockingOverlay(el.secondChanceIntro);
+  scheduleIntroAutoAdvance(() => beginSecondChanceFromIntro());
 }
 
 function beginSecondChanceFromIntro() {
-  if (!state.lesson.secondChanceIntroActive) return;
+  if (!state.lesson.active || !state.lesson.secondChanceIntroActive) return;
   clearSecondChanceIntro();
   nextQuestion();
 }
 
 function clearVerbMatchIntro() {
   state.match.verbIntroActive = false;
-
-  if (!el.verbMatchIntro) return;
-  el.verbMatchIntro.classList.remove("active");
-  el.verbMatchIntro.classList.add("hidden");
-  el.verbMatchIntro.setAttribute("aria-hidden", "true");
+  clearIntroAutoAdvance();
+  hideBlockingOverlay(el.verbMatchIntro);
 }
 
 function playVerbMatchIntro() {
@@ -1937,29 +2432,28 @@ function playVerbMatchIntro() {
 
   clearVerbMatchIntro();
   state.match.verbIntroActive = true;
-  el.verbMatchIntro.classList.remove("hidden");
-  el.verbMatchIntro.classList.add("active");
-  el.verbMatchIntro.setAttribute("aria-hidden", "false");
+  showBlockingOverlay(el.verbMatchIntro);
+  scheduleIntroAutoAdvance(() => beginVerbMatchFromIntro());
 }
 
 function beginVerbMatchFromIntro() {
   if (!state.match.active) return;
+  if (!state.match.verbIntroActive && state.match.currentVerb) return;
   if (state.match.verbIntroActive) {
     clearVerbMatchIntro();
   }
 
-  state.match.startMs = Date.now();
-  state.match.elapsedSeconds = 0;
-  startVerbMatchTimer();
+  if (!state.match.startMs) {
+    state.match.startMs = Date.now();
+    state.match.elapsedSeconds = 0;
+    startVerbMatchTimer();
+  }
   clearFeedback();
   loadNextVerbRound();
 }
 
 function nextQuestion() {
   if (state.mode !== "lesson") return;
-  if (state.lastAnswerView.mode === "lesson") {
-    clearLastAnswerView();
-  }
   if (!state.lesson.active) {
     goHome();
     return;
@@ -1987,7 +2481,6 @@ function nextQuestion() {
       return;
     }
     state.currentQuestion = null;
-    state.showNiqqudInline = false;
     renderSessionHeader();
     playSecondChanceIntro();
     return;
@@ -2012,19 +2505,17 @@ function nextQuestion() {
     state.lesson.currentRound += 1;
   }
   state.currentQuestion = { ...question, locked: false, selectedOptionId: null };
-  state.showNiqqudInline = false;
   clearFeedback();
   renderQuestion();
 }
 
 function renderQuestion() {
-  const question = getDisplayedLessonQuestion();
+  const question = state.currentQuestion;
 
   setGamePickerVisibility(false);
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
   el.choiceContainer.classList.remove("match-grid");
 
   if (!question) return;
@@ -2032,9 +2523,6 @@ function renderQuestion() {
   el.promptLabel.textContent = question.promptLabel;
   renderPromptText(question);
   renderChoices(question);
-  if (isViewingLastAnswer("lesson")) {
-    renderLastAnswerFeedback("lesson", question);
-  }
 }
 
 function renderChoices(question) {
@@ -2050,9 +2538,10 @@ function renderChoices(question) {
 
     btn.addEventListener("click", () => {
       if (question.locked) return;
-      const isCorrect = option.id === question.word.id;
-      applyAnswer(isCorrect, option.id);
+      question.selectedOptionId = option.id;
+      renderQuestion();
     });
+    btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
 
     el.choiceContainer.append(btn);
   });
@@ -2105,9 +2594,18 @@ function applyAnswer(isCorrect, selectedId = null) {
   updateProgress(word.id, isCorrect);
   state.sessionStreak = isCorrect ? state.sessionStreak + 1 : 0;
 
-  if (isCorrect && !state.currentQuestion.isReview) {
-    state.sessionScore += 1;
-  } else if (!state.currentQuestion.isReview) {
+  if (isCorrect) {
+    if (!state.currentQuestion.isReview) {
+      state.sessionScore += 1;
+    }
+  } else {
+    state.lesson.wrongAnswers += 1;
+    if (!state.lesson.sessionMistakeIds.includes(word.id)) {
+      state.lesson.sessionMistakeIds.push(word.id);
+    }
+  }
+
+  if (!isCorrect && !state.currentQuestion.isReview) {
     addMissedWord(state.currentQuestion.word.id);
   }
 
@@ -2120,12 +2618,10 @@ function applyAnswer(isCorrect, selectedId = null) {
   );
 
   state.currentQuestion.selectedOptionId = selectedId ?? null;
-  rememberLessonLastAnswer(state.currentQuestion, isCorrect, state.currentQuestion.selectedOptionId);
   markChoiceResults();
 
   saveProgress();
   renderSessionHeader();
-  renderPoolMeta();
   renderDomainPerformance();
   renderMostMissed();
 }
@@ -2148,98 +2644,6 @@ function markChoiceResults(question = state.currentQuestion) {
   });
 }
 
-function showLastAnswer() {
-  if (state.mode !== "lesson" && state.mode !== "abbreviation") {
-    return;
-  }
-
-  const mode = state.mode;
-  const snapshot = mode === "abbreviation" ? state.lastAnswer.abbreviation : state.lastAnswer.lesson;
-  if (!snapshot) {
-    setFeedback(t("feedback.lastAnswerMissing"), null);
-    return;
-  }
-
-  if (isViewingLastAnswer(mode)) {
-    clearLastAnswerView();
-    clearFeedback();
-  } else {
-    state.lastAnswerView.active = true;
-    state.lastAnswerView.mode = mode;
-  }
-
-  if (mode === "abbreviation") {
-    renderAbbreviationQuestion();
-    return;
-  }
-  renderQuestion();
-}
-
-function rememberLessonLastAnswer(question, isCorrect, selectedId = null) {
-  if (!question?.word || !Array.isArray(question.options)) return;
-
-  const answerDisplay = buildAnswerDisplay(question.word, state.showNiqqudInline);
-  const feedbackKey = isCorrect ? "feedback.correct" : "feedback.wrong";
-  const feedbackVars = isCorrect
-    ? { answer: answerDisplay }
-    : { answer: answerDisplay, english: question.word.en };
-
-  state.lastAnswer.lesson = cloneLessonQuestionSnapshot({
-    ...question,
-    selectedOptionId: selectedId ?? null,
-    locked: true,
-    lastAnswerResult: {
-      key: feedbackKey,
-      vars: feedbackVars,
-      success: Boolean(isCorrect),
-    },
-  });
-}
-
-function rememberAbbreviationLastAnswer(question, isCorrect, selectedId = null) {
-  if (!question?.entry || !Array.isArray(question.options)) return;
-
-  const expansion = `${question.entry.expansionHe} (${question.entry.abbr})`;
-  const feedbackKey = isCorrect ? "feedback.abbreviationCorrect" : "feedback.abbreviationWrong";
-
-  state.lastAnswer.abbreviation = cloneAbbreviationQuestionSnapshot({
-    ...question,
-    selectedOptionId: selectedId ?? null,
-    locked: true,
-    lastAnswerResult: {
-      key: feedbackKey,
-      vars: { english: question.entry.english, expansion },
-      success: Boolean(isCorrect),
-    },
-  });
-}
-
-function renderLastAnswerFeedback(mode, snapshot = null) {
-  const question = snapshot || (mode === "abbreviation" ? state.lastAnswer.abbreviation : state.lastAnswer.lesson);
-  let feedback = question?.lastAnswerResult || null;
-  if (!feedback?.key && question) {
-    if (mode === "abbreviation" && question.entry) {
-      const isCorrect = question.selectedOptionId === question.entry.id;
-      const expansion = `${question.entry.expansionHe} (${question.entry.abbr})`;
-      feedback = {
-        key: isCorrect ? "feedback.abbreviationCorrect" : "feedback.abbreviationWrong",
-        vars: { english: question.entry.english, expansion },
-        success: Boolean(isCorrect),
-      };
-    } else if (question.word) {
-      const isCorrect = question.selectedOptionId === question.word.id;
-      const answerDisplay = buildAnswerDisplay(question.word, state.showNiqqudInline);
-      feedback = {
-        key: isCorrect ? "feedback.correct" : "feedback.wrong",
-        vars: isCorrect ? { answer: answerDisplay } : { answer: answerDisplay, english: question.word.en },
-        success: Boolean(isCorrect),
-      };
-    }
-  }
-  if (!feedback?.key) return;
-  setFeedback(t(feedback.key, feedback.vars || {}), feedback.success);
-}
-
 function cloneLessonQuestionSnapshot(question) {
   return {
     ...question,
@@ -2248,15 +2652,8 @@ function cloneLessonQuestionSnapshot(question) {
       ...option,
       word: option.word ? { ...option.word } : null,
     })),
-    locked: true,
+    locked: question.locked !== undefined ? Boolean(question.locked) : true,
     selectedOptionId: question.selectedOptionId ?? null,
-    lastAnswerResult: question.lastAnswerResult
-      ? {
-          key: String(question.lastAnswerResult.key || ""),
-          vars: { ...(question.lastAnswerResult.vars || {}) },
-          success: question.lastAnswerResult.success,
-        }
-      : null,
   };
 }
 
@@ -2268,23 +2665,13 @@ function cloneAbbreviationQuestionSnapshot(question) {
       ...option,
       entry: option.entry ? { ...option.entry } : null,
     })),
-    locked: true,
+    locked: question.locked !== undefined ? Boolean(question.locked) : true,
     selectedOptionId: question.selectedOptionId ?? null,
-    lastAnswerResult: question.lastAnswerResult
-      ? {
-          key: String(question.lastAnswerResult.key || ""),
-          vars: { ...(question.lastAnswerResult.vars || {}) },
-          success: question.lastAnswerResult.success,
-        }
-      : null,
   };
 }
 
 function handleNextAction() {
   if (state.mode === "home" || state.mode === "summary") {
-    return;
-  }
-  if (isViewingLastAnswer()) {
     return;
   }
 
@@ -2302,6 +2689,13 @@ function handleNextAction() {
     }
     if (state.abbreviation.currentQuestion.locked) {
       nextAbbreviationQuestion();
+      return;
+    }
+    if (state.abbreviation.currentQuestion.selectedOptionId) {
+      applyAbbreviationAnswer(
+        state.abbreviation.currentQuestion.selectedOptionId === state.abbreviation.currentQuestion.entry.id,
+        state.abbreviation.currentQuestion.selectedOptionId
+      );
     }
     return;
   }
@@ -2313,6 +2707,10 @@ function handleNextAction() {
   if (state.currentQuestion.locked) {
     nextQuestion();
     return;
+  }
+
+  if (state.currentQuestion.selectedOptionId) {
+    applyAnswer(state.currentQuestion.selectedOptionId === state.currentQuestion.word.id, state.currentQuestion.selectedOptionId);
   }
 }
 
@@ -2327,22 +2725,7 @@ function renderMostMissed() {
   if (!el.mostMissedList || !el.mostMissedEmpty) return;
 
   const wordsById = new Map(getAllVocabulary().map((word) => [word.id, word]));
-  const ranked = Object.entries(state.progress)
-    .map(([wordId, rec]) => {
-      const attempts = rec?.attempts || 0;
-      const correct = rec?.correct || 0;
-      const missed = Math.max(0, attempts - correct);
-      return { wordId, attempts, missed };
-    })
-    .filter((item) => item.missed > 0 && wordsById.has(item.wordId))
-    .sort((a, b) => {
-      if (b.missed !== a.missed) return b.missed - a.missed;
-      if (b.attempts !== a.attempts) return b.attempts - a.attempts;
-      const aWord = wordsById.get(a.wordId);
-      const bWord = wordsById.get(b.wordId);
-      return String(aWord?.en || "").localeCompare(String(bWord?.en || ""));
-    })
-    .slice(0, 10);
+  const ranked = getMostMissedRanked();
 
   el.mostMissedList.innerHTML = "";
   el.mostMissedEmpty.classList.toggle("hidden", ranked.length > 0);
@@ -2367,11 +2750,6 @@ function renderMostMissed() {
   });
 }
 
-function openMasteredModal() {
-  state.masteredModalOpen = true;
-  renderMasteredModal();
-}
-
 function closeMasteredModal() {
   state.masteredModalOpen = false;
   state.masteredSelection = new Set();
@@ -2384,6 +2762,7 @@ function renderMasteredModal() {
   const open = Boolean(state.masteredModalOpen);
   el.masteredModal.classList.toggle("hidden", !open);
   el.masteredModal.setAttribute("aria-hidden", open ? "false" : "true");
+  updateUiLockState();
   if (!open) return;
 
   const masteredWords = getMasteredWords().sort((a, b) => a.en.localeCompare(b.en));
@@ -2461,6 +2840,7 @@ function startVerbMatch() {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
+  closeLeaveSessionConfirm();
   closeMasteredModal();
   clearLessonStartIntro();
   clearSecondChanceIntro();
@@ -2470,11 +2850,12 @@ function startVerbMatch() {
   state.lesson.active = false;
   state.lesson.inReview = false;
   state.currentQuestion = null;
-  clearLastAnswerView();
   resetSessionCounters();
   resetVerbMatchState();
   resetAbbreviationState();
   state.mode = "verbMatch";
+  state.route = "home";
+  state.lastPlayedMode = "verbMatch";
   setGamePickerVisibility(false);
   el.choiceContainer.innerHTML = "";
   el.choiceContainer.classList.remove("match-grid");
@@ -2490,7 +2871,7 @@ function startVerbMatch() {
   state.match.verbQueue = shuffle(verbFormDeck);
   state.match.totalVerbs = state.match.verbQueue.length;
   state.match.currentVerbIndex = 0;
-  state.match.startMs = Date.now();
+  state.match.startMs = 0;
   state.match.elapsedSeconds = 0;
   state.match.sessionMatched = 0;
   state.match.sessionTotalPairs = state.match.verbQueue.reduce(
@@ -2498,8 +2879,8 @@ function startVerbMatch() {
     0
   );
   clearFeedback();
-  renderVerbMatchIdleState();
   playVerbMatchIntro();
+  renderAll();
 }
 
 function resetVerbMatchState() {
@@ -2530,6 +2911,8 @@ function resetVerbMatchState() {
   state.match.sessionTotalPairs = 0;
   state.match.currentVerbHadMismatch = false;
   state.match.eligibleMasterWordId = "";
+  state.match.mismatchCount = 0;
+  state.match.sessionMistakeIds = [];
 }
 
 function loadNextVerbRound() {
@@ -2552,6 +2935,10 @@ function loadNextVerbRound() {
       scoreVars: { score: sessionMatched, total: sessionTotal },
       noteKey: "summary.matchNote",
       noteVars: { verbs: verbsCovered, combo: bestCombo, seconds: elapsed },
+      correctCount: sessionMatched,
+      incorrectCount: state.match.mismatchCount,
+      elapsedSeconds: elapsed,
+      mistakes: buildVerbMatchMistakeSummary(),
     });
     return;
   }
@@ -2580,12 +2967,8 @@ function loadNextVerbRound() {
   state.match.rightCards = [];
   state.match.nextCardId = 1;
   refillVerbMatchColumns();
-  setFeedback(getVerbRoundFeedback(nextVerb), true);
+  clearFeedback();
   renderVerbMatchRound();
-}
-
-function getVerbRoundFeedback(verbRound) {
-  return verbRound?.formSource === "generated" ? t("match.generatedNote") : t("match.validatedNote");
 }
 
 function selectVerbRoundPairs(forms) {
@@ -2609,7 +2992,9 @@ function selectVerbRoundPairs(forms) {
 }
 
 function refillVerbMatchColumns() {
-  while (state.match.leftCards.length < MATCH_VISIBLE_ROWS && state.match.remainingPairs.length) {
+  const visibleRows = getVisibleVerbMatchRows();
+
+  while (state.match.leftCards.length < visibleRows && state.match.remainingPairs.length) {
     const pair = state.match.remainingPairs.shift();
     if (!pair) break;
 
@@ -2640,7 +3025,6 @@ function renderVerbMatchIdleState() {
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
   el.promptLabel.textContent = t("match.prompt");
   el.promptText.classList.remove("hebrew");
   el.promptText.textContent = t("prompt.verbMatchStart");
@@ -2659,7 +3043,6 @@ function renderVerbMatchRound() {
   setPromptCardVisibility(true);
   el.choiceContainer.classList.remove("summary-grid");
   renderSessionHeader();
-  renderPoolMeta();
   el.promptLabel.textContent = t("match.prompt");
   renderPromptText();
   renderVerbMatchCards();
@@ -2818,15 +3201,10 @@ function applyVerbMatchSuccess(leftCard, rightCard) {
 
     if (state.match.matchedCount >= state.match.totalPairs) {
       const current = state.match.currentVerb.word;
-      const verbLabel = state.showNiqqudInline ? current.heNiqqud : current.he;
       const streakCount = recordConjugationRound(current.id, !state.match.currentVerbHadMismatch);
       const reachedMasterThreshold = streakCount >= CONJUGATION_MASTER_STREAK && !isWordMastered(current.id);
       state.match.eligibleMasterWordId = reachedMasterThreshold ? current.id : "";
-      const roundText = t("match.roundDone", { verb: `${current.en} / ${verbLabel}` });
-      const masteryText = reachedMasterThreshold
-        ? t("mastered.ready", { verb: current.en, target: CONJUGATION_MASTER_STREAK })
-        : t("mastered.streakStatus", { count: streakCount, target: CONJUGATION_MASTER_STREAK });
-      setFeedback(`${roundText} ${masteryText}`, true);
+      clearFeedback();
     }
     renderVerbMatchRound();
   }, 180);
@@ -2838,6 +3216,10 @@ function applyVerbMatchMismatch(leftCard, rightCard) {
   state.match.combo = 0;
   state.sessionStreak = 0;
   state.match.currentVerbHadMismatch = true;
+  state.match.mismatchCount += 1;
+  if (currentWordId && !state.match.sessionMistakeIds.includes(currentWordId)) {
+    state.match.sessionMistakeIds.push(currentWordId);
+  }
   state.match.mismatchedCardIds = [leftCard.id, rightCard.id];
   state.match.selectedLeftId = null;
   state.match.selectedRightId = null;
@@ -3090,22 +3472,27 @@ function pickBestWord(pool, usedWordIds = []) {
 
 function updateProgress(wordId, isCorrect) {
   const rec = getProgressRecord(wordId);
+  const now = Date.now();
   rec.attempts += 1;
-  rec.lastSeen = Date.now();
+  rec.lastSeen = now;
 
   if (isCorrect) {
     rec.correct += 1;
     rec.level = Math.min(LEITNER_INTERVALS.length - 1, rec.level + 1);
-    rec.nextDue = Date.now() + LEITNER_INTERVALS[rec.level];
+    rec.nextDue = now + LEITNER_INTERVALS[rec.level];
   } else {
+    rec.misses = getMissCountForRecord(rec) + 1;
     rec.level = Math.max(0, rec.level - 1);
-    rec.nextDue = Date.now() + 2 * 60 * 1000;
+    rec.nextDue = now + 2 * 60 * 1000;
   }
 
   state.progress[wordId] = rec;
 }
 
 function getProgressRecord(wordId) {
+  const existing = state.progress[wordId] || {};
+  const attempts = Math.max(0, Number(existing.attempts || 0));
+  const correct = Math.max(0, Math.min(attempts, Number(existing.correct || 0)));
   return {
     attempts: 0,
     correct: 0,
@@ -3113,12 +3500,26 @@ function getProgressRecord(wordId) {
     nextDue: 0,
     lastSeen: 0,
     mastered: false,
+    misses: 0,
     conjugationAttempts: 0,
     conjugationCorrect: 0,
     conjugationStreak: 0,
     lastConjugationSeen: 0,
-    ...(state.progress[wordId] || {}),
+    ...existing,
+    attempts,
+    correct,
+    misses: getMissCountForRecord(existing),
   };
+}
+
+function getMissCountForRecord(record) {
+  const attempts = Math.max(0, Number(record?.attempts || 0));
+  const correct = Math.max(0, Math.min(attempts, Number(record?.correct || 0)));
+  const explicit = Number(record?.misses);
+  if (Number.isFinite(explicit) && explicit >= 0) {
+    return Math.round(explicit);
+  }
+  return Math.max(0, attempts - correct);
 }
 
 function getDueWords(pool, now = Date.now()) {
@@ -3636,6 +4037,220 @@ function clearFeedback() {
 function resetSessionCounters() {
   state.sessionScore = 0;
   state.sessionStreak = 0;
+}
+
+function restoreSessionState(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return;
+
+  state.mode = typeof snapshot.mode === "string" ? snapshot.mode : state.mode;
+  state.route = typeof snapshot.route === "string" ? snapshot.route : state.route;
+  state.lastPlayedMode = typeof snapshot.lastPlayedMode === "string" ? snapshot.lastPlayedMode : state.lastPlayedMode;
+  state.sessionScore = Math.max(0, Number(snapshot.sessionScore || 0));
+  state.sessionStreak = Math.max(0, Number(snapshot.sessionStreak || 0));
+  state.showNiqqudInline = Boolean(snapshot.showNiqqudInline);
+
+  if (snapshot.currentQuestion) {
+    state.currentQuestion = cloneLessonQuestionSnapshot(snapshot.currentQuestion);
+    state.currentQuestion.locked = Boolean(snapshot.currentQuestion.locked);
+  }
+
+  if (snapshot.summary) {
+    Object.assign(state.summary, {
+      active: Boolean(snapshot.summary.active),
+      game: String(snapshot.summary.game || ""),
+      titleKey: String(snapshot.summary.titleKey || ""),
+      titleVars: snapshot.summary.titleVars || {},
+      scoreKey: String(snapshot.summary.scoreKey || ""),
+      scoreVars: snapshot.summary.scoreVars || {},
+      noteKey: String(snapshot.summary.noteKey || ""),
+      noteVars: snapshot.summary.noteVars || {},
+      correctCount: Math.max(0, Number(snapshot.summary.correctCount || 0)),
+      incorrectCount: Math.max(0, Number(snapshot.summary.incorrectCount || 0)),
+      elapsedSeconds: Math.max(0, Number(snapshot.summary.elapsedSeconds || 0)),
+      mistakes: Array.isArray(snapshot.summary.mistakes) ? snapshot.summary.mistakes : [],
+    });
+  }
+
+  if (snapshot.lesson) {
+    Object.assign(state.lesson, {
+      active: Boolean(snapshot.lesson.active),
+      currentRound: Math.max(0, Number(snapshot.lesson.currentRound || 0)),
+      secondChanceCurrent: Math.max(0, Number(snapshot.lesson.secondChanceCurrent || 0)),
+      secondChanceTotal: Math.max(0, Number(snapshot.lesson.secondChanceTotal || 0)),
+      startMs: Math.max(0, Number(snapshot.lesson.startMs || 0)),
+      elapsedSeconds: Math.max(0, Number(snapshot.lesson.elapsedSeconds || 0)),
+      askedWordIds: Array.isArray(snapshot.lesson.askedWordIds) ? snapshot.lesson.askedWordIds : [],
+      domainCounts: snapshot.lesson.domainCounts || {},
+      missedWordIds: Array.isArray(snapshot.lesson.missedWordIds) ? snapshot.lesson.missedWordIds : [],
+      reviewQueue: Array.isArray(snapshot.lesson.reviewQueue) ? snapshot.lesson.reviewQueue : [],
+      inReview: Boolean(snapshot.lesson.inReview),
+      lessonStartIntroActive: Boolean(snapshot.lesson.lessonStartIntroActive),
+      secondChanceIntroActive: Boolean(snapshot.lesson.secondChanceIntroActive),
+      optionHistory: snapshot.lesson.optionHistory || {},
+      wrongAnswers: Math.max(0, Number(snapshot.lesson.wrongAnswers || 0)),
+      sessionMistakeIds: Array.isArray(snapshot.lesson.sessionMistakeIds) ? snapshot.lesson.sessionMistakeIds : [],
+      timerId: null,
+    });
+  }
+
+  if (snapshot.abbreviation) {
+    Object.assign(state.abbreviation, {
+      active: Boolean(snapshot.abbreviation.active),
+      currentRound: Math.max(0, Number(snapshot.abbreviation.currentRound || 0)),
+      startMs: Math.max(0, Number(snapshot.abbreviation.startMs || 0)),
+      elapsedSeconds: Math.max(0, Number(snapshot.abbreviation.elapsedSeconds || 0)),
+      askedEntryIds: Array.isArray(snapshot.abbreviation.askedEntryIds) ? snapshot.abbreviation.askedEntryIds : [],
+      introActive: Boolean(snapshot.abbreviation.introActive),
+      currentQuestion: snapshot.abbreviation.currentQuestion
+        ? cloneAbbreviationQuestionSnapshot(snapshot.abbreviation.currentQuestion)
+        : null,
+      wrongAnswers: Math.max(0, Number(snapshot.abbreviation.wrongAnswers || 0)),
+      sessionMistakeIds: Array.isArray(snapshot.abbreviation.sessionMistakeIds) ? snapshot.abbreviation.sessionMistakeIds : [],
+      timerId: null,
+    });
+    if (state.abbreviation.currentQuestion) {
+      state.abbreviation.currentQuestion.locked = Boolean(snapshot.abbreviation.currentQuestion?.locked);
+    }
+  }
+
+  if (snapshot.match) {
+    Object.assign(state.match, {
+      active: Boolean(snapshot.match.active),
+      verbQueue: Array.isArray(snapshot.match.verbQueue) ? snapshot.match.verbQueue : [],
+      totalVerbs: Math.max(0, Number(snapshot.match.totalVerbs || 0)),
+      currentVerbIndex: Math.max(0, Number(snapshot.match.currentVerbIndex || 0)),
+      currentVerb: snapshot.match.currentVerb || null,
+      pairs: Array.isArray(snapshot.match.pairs) ? snapshot.match.pairs : [],
+      remainingPairs: Array.isArray(snapshot.match.remainingPairs) ? snapshot.match.remainingPairs : [],
+      leftCards: Array.isArray(snapshot.match.leftCards) ? snapshot.match.leftCards : [],
+      rightCards: Array.isArray(snapshot.match.rightCards) ? snapshot.match.rightCards : [],
+      selectedLeftId: snapshot.match.selectedLeftId || null,
+      selectedRightId: snapshot.match.selectedRightId || null,
+      mismatchedCardIds: Array.isArray(snapshot.match.mismatchedCardIds) ? snapshot.match.mismatchedCardIds : [],
+      matchedCardIds: Array.isArray(snapshot.match.matchedCardIds) ? snapshot.match.matchedCardIds : [],
+      matchedPairIds: Array.isArray(snapshot.match.matchedPairIds) ? snapshot.match.matchedPairIds : [],
+      isResolving: Boolean(snapshot.match.isResolving),
+      nextCardId: Math.max(1, Number(snapshot.match.nextCardId || 1)),
+      combo: Math.max(0, Number(snapshot.match.combo || 0)),
+      bestCombo: Math.max(0, Number(snapshot.match.bestCombo || 0)),
+      matchedCount: Math.max(0, Number(snapshot.match.matchedCount || 0)),
+      totalPairs: Math.max(0, Number(snapshot.match.totalPairs || 0)),
+      startMs: Math.max(0, Number(snapshot.match.startMs || 0)),
+      elapsedSeconds: Math.max(0, Number(snapshot.match.elapsedSeconds || 0)),
+      verbIntroActive: Boolean(snapshot.match.verbIntroActive),
+      sessionMatched: Math.max(0, Number(snapshot.match.sessionMatched || 0)),
+      sessionTotalPairs: Math.max(0, Number(snapshot.match.sessionTotalPairs || 0)),
+      currentVerbHadMismatch: Boolean(snapshot.match.currentVerbHadMismatch),
+      eligibleMasterWordId: String(snapshot.match.eligibleMasterWordId || ""),
+      mismatchCount: Math.max(0, Number(snapshot.match.mismatchCount || 0)),
+      sessionMistakeIds: Array.isArray(snapshot.match.sessionMistakeIds) ? snapshot.match.sessionMistakeIds : [],
+      timerId: null,
+    });
+  }
+
+  state.route = resolveInitialRoute(state.route);
+}
+
+function persistUiState() {
+  saveJson(STORAGE_KEYS.ui, {
+    route: state.route,
+    lastPlayedMode: state.lastPlayedMode,
+  });
+}
+
+function persistSessionState() {
+  saveJson(STORAGE_KEYS.session, {
+    mode: state.mode,
+    route: state.route,
+    lastPlayedMode: state.lastPlayedMode,
+    sessionScore: state.sessionScore,
+    sessionStreak: state.sessionStreak,
+    showNiqqudInline: state.showNiqqudInline,
+    currentQuestion: state.currentQuestion ? cloneLessonQuestionSnapshot(state.currentQuestion) : null,
+    summary: {
+      active: state.summary.active,
+      game: state.summary.game,
+      titleKey: state.summary.titleKey,
+      titleVars: state.summary.titleVars,
+      scoreKey: state.summary.scoreKey,
+      scoreVars: state.summary.scoreVars,
+      noteKey: state.summary.noteKey,
+      noteVars: state.summary.noteVars,
+      correctCount: state.summary.correctCount,
+      incorrectCount: state.summary.incorrectCount,
+      elapsedSeconds: state.summary.elapsedSeconds,
+      mistakes: state.summary.mistakes,
+    },
+    lesson: {
+      active: state.lesson.active,
+      currentRound: state.lesson.currentRound,
+      secondChanceCurrent: state.lesson.secondChanceCurrent,
+      secondChanceTotal: state.lesson.secondChanceTotal,
+      startMs: state.lesson.startMs,
+      elapsedSeconds: state.lesson.elapsedSeconds,
+      askedWordIds: state.lesson.askedWordIds,
+      domainCounts: state.lesson.domainCounts,
+      missedWordIds: state.lesson.missedWordIds,
+      reviewQueue: state.lesson.reviewQueue,
+      inReview: state.lesson.inReview,
+      lessonStartIntroActive: state.lesson.lessonStartIntroActive,
+      secondChanceIntroActive: state.lesson.secondChanceIntroActive,
+      optionHistory: state.lesson.optionHistory,
+      wrongAnswers: state.lesson.wrongAnswers,
+      sessionMistakeIds: state.lesson.sessionMistakeIds,
+    },
+    abbreviation: {
+      active: state.abbreviation.active,
+      currentRound: state.abbreviation.currentRound,
+      startMs: state.abbreviation.startMs,
+      elapsedSeconds: state.abbreviation.elapsedSeconds,
+      askedEntryIds: state.abbreviation.askedEntryIds,
+      introActive: state.abbreviation.introActive,
+      currentQuestion: state.abbreviation.currentQuestion ? cloneAbbreviationQuestionSnapshot(state.abbreviation.currentQuestion) : null,
+      wrongAnswers: state.abbreviation.wrongAnswers,
+      sessionMistakeIds: state.abbreviation.sessionMistakeIds,
+    },
+    match: {
+      active: state.match.active,
+      verbQueue: state.match.verbQueue,
+      totalVerbs: state.match.totalVerbs,
+      currentVerbIndex: state.match.currentVerbIndex,
+      currentVerb: state.match.currentVerb,
+      pairs: state.match.pairs,
+      remainingPairs: state.match.remainingPairs,
+      leftCards: state.match.leftCards,
+      rightCards: state.match.rightCards,
+      selectedLeftId: state.match.selectedLeftId,
+      selectedRightId: state.match.selectedRightId,
+      mismatchedCardIds: state.match.mismatchedCardIds,
+      matchedCardIds: state.match.matchedCardIds,
+      matchedPairIds: state.match.matchedPairIds,
+      isResolving: state.match.isResolving,
+      nextCardId: state.match.nextCardId,
+      combo: state.match.combo,
+      bestCombo: state.match.bestCombo,
+      matchedCount: state.match.matchedCount,
+      totalPairs: state.match.totalPairs,
+      startMs: state.match.startMs,
+      elapsedSeconds: state.match.elapsedSeconds,
+      verbIntroActive: state.match.verbIntroActive,
+      sessionMatched: state.match.sessionMatched,
+      sessionTotalPairs: state.match.sessionTotalPairs,
+      currentVerbHadMismatch: state.match.currentVerbHadMismatch,
+      eligibleMasterWordId: state.match.eligibleMasterWordId,
+      mismatchCount: state.match.mismatchCount,
+      sessionMistakeIds: state.match.sessionMistakeIds,
+    },
+  });
+}
+
+function clearPersistedSession() {
+  if (!storage) return;
+  try {
+    storage.removeItem(STORAGE_KEYS.session);
+  } catch {
+    // Ignore storage failures.
+  }
 }
 
 function loadJson(key, fallback) {
