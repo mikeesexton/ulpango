@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Assistant:wght@400;600;700&family=Chivo:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260307f" />
+    <link rel="stylesheet" href="./styles.css?v=20260307g" />
   </head>
   <body data-theme="dark">
     <div class="ambient ambient-a" aria-hidden="true"></div>
@@ -77,6 +77,7 @@
                         <div>
                           <h2 id="modeTitle">10-Round Mixed Lesson</h2>
                         </div>
+                        <button type="button" id="homeBtn" class="quiet lesson-home-btn" aria-label="Back to Home">🏠</button>
                       </div>
 
                       <div class="status-row">
@@ -126,19 +127,6 @@
                     </button>
                   </div>
                 </article>
-
-                <article id="homeResultsStage" class="page-card results-card hidden">
-                  <div class="results-head">
-                    <h2 id="resultsTitle">Translation Complete</h2>
-                    <p id="resultsNote" class="results-praise">Nice job!</p>
-                  </div>
-                  <div id="resultsSummary" class="results-summary"></div>
-                  <div class="results-actions">
-                    <button id="resultsContinueBtn" type="button" class="accent" data-i18n="results.continue">Continue</button>
-                    <button id="resultsReviewBtn" type="button" class="quiet" data-i18n="results.reviewPerformance">Review Performance</button>
-                    <button id="resultsHomeBtn" type="button" class="quiet" data-i18n="session.backHome">Back to Home</button>
-                  </div>
-                </article>
               </div>
 
               <aside class="home-utility-rail" aria-label="Home tools">
@@ -172,6 +160,21 @@
                 </article>
               </aside>
             </div>
+          </section>
+
+          <section id="resultsView" class="page-view">
+            <article class="page-card results-card">
+              <div class="results-head">
+                <h2 id="resultsTitle">Translation Complete</h2>
+                <p id="resultsNote" class="results-praise">Nice job!</p>
+              </div>
+              <div id="resultsSummary" class="results-summary"></div>
+              <div class="results-actions">
+                <button id="resultsContinueBtn" type="button" class="accent" data-i18n="results.continue">Continue</button>
+                <button id="resultsReviewBtn" type="button" class="quiet" data-i18n="results.reviewPerformance">Review Performance</button>
+                <button id="resultsHomeBtn" type="button" class="quiet" data-i18n="session.backHome">Back to Home</button>
+              </div>
+            </article>
           </section>
 
           <section id="reviewView" class="page-view">
@@ -348,7 +351,7 @@
     </script>
     <script src="./vocab-data.js?v=20260307b"></script>
     <script src="./abbreviation-data.js?v=20260306d"></script>
-    <script src="./hebrew-verbs.js?v=20260307a"></script>
-    <script src="./app.js?v=20260307i"></script>
+    <script src="./hebrew-verbs.js?v=20260307b"></script>
+    <script src="./app.js?v=20260307j"></script>
   </body>
 </html>

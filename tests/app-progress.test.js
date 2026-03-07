@@ -608,7 +608,7 @@ test("leaving an active game for review keeps the warning and lands on review af
   assert.equal(state.route, "review");
 });
 
-test("conjugation summary keeps its performance data and home exits without a leave prompt", () => {
+test("conjugation summary opens on the results route and home exits without a leave prompt", () => {
   const vocabulary = [
     { id: "verb-go", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
   ];
@@ -639,11 +639,11 @@ test("conjugation summary keeps its performance data and home exits without a le
   loadNextVerbRound();
 
   assert.equal(state.summary.active, true);
-  assert.equal(state.route, "home");
+  assert.equal(state.route, "results");
   assert.equal(state.summary.game, "verbMatch");
   assert.equal(state.summary.correctCount, 7);
   assert.equal(state.summary.incorrectCount, 3);
-  assert.equal(document.querySelector("#homeResultsStage").classList.contains("hidden"), false);
+  assert.equal(document.querySelector("#resultsView").classList.contains("active"), true);
   assert.equal(document.querySelector("#resultsNote").textContent, "Nice job!");
   assert.equal(document.querySelector("#resultsSummary").children[0].children.length, 1);
   assert.equal(document.querySelector("#resultsSummary").children[0].children[0].children[0].children.length, 1);

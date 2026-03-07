@@ -152,6 +152,73 @@ test("present plural English labels include gender when the Hebrew forms would o
   );
 });
 
+test("generated English past labels use irregular forms for keep", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [],
+    entries: [
+      {
+        id: "test-lishmor",
+        lemma: "לשמור",
+        root: ["ש", "מ", "ר"],
+        binyan: "paal",
+        regularity: "regular",
+        conjugation_mode: "generated",
+        senses: [sense("to keep", null, true)],
+        forms: forms(
+          {
+            masculine_singular: "שומר",
+            feminine_singular: "שומרת",
+            masculine_plural: "שומרים",
+            feminine_plural: "שומרות",
+          },
+          {
+            first_person_singular: "שמרתי",
+            second_person_masculine_singular: "שמרת",
+            second_person_feminine_singular: "שמרת",
+            third_person_masculine_singular: "שמר",
+            third_person_feminine_singular: "שמרה",
+            first_person_plural: "שמרנו",
+            second_person_masculine_plural: "שמרתם",
+            second_person_feminine_plural: "שמרתן",
+            third_person_plural: "שמרו",
+          },
+          {
+            first_person_singular: "אשמור",
+            second_person_masculine_singular: "תשמור",
+            second_person_feminine_singular: "תשמרי",
+            third_person_masculine_singular: "ישמור",
+            third_person_feminine_singular: "תשמור",
+            first_person_plural: "נשמור",
+            second_person_plural: "תשמרו",
+            third_person_plural: "ישמרו",
+          }
+        ),
+        generated_forms: {},
+        review_status: "approved",
+        notes: "",
+        examples: [],
+        difficulty_level: 2,
+        tags: ["test"],
+        personal_priority: 80,
+        category: "core_advanced",
+        source_word_ids: [],
+        source: "test",
+      },
+    ],
+  });
+
+  const item = deck.find((entry) => entry.id.startsWith("test-lishmor"));
+  assert.ok(item);
+  assert.equal(
+    item.forms.find((form) => form.id === "past_third_person_masculine_singular")?.englishText,
+    "he kept"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_plural")?.englishText,
+    "we kept"
+  );
+});
+
 test("difficult curated verbs can appear in conjugation mode when authoritative forms exist", () => {
   const deck = verbApi.buildVerbConjugationDeck({
     vocabulary: [],

@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307i";
+const APP_BUILD = "20260307j";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -790,7 +790,6 @@ const el = {
   homeView: document.querySelector("#homeView"),
   homeDashboard: document.querySelector("#homeDashboard"),
   homeLessonStage: document.querySelector("#homeLessonStage"),
-  homeResultsStage: document.querySelector("#homeResultsStage"),
   reviewView: document.querySelector("#reviewView"),
   settingsView: document.querySelector("#settingsView"),
   resultsView: document.querySelector("#resultsView"),
@@ -802,6 +801,7 @@ const el = {
   lessonBtn: document.querySelector("#lessonBtn"),
   verbMatchBtn: document.querySelector("#verbMatchBtn"),
   abbreviationBtn: document.querySelector("#abbreviationBtn"),
+  homeBtn: document.querySelector("#homeBtn"),
   gamePicker: document.querySelector("#gamePicker"),
   statusRow: document.querySelector(".status-row"),
   homeLangToggle: document.querySelector("#homeLangToggle"),
@@ -1007,14 +1007,15 @@ function bindUi() {
   });
   el.nextBtn.addEventListener("click", () => handleNextAction());
   el.masterVerbBtn?.addEventListener("click", () => moveEligibleVerbToMastered());
+  el.homeBtn?.addEventListener("click", () => requestGoHome());
   el.homeLangToggle?.addEventListener("click", () => toggleLanguage());
   el.homeThemeToggle?.addEventListener("click", () => toggleTheme());
   el.homeNiqqudToggle?.addEventListener("click", () => toggleNiqqudPreference());
   el.langToggle?.addEventListener("click", () => toggleLanguage());
   el.themeToggle?.addEventListener("click", () => toggleTheme());
   el.resultsContinueBtn?.addEventListener("click", () => continueFromResults());
-  el.resultsReviewBtn?.addEventListener("click", () => navigateTo("review"));
-  el.resultsHomeBtn?.addEventListener("click", () => goHome());
+  el.resultsReviewBtn?.addEventListener("click", () => leaveSummaryAndNavigate("review"));
+  el.resultsHomeBtn?.addEventListener("click", () => leaveSummaryAndNavigate("home"));
   el.welcomeModalCloseBtn?.addEventListener("click", () => closeWelcomeModal());
   el.welcomeModal?.addEventListener("click", (event) => {
     if (event.target === el.welcomeModal) {
@@ -1068,8 +1069,8 @@ function bindUi() {
 }
 
 function handleRouteButtonPress(route) {
-  if (state.summary.active && route === "home") {
-    goHome();
+  if (state.summary.active) {
+    leaveSummaryAndNavigate(route);
     return;
   }
 
@@ -1124,6 +1125,17 @@ function continueFromResults() {
   startLesson();
 }
 
+function leaveSummaryAndNavigate(targetRoute = "home") {
+  if (!state.summary.active) {
+    navigateTo(targetRoute);
+    return;
+  }
+  clearSummaryState();
+  state.mode = "home";
+  state.route = resolveInitialRoute(targetRoute);
+  renderAll();
+}
+
 function hasActiveLearnSession() {
   return Boolean(
     state.lesson.active ||
@@ -1147,14 +1159,14 @@ function isModeSessionActive(mode) {
 }
 
 function resolveInitialRoute(candidate, options = {}) {
-  const valid = new Set(["home", "review", "settings"]);
+  const valid = new Set(["home", "review", "settings", "results"]);
   if (state.summary.active) {
-    return valid.has(candidate) ? candidate : "home";
+    return valid.has(candidate) ? candidate : "results";
   }
   if (hasActiveLearnSession()) {
     return "home";
   }
-  return valid.has(candidate) ? candidate : "home";
+  return valid.has(candidate) && candidate !== "results" ? candidate : "home";
 }
 
 function navigateTo(route) {
@@ -1307,6 +1319,8 @@ function applyLanguage() {
     el.langToggle.setAttribute("aria-label", toggleLabel);
   }
 
+  renderHomeButton();
+
   if (el.welcomeModalCloseBtn) {
     el.welcomeModalCloseBtn.setAttribute("aria-label", t("welcome.closeAria"));
   }
@@ -1346,6 +1360,14 @@ function getLocaleBundle() {
 
 function getLanguageToggleLabel() {
   return state.language === "en" ? "עברית" : "English";
+}
+
+function renderHomeButton() {
+  if (!el.homeBtn) return;
+  const label = t("session.backHome");
+  el.homeBtn.textContent = "🏠";
+  el.homeBtn.setAttribute("aria-label", label);
+  el.homeBtn.setAttribute("title", label);
 }
 
 function getNestedTranslation(bundle, key) {
@@ -1402,6 +1424,7 @@ function renderAll() {
 
 function renderRouteVisibility() {
   el.homeView?.classList.toggle("active", state.route === "home");
+  el.resultsView?.classList.toggle("active", state.route === "results" && state.summary.active);
   el.reviewView?.classList.toggle("active", state.route === "review");
   el.settingsView?.classList.toggle("active", state.route === "settings");
 }
@@ -1412,7 +1435,7 @@ function renderShellChrome() {
     el.shellRouteChip.textContent = t(routeKey);
   }
   if (el.shellRouteSummary) {
-    if (state.summary.active && state.route === "home") {
+    if (state.summary.active && state.route === "results") {
       el.shellRouteSummary.textContent = t("summary.thumbsText");
     } else if (state.route === "home") {
       el.shellRouteSummary.textContent = hasActiveLearnSession() ? t("dashboard.active") : t("dashboard.ready");
@@ -1860,10 +1883,8 @@ function goHome() {
 
 function renderHomeState() {
   const showLesson = hasActiveLearnSession();
-  const showSummary = Boolean(state.summary.active && state.route === "home");
-  el.homeDashboard?.classList.toggle("hidden", showLesson || showSummary);
+  el.homeDashboard?.classList.toggle("hidden", showLesson);
   el.homeLessonStage?.classList.toggle("hidden", !showLesson);
-  el.homeResultsStage?.classList.toggle("hidden", !showSummary);
   renderHomeLessonButtons();
   renderHomeOptions();
 }
@@ -1896,7 +1917,7 @@ function showSessionSummary(config = {}) {
   state.summary.incorrectCount = Math.max(0, Number(config.incorrectCount || 0));
   state.summary.elapsedSeconds = Math.max(0, Number(config.elapsedSeconds || 0));
   state.summary.mistakes = Array.isArray(config.mistakes) ? config.mistakes : [];
-  state.route = "home";
+  state.route = "results";
   clearFeedback();
   renderAll();
 }

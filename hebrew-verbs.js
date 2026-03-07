@@ -1349,6 +1349,7 @@ function inflectEnglishPast(basePhrase) {
     ["eat", "ate"],
     ["give", "gave"],
     ["go", "went"],
+    ["keep", "kept"],
     ["see", "saw"],
     ["sit", "sat"],
     ["take", "took"],
