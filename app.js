@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307k";
+const APP_BUILD = "20260307l";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -347,7 +347,7 @@ const I18N = {
       closeAria: "Close welcome message",
     },
     results: {
-      continue: "Continue",
+      continue: "Play Again",
       correct: "Correct",
       incorrect: "Incorrect",
       time: "Time",
@@ -360,7 +360,7 @@ const I18N = {
       mistakes: "Session Mistakes",
       reviewPerformance: "Review Performance",
       niceJob: "Nice job!",
-      amazing: "That's amazing!",
+      amazing: "Amazing!",
       noMistakes: "No mistakes in this session.",
     },
     match: {
@@ -590,7 +590,7 @@ const I18N = {
       closeAria: "סגור הודעת פתיחה",
     },
     results: {
-      continue: "המשך",
+      continue: "שחק שוב",
       correct: "נכון",
       incorrect: "שגוי",
       time: "זמן",

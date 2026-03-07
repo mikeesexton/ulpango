@@ -966,6 +966,7 @@ const RAW = {
     ["landlord", "בעל הדירה", "בַּעַל הַדִּירָה"],
     ["tenant", "שוכר", "שׂוֹכֵר"],
     ["building maintenance fee", "ועד בית", "וַעַד בַּיִת"],
+    ["to crack your knuckles", "לפצח מפרקים", "לְפַצֵּחַ מַפְרָקִים"],
   ],
   abstract_philosophy: [
     ["consciousness", "תודעה", "תּוֹדָעָה"],
