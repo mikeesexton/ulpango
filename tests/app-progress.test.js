@@ -441,6 +441,33 @@ test("starting conjugation immediately swaps out the home picker and shows five 
   harness.goHome();
 });
 
+test("conjugation sessions are capped to a small verb set so results are reachable", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const verbDeck = Array.from({ length: 8 }, (_, index) => ({
+    word: {
+      id: `verb-${index + 1}`,
+      en: `to test ${index + 1}`,
+      he: `לבדוק${index + 1}`,
+      heNiqqud: `לִבְדוֹק${index + 1}`,
+    },
+    formSource: "validated",
+    forms: [
+      { id: "present_masculine_singular", englishText: `he tests ${index + 1}`, valuePlain: `בודק${index + 1}`, valueNiqqud: `בּוֹדֵק${index + 1}` },
+      { id: "present_feminine_singular", englishText: `she tests ${index + 1}`, valuePlain: `בודקת${index + 1}`, valueNiqqud: `בּוֹדֶקֶת${index + 1}` },
+      { id: "past_first_person_singular", englishText: `I tested ${index + 1}`, valuePlain: `בדקתי${index + 1}`, valueNiqqud: `בָּדַקְתִּי${index + 1}` },
+      { id: "future_first_person_singular", englishText: `I will test ${index + 1}`, valuePlain: `אבדוק${index + 1}`, valueNiqqud: `אֶבְדּוֹק${index + 1}` },
+    ],
+  }));
+
+  const { startVerbMatch, state } = loadAppHarness(vocabulary, [], verbDeck);
+  startVerbMatch();
+
+  assert.equal(state.match.totalVerbs, 5);
+  assert.equal(state.match.verbQueue.length, 5);
+});
+
 test("active learn sessions stay pinned to home and restored intros auto-advance into gameplay", async () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },

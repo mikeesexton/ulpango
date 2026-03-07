@@ -680,6 +680,7 @@ const LEITNER_INTERVALS = [
 ];
 const LESSON_ROUNDS = 10;
 const ABBREVIATION_ROUNDS = 10;
+const VERB_MATCH_ROUNDS = 5;
 const MATCH_MAX_PAIRS = 12;
 const MATCH_VISIBLE_ROWS = 5;
 const CONJUGATION_MASTER_STREAK = 10;
@@ -3109,7 +3110,7 @@ function startVerbMatch() {
   }
 
   state.match.active = true;
-  state.match.verbQueue = shuffle(verbFormDeck);
+  state.match.verbQueue = shuffle(verbFormDeck).slice(0, VERB_MATCH_ROUNDS);
   state.match.totalVerbs = state.match.verbQueue.length;
   state.match.currentVerbIndex = 0;
   state.match.startMs = 0;
