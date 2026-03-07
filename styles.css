@@ -444,7 +444,12 @@ h3 {
 .home-option-value {
   font-weight: 800;
   color: var(--ink);
+  text-align: left;
+}
+
+body[data-ui-lang="en"] #homeLangValue {
   text-align: right;
+  direction: rtl;
 }
 
 .stats-grid {
@@ -736,6 +741,7 @@ h3 {
   font-family: "Alegreya", serif;
   font-size: 1.1rem;
   font-weight: 800;
+  align-self: center;
 }
 
 .game-tile-note {
