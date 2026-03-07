@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ivritelite | Advanced Hebrew Trainer</title>
+    <title>IvritElite | Advanced Hebrew Trainer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Assistant:wght@400;600;700&family=Chivo:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260307b" />
+    <link rel="stylesheet" href="./styles.css?v=20260307f" />
   </head>
   <body data-theme="dark">
     <div class="ambient ambient-a" aria-hidden="true"></div>
@@ -21,7 +21,7 @@
       <header class="shell-topbar card">
         <div class="shell-brand shell-brand-title">
           <span class="shell-logo" aria-hidden="true">ע</span>
-          <h1 data-i18n="app.name">Ivritelite</h1>
+          <h1 data-i18n="app.name">IvritElite</h1>
         </div>
       </header>
 
@@ -77,7 +77,6 @@
                         <div>
                           <h2 id="modeTitle">10-Round Mixed Lesson</h2>
                         </div>
-                        <button type="button" id="homeBtn" class="quiet home-emoji-btn" aria-label="Back to Home" title="Back to Home">🏠</button>
                       </div>
 
                       <div class="status-row">
@@ -127,22 +126,31 @@
                     </button>
                   </div>
                 </article>
+
+                <article id="homeResultsStage" class="page-card results-card hidden">
+                  <div class="results-head">
+                    <h2 id="resultsTitle">Translation Complete</h2>
+                    <p id="resultsNote" class="results-praise">Nice job!</p>
+                  </div>
+                  <div id="resultsSummary" class="results-summary"></div>
+                  <div class="results-actions">
+                    <button id="resultsContinueBtn" type="button" class="accent" data-i18n="results.continue">Continue</button>
+                    <button id="resultsReviewBtn" type="button" class="quiet" data-i18n="results.reviewPerformance">Review Performance</button>
+                    <button id="resultsHomeBtn" type="button" class="quiet" data-i18n="session.backHome">Back to Home</button>
+                  </div>
+                </article>
               </div>
 
               <aside class="home-utility-rail" aria-label="Home tools">
                 <article class="page-card home-controls-card">
                   <div class="section-head">
-                    <div>
-                      <p class="eyebrow" data-i18n="dashboard.modeEyebrow">Interface</p>
-                      <h2 data-i18n="dashboard.modeTitle">Options</h2>
-                    </div>
-                    <p id="poolMeta" class="section-copy"></p>
+                    <h2 data-i18n="dashboard.modeTitle">Options</h2>
                   </div>
 
                   <div class="home-option-list">
                     <button type="button" id="homeLangToggle" class="settings-block home-option-btn">
                       <span class="settings-label" data-i18n="dashboard.language">Language</span>
-                      <span id="homeLangValue" class="home-option-value">English</span>
+                      <span id="homeLangValue" class="home-option-value">עברית</span>
                     </button>
                     <button type="button" id="homeThemeToggle" class="settings-block home-option-btn">
                       <span class="settings-label" data-i18n="dashboard.theme">Theme</span>
@@ -157,34 +165,13 @@
 
                 <article class="page-card home-analytics-card">
                   <div class="section-head">
-                    <div>
-                      <p class="eyebrow" data-i18n="review.analyticsEyebrow">Category Analytics</p>
-                      <h2 data-i18n="review.analyticsTitle">Category Performance</h2>
-                    </div>
+                    <h2 data-i18n="review.analyticsEyebrow">Category Analytics</h2>
                   </div>
                   <div id="homeDomainPerformance" class="domain-grid"></div>
                   <div id="homeModePerformance" class="mode-grid"></div>
                 </article>
               </aside>
             </div>
-          </section>
-
-          <section id="resultsView" class="page-view">
-            <article class="page-card results-card">
-              <div class="section-head">
-                <div>
-                  <p class="eyebrow" data-i18n="summary.resultsHeader">Session Results</p>
-                  <h2 id="resultsTitle">Translation Complete</h2>
-                </div>
-                <p id="resultsNote" class="section-copy"></p>
-              </div>
-              <div id="resultsSummary" class="results-summary"></div>
-              <div class="results-actions">
-                <button id="resultsContinueBtn" type="button" class="accent" data-i18n="results.continue">Continue</button>
-                <button id="resultsReviewBtn" type="button" class="quiet" data-i18n="dashboard.review">Review Mistakes</button>
-                <button id="resultsHomeBtn" type="button" class="quiet" data-i18n="session.backHome">Back to Home</button>
-              </div>
-            </article>
           </section>
 
           <section id="reviewView" class="page-view">
@@ -197,7 +184,7 @@
                 <p id="mostMissedEmpty" class="small-note" data-i18n="missed.empty">No misses yet.</p>
               </article>
 
-              <article class="page-card">
+              <article class="page-card review-analytics-card">
                 <div class="section-head">
                   <h2 data-i18n="review.analyticsEyebrow">Category Analytics</h2>
                 </div>
@@ -215,22 +202,22 @@
 
               <div class="settings-list">
                 <section class="settings-block">
-                  <p class="settings-label" data-i18n="settings.language">Language</p>
                   <button id="langToggle" type="button" class="quiet">עברית</button>
                 </section>
 
                 <section class="settings-block">
-                  <p class="settings-label" data-i18n="settings.niqqud">Inline Nikud</p>
                   <button type="button" id="niqqudToggle" class="quiet" data-i18n="prompt.showNiqqud">Show Nikud</button>
                 </section>
 
                 <section class="settings-block">
-                  <p class="settings-label" data-i18n="settings.theme">Theme</p>
                   <button id="themeToggle" type="button" class="quiet">Light Mode</button>
                 </section>
 
+                <section class="settings-block">
+                  <a id="feedbackSurveyLink" class="settings-link-btn" data-i18n="settings.feedbackSurvey">Feedback survey</a>
+                </section>
+
                 <section class="settings-block danger-block">
-                  <p class="small-note" data-i18n="settings.resetNote">Clear saved spacing, streaks, and review data.</p>
                   <button id="resetProgress" type="button" class="quiet" data-i18n="controls.reset">Reset Progress</button>
                 </section>
               </div>
@@ -283,10 +270,26 @@
       </div>
     </div>
 
+    <div id="welcomeModal" class="session-leave-modal hidden" aria-hidden="true">
+      <section class="welcome-dialog card" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+        <div class="welcome-head">
+          <h3 id="welcomeModalTitle" data-i18n="welcome.title">Welcome to IvritElite!</h3>
+        </div>
+        <div class="welcome-copy">
+          <p data-i18n="welcome.line1">This is a new app for advanced Hebrew learning.</p>
+          <p>
+            <span data-i18n="welcome.surveyPrefix">We would love to hear your feedback in </span><a id="welcomeSurveyLink" data-i18n="welcome.surveyLink">this survey</a><span data-i18n="welcome.surveySuffix">.</span>
+          </p>
+          <p data-i18n="welcome.line2">You can also access the survey from the Settings page.</p>
+        </div>
+        <button type="button" id="welcomeModalCloseBtn" class="quiet welcome-close-btn" data-i18n="welcome.close">Close</button>
+      </section>
+    </div>
+
     <div id="leaveSessionConfirm" class="session-leave-modal hidden" aria-hidden="true">
       <section class="session-leave-dialog card" role="dialog" aria-modal="true" aria-labelledby="leaveSessionTitle">
         <h3 id="leaveSessionTitle" data-i18n="session.leaveTitle">Leave this game?</h3>
-        <p class="small-note" data-i18n="session.leaveBody">If you go home now, you'll lose your progress so far.</p>
+        <p class="small-note" data-i18n="session.leaveBody">If you leave this game now, you'll lose your progress so far.</p>
         <div class="session-leave-actions">
           <button id="leaveSessionStayBtn" type="button" class="quiet" data-i18n="session.keepPlaying">Keep Playing</button>
           <button id="leaveSessionConfirmBtn" type="button" class="accent" data-i18n="session.leaveGame">Lose Progress</button>
@@ -343,9 +346,9 @@
         });
       })();
     </script>
-    <script src="./vocab-data.js?v=20260306d"></script>
+    <script src="./vocab-data.js?v=20260307b"></script>
     <script src="./abbreviation-data.js?v=20260306d"></script>
-    <script src="./hebrew-verbs.js?v=20260306d"></script>
-    <script src="./app.js?v=20260307b"></script>
+    <script src="./hebrew-verbs.js?v=20260307a"></script>
+    <script src="./app.js?v=20260307i"></script>
   </body>
 </html>

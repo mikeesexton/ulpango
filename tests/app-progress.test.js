@@ -98,8 +98,8 @@ class FakeElement {
   }
 }
 
-function createLocalStorage() {
-  const store = new Map();
+function createLocalStorage(initialEntries = {}) {
+  const store = new Map(Object.entries(initialEntries));
   return {
     getItem(key) {
       return store.has(key) ? store.get(key) : null;
@@ -110,10 +110,13 @@ function createLocalStorage() {
     removeItem(key) {
       store.delete(key);
     },
+    __dump() {
+      return Object.fromEntries(store.entries());
+    },
   };
 }
 
-function loadAppHarness(vocabulary, abbreviations = [], verbDeck = []) {
+function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options = {}) {
   const sourcePath = path.join(__dirname, "..", "app.js");
   const source = fs.readFileSync(sourcePath, "utf8");
   const instrumented = source.replace(
@@ -126,13 +129,18 @@ globalThis.__appTestExports = {
   beginVerbMatchFromIntro,
   confirmLeaveSession,
   closeLeaveSessionConfirm,
+  closeWelcomeModal,
   document,
   goHome,
   getMostMissedRanked,
   getProgressRecord,
+  getSelectedPool,
+  localStorage,
+  loadNextVerbRound,
   navigateTo,
   nextAbbreviationQuestion,
   nextQuestion,
+  requestLeaveSession,
   requestGoHome,
   resumeActiveTimers,
   restoreSessionState,
@@ -188,7 +196,9 @@ globalThis.__appTestExports = {
       introAutoAdvanceMs: 0,
     },
     document,
-    localStorage: createLocalStorage(),
+    localStorage: createLocalStorage(options.localStorageData || {
+      "ivriquest-welcome-seen-v1": "1",
+    }),
     confirm() {
       return false;
     },
@@ -277,6 +287,48 @@ test("correct second-chance answers do not add misses or reshuffle most-missed r
   assert.deepEqual(
     getMostMissedRanked().map((item) => `${item.wordId}:${item.missed}`),
     ["alpha:1", "beta:1"]
+  );
+});
+
+test("welcome modal appears once and survey links stay available", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const firstHarness = loadAppHarness(vocabulary, [], [], { localStorageData: {} });
+  const feedbackLink = firstHarness.document.querySelector("#feedbackSurveyLink");
+  const welcomeLink = firstHarness.document.querySelector("#welcomeSurveyLink");
+
+  assert.equal(firstHarness.state.welcomeModalOpen, true);
+  assert.equal(firstHarness.localStorage.getItem("ivriquest-welcome-seen-v1"), "1");
+  assert.equal(feedbackLink.getAttribute("href"), "https://forms.gle/KqqP7TVLxphRDM179");
+  assert.equal(feedbackLink.getAttribute("target"), "_blank");
+  assert.equal(feedbackLink.getAttribute("rel"), "noopener noreferrer");
+  assert.equal(welcomeLink.getAttribute("href"), "https://forms.gle/KqqP7TVLxphRDM179");
+  assert.equal(welcomeLink.getAttribute("target"), "_blank");
+  assert.equal(welcomeLink.getAttribute("rel"), "noopener noreferrer");
+
+  firstHarness.closeWelcomeModal();
+  assert.equal(firstHarness.state.welcomeModalOpen, false);
+
+  const returningHarness = loadAppHarness(vocabulary, [], [], {
+    localStorageData: firstHarness.localStorage.__dump(),
+  });
+  assert.equal(returningHarness.state.welcomeModalOpen, false);
+});
+
+test("most-missed rankings ignore words that are unavailable for translation quiz", () => {
+  const vocabulary = [
+    { id: "basic-office", category: "work_business", en: "office", he: "משרד", heNiqqud: "מִשְׂרָד", utility: 82, source: "seed", availability: { translationQuiz: false, sentenceHints: true } },
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test", availability: { translationQuiz: true, sentenceHints: true } },
+  ];
+  const { getMostMissedRanked, updateProgress } = loadAppHarness(vocabulary);
+
+  updateProgress("basic-office", false);
+  updateProgress("alpha", false);
+
+  assert.deepEqual(
+    getMostMissedRanked().map((item) => `${item.wordId}:${item.missed}`),
+    ["alpha:1"]
   );
 });
 
@@ -532,4 +584,90 @@ test("home button opens a leave confirmation before dropping session progress", 
   assert.equal(state.lesson.active, false);
   assert.equal(state.route, "home");
   assert.equal(state.currentQuestion, null);
+});
+
+test("leaving an active game for review keeps the warning and lands on review after confirmation", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { confirmLeaveSession, nextQuestion, requestLeaveSession, state } = loadAppHarness(vocabulary);
+
+  state.mode = "lesson";
+  state.route = "home";
+  state.lesson.active = true;
+  nextQuestion();
+
+  requestLeaveSession("review");
+  assert.equal(state.leaveConfirmOpen, true);
+  assert.equal(state.lesson.active, true);
+
+  confirmLeaveSession();
+  assert.equal(state.leaveConfirmOpen, false);
+  assert.equal(state.lesson.active, false);
+  assert.equal(state.route, "review");
+});
+
+test("conjugation summary keeps its performance data and home exits without a leave prompt", () => {
+  const vocabulary = [
+    { id: "verb-go", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      word: { id: "verb-go", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת" },
+      formSource: "validated",
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+        { id: "present_feminine_singular", englishText: "she goes", valuePlain: "הולכת", valueNiqqud: "הוֹלֶכֶת" },
+      ],
+    },
+  ];
+  const { document, loadNextVerbRound, requestGoHome, state } = loadAppHarness(vocabulary, [], verbDeck);
+
+  state.mode = "verbMatch";
+  state.route = "home";
+  state.match.active = true;
+  state.match.verbQueue = [];
+  state.match.totalVerbs = 3;
+  state.match.sessionMatched = 7;
+  state.match.sessionTotalPairs = 10;
+  state.match.bestCombo = 4;
+  state.match.elapsedSeconds = 21;
+  state.match.mismatchCount = 3;
+  state.match.sessionMistakeIds = ["verb-go"];
+
+  loadNextVerbRound();
+
+  assert.equal(state.summary.active, true);
+  assert.equal(state.route, "home");
+  assert.equal(state.summary.game, "verbMatch");
+  assert.equal(state.summary.correctCount, 7);
+  assert.equal(state.summary.incorrectCount, 3);
+  assert.equal(document.querySelector("#homeResultsStage").classList.contains("hidden"), false);
+  assert.equal(document.querySelector("#resultsNote").textContent, "Nice job!");
+  assert.equal(document.querySelector("#resultsSummary").children[0].children.length, 1);
+  assert.equal(document.querySelector("#resultsSummary").children[0].children[0].children[0].children.length, 1);
+  assert.deepEqual(
+    state.summary.mistakes.map((item) => ({ primary: item.primary, secondary: item.secondary })),
+    [{ primary: "לָלֶכֶת", secondary: "to go" }]
+  );
+
+  requestGoHome();
+  assert.equal(state.leaveConfirmOpen, false);
+  assert.equal(state.summary.active, false);
+  assert.equal(state.route, "home");
+});
+
+test("translation pool excludes words marked unavailable for translation quiz", () => {
+  const vocabulary = [
+    { id: "basic-go", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 91, source: "verb-seed", availability: { translationQuiz: false, sentenceHints: true } },
+    { id: "basic-office", category: "work_business", en: "office", he: "משרד", heNiqqud: "מִשְׂרָד", utility: 82, source: "seed", availability: { translationQuiz: false, sentenceHints: true } },
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test", availability: { translationQuiz: true, sentenceHints: true } },
+  ];
+  const { getSelectedPool } = loadAppHarness(vocabulary);
+
+  assert.deepEqual(
+    Array.from(getSelectedPool(), (word) => word.id),
+    ["alpha"]
+  );
 });

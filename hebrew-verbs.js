@@ -45,6 +45,7 @@ if (root) {
  *   personal_priority: number,
  *   category: string,
  *   source_word_ids: string[],
+ *   availability: { translationQuiz: boolean, sentenceHints: boolean },
  *   source: string,
  *   generation_pattern: string | null,
  * }} VerbEntry
@@ -78,6 +79,11 @@ const FORMAL_FUTURE_FORM_ORDER = [
   { id: "future_second_person_feminine_plural", tense: "future", slot: "second_person_feminine_plural" },
   { id: "future_third_person_feminine_plural", tense: "future", slot: "third_person_feminine_plural" },
 ];
+
+const AVAILABILITY_DEFAULTS = Object.freeze({
+  translationQuiz: true,
+  sentenceHints: true,
+});
 
 const RECOGNIZED_REGULARITY = new Set(["regular", "irregular", "ambiguous", "phrase"]);
 const RECOGNIZED_CONJUGATION_MODES = new Set(["generated", "curated", "phrase_only", "blocked"]);
@@ -124,6 +130,49 @@ const SAFE_GENERATION_OVERRIDES = new Map([
   ["להסמיך", { root: ["ס", "מ", "כ"], binyan: "hifil", personal_priority: 70 }],
   ["להרתיח", { root: ["ר", "ת", "ח"], binyan: "hifil", personal_priority: 79 }],
 ]);
+
+const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
+  "starter-verb-liftoach",
+  "starter-verb-lisgor",
+  "starter-verb-lilmod",
+  "starter-verb-lesachek",
+  "starter-verb-laavod",
+  "starter-verb-lagur",
+  "starter-verb-lavo",
+  "starter-verb-lihyot",
+  "starter-verb-lirot",
+  "starter-verb-lakachat",
+  "starter-verb-lasim",
+  "starter-verb-latet",
+  "starter-verb-lashevet",
+  "starter-verb-lalechet",
+  "starter-verb-lehagid",
+  "starter-verb-laamod",
+  "starter-verb-leechol",
+  "starter-verb-lishtot",
+]);
+
+function normalizeAvailability(availability) {
+  return {
+    translationQuiz: availability?.translationQuiz !== false,
+    sentenceHints: availability?.sentenceHints !== false,
+  };
+}
+
+function mergeAvailability(current, incoming) {
+  const left = normalizeAvailability(current || AVAILABILITY_DEFAULTS);
+  const right = normalizeAvailability(incoming || AVAILABILITY_DEFAULTS);
+  return {
+    translationQuiz: left.translationQuiz && right.translationQuiz,
+    sentenceHints: left.sentenceHints || right.sentenceHints,
+  };
+}
+
+function getStarterVerbAvailability(id) {
+  return TRANSLATION_HIDDEN_STARTER_VERB_IDS.has(id)
+    ? { translationQuiz: false, sentenceHints: true }
+    : AVAILABILITY_DEFAULTS;
+}
 
 function makePresent(ms, fs, mp, fp) {
   return {
@@ -216,6 +265,7 @@ function createVerbEntry(config) {
     source_word_ids: Array.isArray(config?.source_word_ids)
       ? config.source_word_ids.map((id) => String(id || "").trim()).filter(Boolean)
       : [],
+    availability: normalizeAvailability(config?.availability || AVAILABILITY_DEFAULTS),
     source: String(config?.source || "hebrew-verb"),
     generation_pattern: config?.generation_pattern || null,
   };
@@ -225,6 +275,7 @@ function buildStarterVerbEntries() {
   return [
     createVerbEntry({
       id: "starter-verb-lisgor",
+      availability: getStarterVerbAvailability("starter-verb-lisgor"),
       lemma: "לסגור",
       root: ["ס", "ג", "ר"],
       binyan: "paal",
@@ -245,6 +296,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-liftoach",
+      availability: getStarterVerbAvailability("starter-verb-liftoach"),
       lemma: "לפתוח",
       root: ["פ", "ת", "ח"],
       binyan: "paal",
@@ -263,6 +315,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lichtov",
+      availability: getStarterVerbAvailability("starter-verb-lichtov"),
       lemma: "לכתוב",
       root: ["כ", "ת", "ב"],
       binyan: "paal",
@@ -281,6 +334,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lishmor",
+      availability: getStarterVerbAvailability("starter-verb-lishmor"),
       lemma: "לשמור",
       root: ["ש", "מ", "ר"],
       binyan: "paal",
@@ -300,6 +354,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lilmod",
+      availability: getStarterVerbAvailability("starter-verb-lilmod"),
       lemma: "ללמוד",
       root: ["ל", "מ", "ד"],
       binyan: "paal",
@@ -318,6 +373,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-leechol",
+      availability: getStarterVerbAvailability("starter-verb-leechol"),
       lemma: "לאכול",
       root: ["א", "כ", "ל"],
       binyan: "paal",
@@ -336,6 +392,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lishtot",
+      availability: getStarterVerbAvailability("starter-verb-lishtot"),
       lemma: "לשתות",
       root: ["ש", "ת", "ה"],
       binyan: "paal",
@@ -354,6 +411,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lesachek",
+      availability: getStarterVerbAvailability("starter-verb-lesachek"),
       lemma: "לשחק",
       root: ["ש", "ח", "ק"],
       binyan: "piel",
@@ -372,6 +430,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-laavod",
+      availability: getStarterVerbAvailability("starter-verb-laavod"),
       lemma: "לעבוד",
       root: ["ע", "ב", "ד"],
       binyan: "paal",
@@ -390,6 +449,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lagur",
+      availability: getStarterVerbAvailability("starter-verb-lagur"),
       lemma: "לגור",
       root: ["ג", "ו", "ר"],
       binyan: "paal",
@@ -408,6 +468,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lavo",
+      availability: getStarterVerbAvailability("starter-verb-lavo"),
       lemma: "לבוא",
       root: ["ב", "ו", "א"],
       binyan: "paal",
@@ -426,6 +487,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lihyot",
+      availability: getStarterVerbAvailability("starter-verb-lihyot"),
       lemma: "להיות",
       root: ["ה", "י", "ה"],
       binyan: "paal",
@@ -445,6 +507,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lirot",
+      availability: getStarterVerbAvailability("starter-verb-lirot"),
       lemma: "לראות",
       root: ["ר", "א", "ה"],
       binyan: "paal",
@@ -463,6 +526,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lakachat",
+      availability: getStarterVerbAvailability("starter-verb-lakachat"),
       lemma: "לקחת",
       root: ["ל", "ק", "ח"],
       binyan: "paal",
@@ -481,6 +545,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lasim",
+      availability: getStarterVerbAvailability("starter-verb-lasim"),
       lemma: "לשים",
       root: ["ש", "י", "ם"],
       binyan: "paal",
@@ -499,6 +564,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-latet",
+      availability: getStarterVerbAvailability("starter-verb-latet"),
       lemma: "לתת",
       root: ["נ", "ת", "נ"],
       binyan: "paal",
@@ -517,6 +583,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lalechet",
+      availability: getStarterVerbAvailability("starter-verb-lalechet"),
       lemma: "ללכת",
       root: ["ה", "ל", "כ"],
       binyan: "paal",
@@ -535,6 +602,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lehagid",
+      availability: getStarterVerbAvailability("starter-verb-lehagid"),
       lemma: "להגיד",
       root: ["נ", "ג", "ד"],
       binyan: "hifil",
@@ -554,6 +622,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-laamod",
+      availability: getStarterVerbAvailability("starter-verb-laamod"),
       lemma: "לעמוד",
       root: ["ע", "מ", "ד"],
       binyan: "paal",
@@ -572,6 +641,7 @@ function buildStarterVerbEntries() {
     }),
     createVerbEntry({
       id: "starter-verb-lashevet",
+      availability: getStarterVerbAvailability("starter-verb-lashevet"),
       lemma: "לשבת",
       root: ["י", "ש", "ב"],
       binyan: "paal",
@@ -610,6 +680,7 @@ function getSeedVocabularyEntries() {
         he: item.word.he,
         heNiqqud: item.word.heNiqqud,
         utility: item.word.utility,
+        availability: cloneData(item.word.availability || AVAILABILITY_DEFAULTS),
         source: "verb-seed",
       });
     });
@@ -686,6 +757,7 @@ function buildStudyWord(entry, sense, senseIndex) {
     he: usagePattern ? `${String(entry?.lemma || "").trim()} ${usagePattern}` : String(entry?.lemma || "").trim(),
     heNiqqud: usagePattern ? `${String(entry?.lemma || "").trim()} ${usagePattern}` : String(entry?.lemma || "").trim(),
     utility: clampNumber(entry?.personal_priority, 1, 100, 60),
+    availability: normalizeAvailability(entry?.availability || AVAILABILITY_DEFAULTS),
     source: String(entry?.source || "hebrew-verb"),
     usagePattern,
   };
@@ -968,6 +1040,7 @@ function buildVocabularyVerbGroups(words) {
         wordIds: [],
         category: String(word?.category || "core_advanced"),
         utility: Number(word?.utility || 60),
+        availability: normalizeAvailability(word?.availability || AVAILABILITY_DEFAULTS),
       });
     }
 
@@ -978,6 +1051,7 @@ function buildVocabularyVerbGroups(words) {
     }
     group.wordIds.push(String(word?.id || slugifyHebrewId(`${lemma}-${group.wordIds.length + 1}`)));
     group.utility = Math.max(group.utility, Number(word?.utility || 60));
+    group.availability = mergeAvailability(group.availability, word?.availability || AVAILABILITY_DEFAULTS);
     if (!group.category && word?.category) {
       group.category = String(word.category);
     }
@@ -989,6 +1063,7 @@ function buildVocabularyVerbGroups(words) {
     source_word_ids: group.wordIds.slice(),
     category: group.category || "core_advanced",
     personal_priority: clampNumber(group.utility, 1, 100, 60),
+    availability: normalizeAvailability(group.availability || AVAILABILITY_DEFAULTS),
   }));
 }
 
@@ -1015,6 +1090,7 @@ function migrateVerbGroup(group) {
         tags: ["migrated", "phrase_only"],
         personal_priority: group.personal_priority,
         source_word_ids: group.source_word_ids,
+        availability: group.availability,
         category: group.category,
         source: "vocab-migration",
       }),
@@ -1042,6 +1118,7 @@ function migrateVerbGroup(group) {
         tags: ["migrated", "ambiguous"],
         personal_priority: group.personal_priority,
         source_word_ids: group.source_word_ids,
+        availability: group.availability,
         category: group.category,
         source: "vocab-migration",
       }),
@@ -1069,6 +1146,7 @@ function migrateVerbGroup(group) {
       tags: ["migrated", "generated_safe"],
       personal_priority: generatedOverride.personal_priority || group.personal_priority,
       source_word_ids: group.source_word_ids,
+      availability: group.availability,
       category: group.category,
       source: "vocab-migration",
     });
@@ -1103,6 +1181,7 @@ function migrateVerbGroup(group) {
         tags: ["migrated", "curated_needed"],
         personal_priority: group.personal_priority,
         source_word_ids: group.source_word_ids,
+        availability: group.availability,
         category: group.category,
         source: "vocab-migration",
       }),
@@ -1129,6 +1208,7 @@ function migrateVerbGroup(group) {
       tags: ["migrated", "blocked"],
       personal_priority: group.personal_priority,
       source_word_ids: group.source_word_ids,
+      availability: group.availability,
       category: group.category,
       source: "vocab-migration",
     }),

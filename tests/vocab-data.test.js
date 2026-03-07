@@ -20,14 +20,20 @@ function loadVocabulary() {
   return context.IvriQuestVocab.getBaseVocabulary();
 }
 
-test("removed standalone vocabulary words are absent from the seed list", () => {
+test("basic standalone vocabulary stays in the lexicon but is unavailable for translation quiz", () => {
   const vocabulary = loadVocabulary();
-  const removedHebrew = new Set(["רופא", "משרד", "פגישה", "פרויקט", "דרכון", "ויזה"]);
+  const dictionaryOnlyHebrew = new Set(["סכין", "מקרר", "כיור", "רופא", "אחות", "בית חולים", "משרד", "פגישה", "פרויקט", "דרכון", "ויזה"]);
+  const entriesByHebrew = new Map(vocabulary.map((word) => [word.he, word]));
 
-  vocabulary.forEach((word) => {
-    assert.equal(removedHebrew.has(word.he), false, `unexpected removed word still present: ${word.he}`);
-    assert.equal(word.he.includes("משרד"), false, `unexpected משרד entry still present: ${word.he}`);
+  dictionaryOnlyHebrew.forEach((hebrew) => {
+    const word = entriesByHebrew.get(hebrew);
+    assert.ok(word, `expected lexicon entry for ${hebrew}`);
+    assert.equal(word.availability?.translationQuiz, false, `expected ${hebrew} to stay out of translation quiz`);
+    assert.equal(word.availability?.sentenceHints, true, `expected ${hebrew} to stay available for sentence hints`);
   });
+
+  assert.equal(entriesByHebrew.get("מצקת")?.availability?.translationQuiz, true);
+  assert.equal(entriesByHebrew.get("מצקת")?.availability?.sentenceHints, true);
 });
 
 test("duplicate Hebrew glosses are collapsed into shared translations", () => {

@@ -273,6 +273,16 @@ test("phrase verbs stay out of generic conjugation mode", () => {
   assert.equal(deck.filter((entry) => entry.id === "phrase-source").length, 0);
 });
 
+test("starter verb seed entries carry per-mode availability metadata", () => {
+  const entries = verbApi.getSeedVocabularyEntries();
+  const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
+
+  assert.equal(entriesById.get("starter-verb-lalechet--sense-1")?.availability?.translationQuiz, false);
+  assert.equal(entriesById.get("starter-verb-lalechet--sense-1")?.availability?.sentenceHints, true);
+  assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.translationQuiz, true);
+  assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.sentenceHints, true);
+});
+
 test("generated-safe verbs may use the limited generator", () => {
   const result = verbApi.resolveLearnerFacingForms(
     {

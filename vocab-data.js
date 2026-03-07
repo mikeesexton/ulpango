@@ -697,6 +697,7 @@ const RAW = {
     ["sprain", "נקע", "נֶקַע"],
     ["rash", "פריחה", "פְּרִיחָה"],
     ["dehydration", "התייבשות", "הִתְיַבְּשׁוּת"],
+    ["doctor", "רופא", "רוֹפֵא"],
   ],
   work_business: [
     ["agenda", "סדר יום", "סֵדֶר יוֹם"],
@@ -770,6 +771,9 @@ const RAW = {
     ["valuation", "שווי", "שְׁוִי"],
     ["board of directors", "דירקטוריון", "דִּירֶקְטוֹרְיוֹן"],
     ["shareholder", "בעל מניות", "בַּעַל מְנָיוֹת"],
+    ["office", "משרד", "מִשְׂרָד"],
+    ["meeting", "פגישה", "פְּגִישָׁה"],
+    ["project", "פרויקט", "פְּרוֹיֶקְט"],
   ],
   bureaucracy: [
     ["municipality", "עירייה", "עִירִיָּה"],
@@ -858,6 +862,8 @@ const RAW = {
     ["legal aid", "סיוע משפטי", "סִיּוּעַ מִשְׁפָּטִי"],
     ["court", "בית משפט", "בֵּית מִשְׁפָּט"],
     ["legal proceeding", "הליך משפטי", "הֲלִיךְ מִשְׁפָּטִי"],
+    ["passport", "דרכון", "דַּרְכּוֹן"],
+    ["visa", "ויזה", "וִיזָה"],
   ],
   home_everyday_life: [
     ["shelf", "מדף", "מַדָּף"],
@@ -1401,6 +1407,32 @@ const RAW = {
   ],
 };
 
+const AVAILABILITY_DEFAULTS = Object.freeze({
+  translationQuiz: true,
+  sentenceHints: true,
+});
+
+const LEXICON_AVAILABILITY_OVERRIDES = new Map([
+  ["אחות", { translationQuiz: false }],
+  ["בית חולים", { translationQuiz: false }],
+  ["כיור", { translationQuiz: false }],
+  ["מקרר", { translationQuiz: false }],
+  ["סכין", { translationQuiz: false }],
+  ["רופא", { translationQuiz: false }],
+  ["משרד", { translationQuiz: false }],
+  ["פגישה", { translationQuiz: false }],
+  ["פרויקט", { translationQuiz: false }],
+  ["דרכון", { translationQuiz: false }],
+  ["ויזה", { translationQuiz: false }],
+]);
+
+function normalizeAvailability(availability) {
+  return {
+    translationQuiz: availability?.translationQuiz !== false,
+    sentenceHints: availability?.sentenceHints !== false,
+  };
+}
+
 function slug(input) {
   return input
     .toLowerCase()
@@ -1426,6 +1458,7 @@ function getBaseVocabulary() {
         he,
         heNiqqud: heNiqqud || he,
         utility,
+        availability: normalizeAvailability(LEXICON_AVAILABILITY_OVERRIDES.get(he) || AVAILABILITY_DEFAULTS),
         source: "seed",
       });
     });
@@ -1438,6 +1471,6 @@ global.IvriQuestVocab = {
   CATEGORY_META,
   EXPANSION_TRACKS,
   getBaseVocabulary,
-  __build: "20260306a",
+  __build: "20260307b",
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307b";
+const APP_BUILD = "20260307i";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -169,8 +169,8 @@ const expansionTrackCount = Object.values(expansionTracks).reduce(
 const I18N = {
   en: {
     app: {
-      title: "Ivritelite | Advanced Hebrew Trainer",
-      name: "Ivritelite",
+      title: "IvritElite | Advanced Hebrew Trainer",
+      name: "IvritElite",
     },
     nav: {
       home: "Home",
@@ -220,9 +220,10 @@ const I18N = {
       skip: "Skip",
       submit: "Submit",
       next: "Next",
+      viewResults: "View Results",
       backHome: "Back to Home",
       leaveTitle: "Leave this game?",
-      leaveBody: "If you go home now, you'll lose your progress so far.",
+      leaveBody: "If you leave this game now, you'll lose your progress so far.",
       keepPlaying: "Keep Playing",
       leaveGame: "Lose Progress",
       starting: "Starting...",
@@ -329,17 +330,37 @@ const I18N = {
       title: "Settings",
       note: "Adjust language, theme, and inline nikud.",
       language: "Language",
+      feedbackSurvey: "Feedback survey",
       niqqud: "Inline Nikud",
       theme: "Theme",
       resetTitle: "Reset Progress",
       resetNote: "Clear saved spacing, streaks, and review data.",
+    },
+    welcome: {
+      title: "Welcome to IvritElite!",
+      line1: "This is a new app for advanced Hebrew learning.",
+      surveyPrefix: "We would love to hear your feedback in ",
+      surveyLink: "this survey",
+      surveySuffix: ".",
+      line2: "You can also access the survey from the Settings page.",
+      close: "Close",
+      closeAria: "Close welcome message",
     },
     results: {
       continue: "Continue",
       correct: "Correct",
       incorrect: "Incorrect",
       time: "Time",
+      score: "Score",
+      accuracy: "Accuracy",
+      reviewRounds: "Review Rounds",
+      rounds: "Rounds",
+      verbs: "Verbs",
+      bestCombo: "Best Combo",
       mistakes: "Session Mistakes",
+      reviewPerformance: "Review Performance",
+      niceJob: "Nice job!",
+      amazing: "That's amazing!",
       noMistakes: "No mistakes in this session.",
     },
     match: {
@@ -357,7 +378,7 @@ const I18N = {
       generatedNote: "Using validated generated forms for an explicitly safe verb.",
     },
     pool: {
-      summary: "Unified vocabulary pool: {pool} words with nikud ({total} total).",
+      summary: "Translation pool: {pool} words with nikud ({total} in lexicon).",
       expansion: "Expansion tracks mapped: {count}.",
       tempProgress: "Progress is temporary in this browser mode (storage unavailable).",
       fallback: "Fallback vocab loaded because vocab-data.js was not available.",
@@ -442,9 +463,10 @@ const I18N = {
       skip: "דלג",
       submit: "שלח",
       next: "הבא",
+      viewResults: "לתוצאות",
       backHome: "חזרה לעמוד הבית",
       leaveTitle: "לצאת מהמשחק?",
-      leaveBody: "אם תחזור עכשיו לעמוד הבית, תאבד את ההתקדמות שלך עד כה.",
+      leaveBody: "אם תצא עכשיו מהמשחק, תאבד את ההתקדמות שלך עד כה.",
       keepPlaying: "להמשיך לשחק",
       leaveGame: "לאבד התקדמות",
       starting: "מתחיל...",
@@ -551,17 +573,37 @@ const I18N = {
       title: "הגדרות",
       note: "התאם שפה, ערכת נושא וניקוד מובנה.",
       language: "שפה",
+      feedbackSurvey: "שאלון משוב",
       niqqud: "ניקוד מובנה",
       theme: "ערכת נושא",
       resetTitle: "איפוס התקדמות",
       resetNote: "נקה שמירות, רצפים ונתוני סקירה.",
+    },
+    welcome: {
+      title: "ברוך הבא ל-IvritElite!",
+      line1: "זאת אפליקציה חדשה ללימוד עברית ברמה מתקדמת.",
+      surveyPrefix: "נשמח לשמוע את המשוב שלך ב",
+      surveyLink: "שאלון הזה",
+      surveySuffix: ".",
+      line2: "אפשר גם לגשת לשאלון מעמוד ההגדרות.",
+      close: "סגור",
+      closeAria: "סגור הודעת פתיחה",
     },
     results: {
       continue: "המשך",
       correct: "נכון",
       incorrect: "שגוי",
       time: "זמן",
+      score: "ציון",
+      accuracy: "דיוק",
+      reviewRounds: "סבבי חזרה",
+      rounds: "סבבים",
+      verbs: "פעלים",
+      bestCombo: "הקומבו הטוב ביותר",
       mistakes: "טעויות מהסשן",
+      reviewPerformance: "סקירת ביצועים",
+      niceJob: "כל הכבוד!",
+      amazing: "זה מדהים!",
       noMistakes: "לא היו טעויות בסשן הזה.",
     },
     match: {
@@ -579,7 +621,7 @@ const I18N = {
       generatedNote: "נעשה שימוש בצורות מחוללות ומאומתות עבור פועל שסומן בטוח להפקה.",
     },
     pool: {
-      summary: "מאגר אחוד: {pool} מילים עם ניקוד ({total} בסך הכול).",
+      summary: "מאגר התרגום: {pool} מילים עם ניקוד ({total} בלקסיקון).",
       expansion: "מסלולי הרחבה שמופו: {count}.",
       tempProgress: "ההתקדמות זמנית בדפדפן זה (אחסון לא זמין).",
       fallback: "נטען אוצר מילים חלופי כי vocab-data.js לא היה זמין.",
@@ -619,6 +661,7 @@ const STORAGE_KEYS = {
   theme: "ivriquest-theme-v1",
   ui: "ivriquest-ui-v1",
   session: "ivriquest-session-v1",
+  welcomeSeen: "ivriquest-welcome-seen-v1",
 };
 
 const storage = getStorage();
@@ -725,6 +768,11 @@ const PERFORMANCE_DOMAINS = [
 ];
 const DOMAIN_BY_CATEGORY = buildDomainByCategoryMap(PERFORMANCE_DOMAINS);
 const FALLBACK_DOMAIN_ID = PERFORMANCE_DOMAINS[PERFORMANCE_DOMAINS.length - 1]?.id || "ideas";
+const VOCABULARY_AVAILABILITY_DEFAULTS = Object.freeze({
+  translationQuiz: true,
+  sentenceHints: true,
+});
+const FEEDBACK_SURVEY_URL = "https://forms.gle/KqqP7TVLxphRDM179";
 
 const baseVocabulary = prepareVocabulary([
   ...getBaseVocabularyFn(),
@@ -742,6 +790,7 @@ const el = {
   homeView: document.querySelector("#homeView"),
   homeDashboard: document.querySelector("#homeDashboard"),
   homeLessonStage: document.querySelector("#homeLessonStage"),
+  homeResultsStage: document.querySelector("#homeResultsStage"),
   reviewView: document.querySelector("#reviewView"),
   settingsView: document.querySelector("#settingsView"),
   resultsView: document.querySelector("#resultsView"),
@@ -753,7 +802,6 @@ const el = {
   lessonBtn: document.querySelector("#lessonBtn"),
   verbMatchBtn: document.querySelector("#verbMatchBtn"),
   abbreviationBtn: document.querySelector("#abbreviationBtn"),
-  homeBtn: document.querySelector("#homeBtn"),
   gamePicker: document.querySelector("#gamePicker"),
   statusRow: document.querySelector(".status-row"),
   homeLangToggle: document.querySelector("#homeLangToggle"),
@@ -765,6 +813,7 @@ const el = {
   poolMeta: document.querySelector("#poolMeta"),
   langToggle: document.querySelector("#langToggle"),
   themeToggle: document.querySelector("#themeToggle"),
+  feedbackSurveyLink: document.querySelector("#feedbackSurveyLink"),
   lessonStatus: document.querySelector("#lessonStatus"),
   lessonProgressFill: document.querySelector("#lessonProgressFill"),
   modeTitle: document.querySelector("#modeTitle"),
@@ -804,6 +853,9 @@ const el = {
   verbMatchContinue: document.querySelector("#verbMatchContinue"),
   abbreviationIntro: document.querySelector("#abbreviationIntro"),
   abbreviationContinue: document.querySelector("#abbreviationContinue"),
+  welcomeModal: document.querySelector("#welcomeModal"),
+  welcomeModalCloseBtn: document.querySelector("#welcomeModalCloseBtn"),
+  welcomeSurveyLink: document.querySelector("#welcomeSurveyLink"),
   leaveSessionConfirm: document.querySelector("#leaveSessionConfirm"),
   leaveSessionStayBtn: document.querySelector("#leaveSessionStayBtn"),
   leaveSessionConfirmBtn: document.querySelector("#leaveSessionConfirmBtn"),
@@ -821,7 +873,9 @@ const state = {
   sessionScore: 0,
   sessionStreak: 0,
   showNiqqudInline: false,
+  welcomeModalOpen: !hasSeenWelcomeModal(),
   leaveConfirmOpen: false,
+  pendingLeaveRoute: "home",
   masteredModalOpen: false,
   masteredSelection: new Set(),
   summary: {
@@ -903,17 +957,21 @@ const state = {
   },
 };
 
+if (state.welcomeModalOpen) {
+  markWelcomeModalSeen();
+}
+
 const INTRO_AUTO_ADVANCE_MS = Math.max(0, Number(global.__IVRIQUEST_TEST_CONFIG__?.introAutoAdvanceMs ?? 900));
 let introAutoAdvanceTimerId = null;
 
 if (usingFallbackVocab) {
   // Keep app usable even when vocab-data.js fails to load.
-  console.warn("Ivritelite: using fallback vocabulary because vocab-data.js was unavailable.");
+  console.warn("IvritElite: using fallback vocabulary because vocab-data.js was unavailable.");
 }
 
 if (usingFallbackAbbreviations) {
   // Keep abbreviation mode available even when abbreviation-data.js fails to load.
-  console.warn("Ivritelite: using fallback abbreviations because abbreviation-data.js was unavailable.");
+  console.warn("IvritElite: using fallback abbreviations because abbreviation-data.js was unavailable.");
 }
 
 sanitizeState();
@@ -927,7 +985,7 @@ renderAll();
 
 function bindUi() {
   el.routeButtons.forEach((button) => {
-    button.addEventListener("click", () => navigateTo(button.dataset.route || "home"));
+    button.addEventListener("click", () => handleRouteButtonPress(button.dataset.route || "home"));
   });
   el.homeLessonBtn?.addEventListener("click", () => openHomeLesson("lesson"));
   el.homeVerbMatchBtn?.addEventListener("click", () => openHomeLesson("verbMatch"));
@@ -949,7 +1007,6 @@ function bindUi() {
   });
   el.nextBtn.addEventListener("click", () => handleNextAction());
   el.masterVerbBtn?.addEventListener("click", () => moveEligibleVerbToMastered());
-  el.homeBtn?.addEventListener("click", () => requestGoHome());
   el.homeLangToggle?.addEventListener("click", () => toggleLanguage());
   el.homeThemeToggle?.addEventListener("click", () => toggleTheme());
   el.homeNiqqudToggle?.addEventListener("click", () => toggleNiqqudPreference());
@@ -958,6 +1015,12 @@ function bindUi() {
   el.resultsContinueBtn?.addEventListener("click", () => continueFromResults());
   el.resultsReviewBtn?.addEventListener("click", () => navigateTo("review"));
   el.resultsHomeBtn?.addEventListener("click", () => goHome());
+  el.welcomeModalCloseBtn?.addEventListener("click", () => closeWelcomeModal());
+  el.welcomeModal?.addEventListener("click", (event) => {
+    if (event.target === el.welcomeModal) {
+      closeWelcomeModal();
+    }
+  });
   el.masteredCloseBtn?.addEventListener("click", () => closeMasteredModal());
   el.masteredRestoreBtn?.addEventListener("click", () => restoreSelectedMasteredWords());
   el.masteredModal?.addEventListener("click", (event) => {
@@ -966,7 +1029,12 @@ function bindUi() {
     }
   });
   global.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && state.masteredModalOpen) {
+    if (event.key !== "Escape") return;
+    if (state.welcomeModalOpen) {
+      closeWelcomeModal();
+      return;
+    }
+    if (state.masteredModalOpen) {
       closeMasteredModal();
     }
   });
@@ -997,6 +1065,20 @@ function bindUi() {
       nextQuestion();
     }
   });
+}
+
+function handleRouteButtonPress(route) {
+  if (state.summary.active && route === "home") {
+    goHome();
+    return;
+  }
+
+  if (hasActiveLearnSession()) {
+    requestLeaveSession(route);
+    return;
+  }
+
+  navigateTo(route);
 }
 
 function stopIntroOverlayInteraction(event) {
@@ -1065,14 +1147,14 @@ function isModeSessionActive(mode) {
 }
 
 function resolveInitialRoute(candidate, options = {}) {
-  const valid = new Set(["home", "review", "settings", "results"]);
+  const valid = new Set(["home", "review", "settings"]);
   if (state.summary.active) {
-    return valid.has(candidate) ? candidate : "results";
+    return valid.has(candidate) ? candidate : "home";
   }
   if (hasActiveLearnSession()) {
     return "home";
   }
-  return valid.has(candidate) && candidate !== "results" ? candidate : "home";
+  return valid.has(candidate) ? candidate : "home";
 }
 
 function navigateTo(route) {
@@ -1141,7 +1223,8 @@ function scheduleIntroAutoAdvance(action) {
 
 function isUiLocked() {
   return Boolean(
-    state.lesson.lessonStartIntroActive ||
+    state.welcomeModalOpen ||
+      state.lesson.lessonStartIntroActive ||
       state.lesson.secondChanceIntroActive ||
       state.abbreviation.introActive ||
       state.match.verbIntroActive ||
@@ -1157,8 +1240,10 @@ function updateUiLockState() {
   global.document.body?.setAttribute("data-learn-session", learnSessionActive ? "true" : "false");
 
   el.routeButtons.forEach((button) => {
-    button.disabled = learnSessionActive;
-    if (learnSessionActive) {
+    const route = button.dataset.route || "home";
+    const shouldDisable = locked;
+    button.disabled = shouldDisable;
+    if (shouldDisable) {
       button.setAttribute("aria-disabled", "true");
       button.setAttribute("tabindex", "-1");
     } else {
@@ -1205,14 +1290,6 @@ function getVisibleVerbMatchRows() {
   return MATCH_VISIBLE_ROWS;
 }
 
-function renderHomeButton() {
-  if (!el.homeBtn) return;
-  const label = t("session.backHome");
-  el.homeBtn.textContent = "🏠";
-  el.homeBtn.setAttribute("aria-label", label);
-  el.homeBtn.setAttribute("title", label);
-}
-
 function applyLanguage() {
   global.document.body?.setAttribute("data-ui-lang", state.language);
   global.document.documentElement.lang = state.language === "he" ? "he" : "en";
@@ -1225,10 +1302,15 @@ function applyLanguage() {
   });
 
   if (el.langToggle) {
-    el.langToggle.textContent = state.language === "en" ? "עברית" : "English";
+    const toggleLabel = getLanguageToggleLabel();
+    el.langToggle.textContent = toggleLabel;
+    el.langToggle.setAttribute("aria-label", toggleLabel);
   }
 
-  renderHomeButton();
+  if (el.welcomeModalCloseBtn) {
+    el.welcomeModalCloseBtn.setAttribute("aria-label", t("welcome.closeAria"));
+  }
+
   renderThemeToggle();
 }
 
@@ -1260,6 +1342,10 @@ function toggleNiqqudPreference() {
 
 function getLocaleBundle() {
   return I18N[state.language] || I18N.en;
+}
+
+function getLanguageToggleLabel() {
+  return state.language === "en" ? "עברית" : "English";
 }
 
 function getNestedTranslation(bundle, key) {
@@ -1305,6 +1391,7 @@ function renderAll() {
   renderHomeState();
   renderReviewState();
   renderSettingsState();
+  renderWelcomeModal();
   renderSummaryState();
   renderLearnState();
   renderRouteVisibility();
@@ -1317,19 +1404,20 @@ function renderRouteVisibility() {
   el.homeView?.classList.toggle("active", state.route === "home");
   el.reviewView?.classList.toggle("active", state.route === "review");
   el.settingsView?.classList.toggle("active", state.route === "settings");
-  el.resultsView?.classList.toggle("active", state.route === "results" && state.summary.active);
 }
 
 function renderShellChrome() {
-  const routeKey = state.route === "results" ? "nav.results" : `nav.${state.route}`;
+  const routeKey = `nav.${state.route}`;
   if (el.shellRouteChip) {
     el.shellRouteChip.textContent = t(routeKey);
   }
   if (el.shellRouteSummary) {
-    if (state.route === "home") {
+    if (state.summary.active && state.route === "home") {
+      el.shellRouteSummary.textContent = t("summary.thumbsText");
+    } else if (state.route === "home") {
       el.shellRouteSummary.textContent = hasActiveLearnSession() ? t("dashboard.active") : t("dashboard.ready");
     } else {
-      el.shellRouteSummary.textContent = state.summary.active && state.route === "results" ? t("summary.thumbsText") : t(routeKey);
+      el.shellRouteSummary.textContent = t(routeKey);
     }
   }
 
@@ -1378,7 +1466,6 @@ function renderSessionHeader() {
   if (el.sessionScore) {
     el.sessionScore.textContent = t("session.score", { score: state.sessionScore });
   }
-  el.homeBtn?.classList.toggle("hidden", false);
   el.statusRow?.classList.toggle("hidden", false);
   el.vocabCount.textContent = "";
   el.vocabCount.classList.add("hidden");
@@ -1415,12 +1502,14 @@ function renderSessionHeader() {
     updateLessonProgress(state.match.totalPairs ? Math.round((state.match.matchedCount / state.match.totalPairs) * 100) : 0);
 
     const canAdvanceVerb = state.match.active && state.match.totalPairs > 0 && state.match.matchedCount >= state.match.totalPairs;
+    const shouldShowSummary = canAdvanceVerb && state.match.verbQueue.length === 0;
     el.nextBtn.disabled = !canAdvanceVerb;
-    el.nextBtn.textContent = t("session.nextVerb");
+    el.nextBtn.textContent = shouldShowSummary ? t("session.viewResults") : t("session.nextVerb");
     el.nextBtn.classList.toggle("hidden", !canAdvanceVerb);
     const showMasterAction =
       canAdvanceVerb &&
       Boolean(state.match.eligibleMasterWordId) &&
+      isWordAvailableForMode(getWordById(state.match.eligibleMasterWordId), "translationQuiz") &&
       !isWordMastered(state.match.eligibleMasterWordId);
     if (el.masterVerbBtn) {
       el.masterVerbBtn.disabled = !showMasterAction;
@@ -1482,7 +1571,7 @@ function updateLessonProgress(percent) {
 }
 
 function getMostMissedRanked() {
-  const wordsById = new Map(getAllVocabulary().map((word) => [word.id, word]));
+  const wordsById = new Map(getVocabularyForMode("translationQuiz", { includeMastered: true }).map((word) => [word.id, word]));
   return Object.entries(state.progress)
     .map(([wordId, rec]) => {
       const missed = getMissCountForRecord(rec);
@@ -1499,7 +1588,7 @@ function getMostMissedRanked() {
 }
 
 function buildLessonMistakeSummary() {
-  const lookup = new Map(getAllVocabulary().map((word) => [word.id, word]));
+  const lookup = new Map(getVocabularyForMode("translationQuiz", { includeMastered: true }).map((word) => [word.id, word]));
   return state.lesson.sessionMistakeIds
     .map((wordId) => lookup.get(wordId))
     .filter(Boolean)
@@ -1708,30 +1797,40 @@ function clearSummaryState() {
   state.summary.mistakes = [];
 }
 
-function openLeaveSessionConfirm() {
+function openLeaveSessionConfirm(targetRoute = "home") {
+  state.pendingLeaveRoute = targetRoute;
   state.leaveConfirmOpen = true;
   showBlockingOverlay(el.leaveSessionConfirm);
 }
 
-function closeLeaveSessionConfirm() {
+function closeLeaveSessionConfirm(options = {}) {
   state.leaveConfirmOpen = false;
+  if (!options.preservePending) {
+    state.pendingLeaveRoute = "home";
+  }
   hideBlockingOverlay(el.leaveSessionConfirm);
 }
 
 function confirmLeaveSession() {
-  closeLeaveSessionConfirm();
-  goHome();
+  const targetRoute = state.pendingLeaveRoute || "home";
+  closeLeaveSessionConfirm({ preservePending: true });
+  endSessionAndNavigate(targetRoute);
+  state.pendingLeaveRoute = "home";
+}
+
+function requestLeaveSession(targetRoute = "home") {
+  if (!hasActiveLearnSession()) {
+    endSessionAndNavigate(targetRoute);
+    return;
+  }
+  openLeaveSessionConfirm(targetRoute);
 }
 
 function requestGoHome() {
-  if (!hasActiveLearnSession()) {
-    goHome();
-    return;
-  }
-  openLeaveSessionConfirm();
+  requestLeaveSession("home");
 }
 
-function goHome() {
+function endSessionAndNavigate(targetRoute = "home") {
   stopVerbMatchTimer();
   stopLessonTimer();
   stopAbbreviationTimer();
@@ -1749,16 +1848,22 @@ function goHome() {
   state.currentQuestion = null;
   clearSummaryState();
   state.mode = "home";
-  state.route = "home";
+  state.route = targetRoute === "review" || targetRoute === "settings" ? targetRoute : "home";
   clearFeedback();
   clearPersistedSession();
   renderAll();
 }
 
+function goHome() {
+  endSessionAndNavigate("home");
+}
+
 function renderHomeState() {
   const showLesson = hasActiveLearnSession();
-  el.homeDashboard?.classList.toggle("hidden", showLesson);
+  const showSummary = Boolean(state.summary.active && state.route === "home");
+  el.homeDashboard?.classList.toggle("hidden", showLesson || showSummary);
   el.homeLessonStage?.classList.toggle("hidden", !showLesson);
+  el.homeResultsStage?.classList.toggle("hidden", !showSummary);
   renderHomeLessonButtons();
   renderHomeOptions();
 }
@@ -1791,7 +1896,7 @@ function showSessionSummary(config = {}) {
   state.summary.incorrectCount = Math.max(0, Number(config.incorrectCount || 0));
   state.summary.elapsedSeconds = Math.max(0, Number(config.elapsedSeconds || 0));
   state.summary.mistakes = Array.isArray(config.mistakes) ? config.mistakes : [];
-  state.route = "results";
+  state.route = "home";
   clearFeedback();
   renderAll();
 }
@@ -1799,26 +1904,29 @@ function showSessionSummary(config = {}) {
 function renderSummaryState() {
   if (!el.resultsSummary || !el.resultsTitle || !el.resultsNote) return;
   const titleText = state.summary.titleKey ? t(state.summary.titleKey, state.summary.titleVars) : t("summary.resultsHeader");
-  const noteText = state.summary.noteKey ? t(state.summary.noteKey, state.summary.noteVars) : t("summary.thumbsText");
-  const scoreText = state.summary.scoreKey ? t(state.summary.scoreKey, state.summary.scoreVars) : "";
+  const scoreValue = getSummaryScoreValue();
+  const scoreTotal = getSummaryScoreTotal();
+  const accuracy = getSummaryAccuracyPercent();
+  const praise = isPerfectSummary() ? t("results.amazing") : t("results.niceJob");
 
   el.resultsTitle.textContent = titleText;
-  el.resultsNote.textContent = noteText;
+  el.resultsNote.textContent = praise;
   el.resultsSummary.innerHTML = "";
+
+  const performance = createResultsPerformanceGraphic(accuracy);
 
   const metrics = document.createElement("div");
   metrics.className = "results-metrics";
-  [
-    { label: scoreText || t("summary.resultsHeader"), value: scoreText || t("summary.thumbsText") },
-    { label: t("results.correct"), value: String(state.summary.correctCount) },
-    { label: t("results.incorrect"), value: String(state.summary.incorrectCount) },
-    { label: t("results.time"), value: t("session.timer", { seconds: state.summary.elapsedSeconds }) },
-  ].forEach((metric) => metrics.append(createResultsMetric(metric.label, metric.value)));
+  const metricItems = buildSummaryMetrics({ scoreValue, scoreTotal, accuracy });
+  metrics.style.setProperty("--results-metric-count", String(metricItems.length));
+  metricItems.forEach((metric) => {
+    metrics.append(createResultsMetric(metric.label, metric.value));
+  });
 
   const mistakesWrap = document.createElement("div");
   mistakesWrap.className = "results-mistakes";
-  const heading = document.createElement("p");
-  heading.className = "eyebrow";
+  const heading = document.createElement("h3");
+  heading.className = "results-section-title";
   heading.textContent = t("results.mistakes");
   mistakesWrap.append(heading);
 
@@ -1838,16 +1946,112 @@ function renderSummaryState() {
     });
   }
 
-  el.resultsSummary.append(metrics, mistakesWrap);
-  if (el.resultsReviewBtn) {
-    el.resultsReviewBtn.disabled = !state.summary.mistakes.length;
-  }
+  el.resultsSummary.append(performance, metrics, mistakesWrap);
 }
 
 function renderReviewState() {
 }
 
+function getSummaryScoreValue() {
+  const explicit = Number(state.summary.scoreVars?.score);
+  if (Number.isFinite(explicit) && explicit >= 0) {
+    return Math.round(explicit);
+  }
+  return Math.max(0, state.summary.correctCount);
+}
+
+function getSummaryScoreTotal() {
+  const explicit = Number(state.summary.scoreVars?.total);
+  if (Number.isFinite(explicit) && explicit >= 0) {
+    return Math.round(explicit);
+  }
+  const attempts = state.summary.correctCount + state.summary.incorrectCount;
+  return Math.max(0, attempts);
+}
+
+function getSummaryAccuracyPercent() {
+  const attempts = state.summary.correctCount + state.summary.incorrectCount;
+  if (attempts > 0) {
+    return Math.round((state.summary.correctCount / attempts) * 100);
+  }
+  const total = getSummaryScoreTotal();
+  if (total > 0) {
+    return Math.round((getSummaryScoreValue() / total) * 100);
+  }
+  return 100;
+}
+
+function isPerfectSummary() {
+  return state.summary.incorrectCount === 0 && getSummaryScoreTotal() > 0 && getSummaryScoreValue() >= getSummaryScoreTotal();
+}
+
+function formatResultSeconds(seconds) {
+  const safeSeconds = Math.max(0, Number(seconds || 0));
+  return state.language === "he" ? `${safeSeconds}ש׳` : `${safeSeconds}s`;
+}
+
+function buildSummaryMetrics({ scoreValue, scoreTotal, accuracy }) {
+  const metrics = [
+    { label: t("results.score"), value: `${scoreValue}/${scoreTotal}` },
+    { label: t("results.accuracy"), value: `${accuracy}%` },
+    { label: t("results.time"), value: formatResultSeconds(state.summary.elapsedSeconds) },
+  ];
+
+  if (state.summary.game === "lesson") {
+    metrics.push({
+      label: t("results.reviewRounds"),
+      value: String(Math.max(0, Number(state.summary.noteVars?.count || 0))),
+    });
+    return metrics;
+  }
+
+  if (state.summary.game === "abbreviation") {
+    metrics.push({
+      label: t("results.rounds"),
+      value: String(Math.max(0, Number(state.summary.noteVars?.rounds || 0))),
+    });
+    return metrics;
+  }
+
+  if (state.summary.game === "verbMatch") {
+    metrics.push({
+      label: t("results.verbs"),
+      value: String(Math.max(0, Number(state.summary.noteVars?.verbs || 0))),
+    });
+    metrics.push({
+      label: t("results.bestCombo"),
+      value: `x${Math.max(0, Number(state.summary.noteVars?.combo || 0))}`,
+    });
+  }
+
+  return metrics;
+}
+
+function createResultsPerformanceGraphic(accuracy) {
+  const performance = document.createElement("section");
+  performance.className = "results-performance";
+  performance.style.setProperty("--results-score", `${Math.max(0, Math.min(100, accuracy))}%`);
+  performance.setAttribute("role", "img");
+  performance.setAttribute("aria-label", `${t("results.accuracy")}: ${accuracy}%`);
+
+  const ring = document.createElement("div");
+  ring.className = "results-performance-ring";
+
+  const center = document.createElement("div");
+  center.className = "results-performance-center";
+
+  const percent = document.createElement("p");
+  percent.className = "results-performance-percent";
+  percent.textContent = `${accuracy}%`;
+
+  center.append(percent);
+  ring.append(center);
+  performance.append(ring);
+  return performance;
+}
+
 function renderSettingsState() {
+  applySurveyLinks();
   renderThemeToggle();
   renderNiqqudToggle();
 }
@@ -1920,7 +2124,7 @@ function setHomeLessonState(button, isCurrent) {
 
 function renderHomeOptions() {
   if (el.homeLangValue) {
-    el.homeLangValue.textContent = state.language === "he" ? "עברית" : "English";
+    el.homeLangValue.textContent = getLanguageToggleLabel();
   }
   if (el.homeThemeValue) {
     el.homeThemeValue.textContent = state.theme === "light" ? t("controls.lightMode") : t("controls.darkMode");
@@ -2756,6 +2960,21 @@ function closeMasteredModal() {
   renderMasteredModal();
 }
 
+function closeWelcomeModal() {
+  if (!state.welcomeModalOpen) return;
+  state.welcomeModalOpen = false;
+  renderWelcomeModal();
+}
+
+function renderWelcomeModal() {
+  if (!el.welcomeModal) return;
+  applySurveyLinks();
+  const open = Boolean(state.welcomeModalOpen);
+  el.welcomeModal.classList.toggle("hidden", !open);
+  el.welcomeModal.setAttribute("aria-hidden", open ? "false" : "true");
+  updateUiLockState();
+}
+
 function renderMasteredModal() {
   if (!el.masteredModal || !el.masteredList || !el.masteredEmpty || !el.masteredRestoreBtn) return;
 
@@ -2822,6 +3041,7 @@ function moveEligibleVerbToMastered() {
   if (!wordId || isWordMastered(wordId)) return;
 
   const word = getWordById(wordId);
+  if (!isWordAvailableForMode(word, "translationQuiz")) return;
   if (!setWordMastered(wordId, true)) return;
 
   state.match.eligibleMasterWordId = "";
@@ -2915,31 +3135,38 @@ function resetVerbMatchState() {
   state.match.sessionMistakeIds = [];
 }
 
+function finishVerbMatchSession() {
+  const verbsCovered = state.match.totalVerbs;
+  const sessionMatched = state.match.sessionMatched;
+  const sessionTotal = state.match.sessionTotalPairs || sessionMatched;
+  const bestCombo = state.match.bestCombo;
+  const elapsed = state.match.elapsedSeconds;
+  const mismatchCount = state.match.mismatchCount;
+  const mistakes = buildVerbMatchMistakeSummary();
+
+  stopVerbMatchTimer();
+  state.match.active = false;
+  resetVerbMatchState();
+  showSessionSummary({
+    game: "verbMatch",
+    titleKey: "summary.matchTitle",
+    scoreKey: "summary.score",
+    scoreVars: { score: sessionMatched, total: sessionTotal },
+    noteKey: "summary.matchNote",
+    noteVars: { verbs: verbsCovered, combo: bestCombo, seconds: elapsed },
+    correctCount: sessionMatched,
+    incorrectCount: mismatchCount,
+    elapsedSeconds: elapsed,
+    mistakes,
+  });
+}
+
 function loadNextVerbRound() {
   if (!state.match.active) return;
   const nextVerb = state.match.verbQueue.shift();
 
   if (!nextVerb) {
-    const verbsCovered = state.match.totalVerbs;
-    const sessionMatched = state.match.sessionMatched;
-    const sessionTotal = state.match.sessionTotalPairs || sessionMatched;
-    const bestCombo = state.match.bestCombo;
-    const elapsed = state.match.elapsedSeconds;
-    stopVerbMatchTimer();
-    state.match.active = false;
-    resetVerbMatchState();
-    showSessionSummary({
-      game: "verbMatch",
-      titleKey: "summary.matchTitle",
-      scoreKey: "summary.score",
-      scoreVars: { score: sessionMatched, total: sessionTotal },
-      noteKey: "summary.matchNote",
-      noteVars: { verbs: verbsCovered, combo: bestCombo, seconds: elapsed },
-      correctCount: sessionMatched,
-      incorrectCount: state.match.mismatchCount,
-      elapsedSeconds: elapsed,
-      mistakes: buildVerbMatchMistakeSummary(),
-    });
+    finishVerbMatchSession();
     return;
   }
 
@@ -3204,7 +3431,13 @@ function applyVerbMatchSuccess(leftCard, rightCard) {
       const streakCount = recordConjugationRound(current.id, !state.match.currentVerbHadMismatch);
       const reachedMasterThreshold = streakCount >= CONJUGATION_MASTER_STREAK && !isWordMastered(current.id);
       state.match.eligibleMasterWordId = reachedMasterThreshold ? current.id : "";
-      clearFeedback();
+      const hasMoreVerbs = state.match.verbQueue.length > 0;
+      if (hasMoreVerbs) {
+        setFeedback(t("feedback.matchDoneVerb", { verb: current.en }), true);
+      } else {
+        finishVerbMatchSession();
+        return;
+      }
     }
     renderVerbMatchRound();
   }, 180);
@@ -3529,8 +3762,29 @@ function getDueWords(pool, now = Date.now()) {
   });
 }
 
+function normalizeVocabularyAvailability(availability) {
+  return {
+    translationQuiz: availability?.translationQuiz !== false,
+    sentenceHints: availability?.sentenceHints !== false,
+  };
+}
+
+function isWordAvailableForMode(word, mode) {
+  if (!word || !mode) return false;
+  const availability = normalizeVocabularyAvailability(word.availability || VOCABULARY_AVAILABILITY_DEFAULTS);
+  return availability[mode] !== false;
+}
+
+function getVocabularyForMode(mode, options = {}) {
+  return getAllVocabulary().filter((word) => {
+    if (!isWordAvailableForMode(word, mode)) return false;
+    if (options.includeMastered) return true;
+    return !isWordMastered(word.id);
+  });
+}
+
 function getSelectedPool() {
-  const all = getAllVocabulary().filter((word) => !isWordMastered(word.id));
+  const all = getVocabularyForMode("translationQuiz");
 
   return [...all].sort((a, b) => {
     if ((b.utility || 0) !== (a.utility || 0)) {
@@ -3555,7 +3809,7 @@ function isWordMastered(wordId) {
 }
 
 function getMasteredWords() {
-  return getAllVocabulary().filter((word) => isWordMastered(word.id));
+  return getVocabularyForMode("translationQuiz", { includeMastered: true }).filter((word) => isWordMastered(word.id));
 }
 
 function setWordMastered(wordId, mastered) {
@@ -4306,6 +4560,35 @@ function saveThemePreference(value) {
   }
 }
 
+function hasSeenWelcomeModal() {
+  if (!storage) return false;
+
+  try {
+    return storage.getItem(STORAGE_KEYS.welcomeSeen) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markWelcomeModalSeen() {
+  if (!storage) return;
+
+  try {
+    storage.setItem(STORAGE_KEYS.welcomeSeen, "1");
+  } catch {
+    // Ignore write failures.
+  }
+}
+
+function applySurveyLinks() {
+  [el.feedbackSurveyLink, el.welcomeSurveyLink].forEach((node) => {
+    if (!node) return;
+    node.setAttribute("href", FEEDBACK_SURVEY_URL);
+    node.setAttribute("target", "_blank");
+    node.setAttribute("rel", "noopener noreferrer");
+  });
+}
+
 function saveProgress() {
   saveJson(STORAGE_KEYS.progress, state.progress);
 }
@@ -4389,14 +4672,16 @@ function prepareVocabulary(words) {
   return words.map((word) => {
     const plain = String(word?.he || "");
     const existing = String(word?.heNiqqud || "");
+    const availability = normalizeVocabularyAvailability(word?.availability || VOCABULARY_AVAILABILITY_DEFAULTS);
 
     if (!plain) {
-      return { ...word, heNiqqud: existing || plain };
+      return { ...word, availability, heNiqqud: existing || plain };
     }
 
     if (existing && existing !== plain) {
       return {
         ...word,
+        availability,
         heNiqqud: existing,
       };
     }
@@ -4407,6 +4692,7 @@ function prepareVocabulary(words) {
 
     return {
       ...word,
+      availability,
       heNiqqud: marked,
     };
   });
