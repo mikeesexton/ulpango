@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307l";
+const APP_BUILD = "20260307m";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -2147,6 +2147,7 @@ function setHomeLessonState(button, isCurrent) {
 function renderHomeOptions() {
   if (el.homeLangValue) {
     el.homeLangValue.textContent = getLanguageToggleLabel();
+    el.homeLangValue.setAttribute("dir", state.language === "en" ? "rtl" : "ltr");
   }
   if (el.homeThemeValue) {
     el.homeThemeValue.textContent = state.theme === "light" ? t("controls.lightMode") : t("controls.darkMode");

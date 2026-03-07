@@ -447,9 +447,18 @@ h3 {
   text-align: left;
 }
 
-body[data-ui-lang="en"] #homeLangValue {
+body[data-ui-lang="he"] .home-option-value {
+  text-align: right;
+}
+
+.home-option-value[dir="rtl"] {
   text-align: right;
   direction: rtl;
+}
+
+.home-option-value[dir="ltr"] {
+  text-align: left;
+  direction: ltr;
 }
 
 .stats-grid {
