@@ -1263,15 +1263,6 @@ const ABBREVIATIONS = [
     "source": "abbreviations-xlsx"
   },
   {
-    "id": "abbr-141",
-    "abbr": "ת״א",
-    "expansionHe": "תיק אזרחי",
-    "english": "civil case file",
-    "bucket": "Civics, Law & Work",
-    "notes": "also Tel Aviv",
-    "source": "abbreviations-xlsx"
-  },
-  {
     "id": "abbr-142",
     "abbr": "ת״צ",
     "expansionHe": "תובענה ייצוגית",

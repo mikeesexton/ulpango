@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307o";
+const APP_BUILD = "20260307p";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -1519,7 +1519,7 @@ function renderSessionHeader() {
       : t("match.verbProgress", { current: 0, total: state.match.totalVerbs });
 
     el.modeTitle.textContent = verbTitle;
-    el.lessonStatus.textContent = `${pairProgress} | ${verbProgress}`;
+    el.lessonStatus.textContent = pairProgress;
     el.vocabCount.classList.remove("hidden");
     el.vocabCount.textContent = t("match.timer", { seconds: state.match.elapsedSeconds });
     el.sessionScore.textContent = t("match.combo", { count: state.match.bestCombo });
@@ -2036,10 +2036,6 @@ function buildSummaryMetrics({ scoreValue, scoreTotal, accuracy }) {
   }
 
   if (state.summary.game === "verbMatch") {
-    metrics.push({
-      label: t("results.verbs"),
-      value: String(Math.max(0, Number(state.summary.noteVars?.verbs || 0))),
-    });
     metrics.push({
       label: t("results.bestCombo"),
       value: `x${Math.max(0, Number(state.summary.noteVars?.combo || 0))}`,

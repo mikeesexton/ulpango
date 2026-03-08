@@ -1342,6 +1342,7 @@ function buildEnglishFormLabel(gloss, slotId) {
   const base = toVerbBasePhrase(gloss);
   const presentThird = inflectEnglishThirdPerson(base);
   const past = inflectEnglishPast(base);
+  const pastPl = base === "be" ? "were" : past;
 
   switch (slotId) {
     case "present_masculine_singular":
@@ -1355,21 +1356,21 @@ function buildEnglishFormLabel(gloss, slotId) {
     case "past_first_person_singular":
       return `I ${past}`;
     case "past_second_person_masculine_singular":
-      return `you (m.s.) ${past}`;
+      return `you (m.s.) ${pastPl}`;
     case "past_second_person_feminine_singular":
-      return `you (f.s.) ${past}`;
+      return `you (f.s.) ${pastPl}`;
     case "past_third_person_masculine_singular":
       return `he ${past}`;
     case "past_third_person_feminine_singular":
       return `she ${past}`;
     case "past_first_person_plural":
-      return `we ${past}`;
+      return `we ${pastPl}`;
     case "past_second_person_masculine_plural":
-      return `you (m.pl.) ${past}`;
+      return `you (m.pl.) ${pastPl}`;
     case "past_second_person_feminine_plural":
-      return `you (f.pl.) ${past}`;
+      return `you (f.pl.) ${pastPl}`;
     case "past_third_person_plural":
-      return `they ${past}`;
+      return `they ${pastPl}`;
     case "future_first_person_singular":
       return `I will ${base}`;
     case "future_second_person_masculine_singular":
