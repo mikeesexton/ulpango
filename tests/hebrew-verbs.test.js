@@ -546,3 +546,81 @@ test("learner-facing fake forms like מצפהת and מצפהים never appear", 
 
   assert.equal(result, null);
 });
+
+test("past-tense labels for ambiguous put/put verbs include (past) annotation", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [],
+    entries: [
+      {
+        id: "test-lasim",
+        lemma: "לשים",
+        root: ["ש", "י", "מ"],
+        binyan: "paal",
+        regularity: "irregular",
+        conjugation_mode: "curated",
+        senses: [sense("to put", null, false)],
+        forms: forms(
+          {
+            masculine_singular: "שם",
+            feminine_singular: "שמה",
+            masculine_plural: "שמים",
+            feminine_plural: "שמות",
+          },
+          {
+            first_person_singular: "שמתי",
+            second_person_masculine_singular: "שמת",
+            second_person_feminine_singular: "שמת",
+            third_person_masculine_singular: "שם",
+            third_person_feminine_singular: "שמה",
+            first_person_plural: "שמנו",
+            second_person_masculine_plural: "שמתם",
+            second_person_feminine_plural: "שמתן",
+            third_person_plural: "שמו",
+          },
+          {
+            first_person_singular: "אשים",
+            second_person_masculine_singular: "תשים",
+            second_person_feminine_singular: "תשימי",
+            third_person_masculine_singular: "ישים",
+            third_person_feminine_singular: "תשים",
+            first_person_plural: "נשים",
+            second_person_plural: "תשימו",
+            third_person_plural: "ישימו",
+          }
+        ),
+        generated_forms: {},
+        review_status: "approved",
+        notes: "",
+        examples: [],
+        difficulty_level: 2,
+        tags: ["test"],
+        personal_priority: 80,
+        category: "starter",
+        source_word_ids: [],
+        source: "test",
+      },
+    ],
+  });
+
+  const item = deck.find((entry) => entry.id.startsWith("test-lasim"));
+  assert.ok(item);
+  // Past labels should include "(past)" since "put" === "put" (same past as present base)
+  assert.equal(
+    item.forms.find((f) => f.id === "past_first_person_plural")?.englishText,
+    "we put (past)"
+  );
+  assert.equal(
+    item.forms.find((f) => f.id === "past_third_person_masculine_singular")?.englishText,
+    "he put (past)"
+  );
+  // Future labels should NOT have the annotation
+  assert.equal(
+    item.forms.find((f) => f.id === "future_first_person_plural")?.englishText,
+    "we will put"
+  );
+  // Present labels should NOT have the annotation
+  assert.equal(
+    item.forms.find((f) => f.id === "present_masculine_singular")?.englishText,
+    "he puts"
+  );
+});

@@ -132,7 +132,7 @@ const ABBREVIATIONS = [
     "id": "abbr-015",
     "abbr": "ז״א",
     "expansionHe": "זאת אומרת",
-    "english": "that is / i.e.",
+    "english": "that is / i.e",
     "bucket": "Daily Life & Home",
     "notes": "",
     "source": "abbreviations-xlsx"

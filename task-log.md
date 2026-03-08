@@ -24,6 +24,62 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-08 — Visual Pop: icon tinting, per-mode colors, red ambient, section headings
+
+**Requested:** 8 targeted visual polish changes: nav icon emoji upgrade, nav icon gold/blue glow, per-mode game tile color identity (gold/teal/violet), section heading brand color, domain emoji glow, red ambient blob, version bump.
+**Files changed:**
+- `index.html`: Nav icons replaced (⌂→🏠, ↺→🔄, ⚙→⚙️) in both desktop and mobile nav; `ambient-c` div added; CSS version bumped to `20260308c`
+- `styles.css`: `.nav-link-icon` gold glow + active/light-mode overrides; `.section-head h2 { color: var(--brand) }`; per-mode game tile icon rules (gold/teal/violet) with hover border overrides; `.domain-emoji` gold glow + light override; `.ambient-c` red blob rule
+**Behavior changed:** Nav icons now render as modern emoji with colored glow; game tiles have distinct color identities per mode; section headings display in brand gold/blue; review domain emojis have a gold halo; subtle warm crimson glow at bottom-right of background in dark mode
+**Tests run:** `npm test` — 12/12 pass
+**Risks / regressions to check:** Emoji rendering on older browsers/OSes (fallback to text glyph is acceptable); teal/violet tile colors on light mode (no override added — verify readability); ambient-c blob visibility in light mode (--error is #FF6B6B at low opacity, should be barely perceptible)
+
+---
+
+### 2026-03-08 — Make Sabra color scheme more prominent (interactive states)
+
+**Requested:** Apply Sabra palette to interactive components that still used hardcoded old blue colors: dark mobile nav bar, dark/light mobile nav active state, dark desktop nav active state, game tile hover border, choice/match card selected border.
+
+**Files changed:**
+- `styles.css` — 6 targeted rule patches: (1) dark mobile nav container border → gold rim; (2) dark mobile nav active pill → gold tint + `var(--brand)` text; (3) new `.desktop-nav .nav-link.active` rule → gold-tinted pill + gold text in dark mode; (4) `.game-tile:hover` border → gold (dark) / blue (light); (5) `.choice-btn.selected, .match-card.selected` border → `var(--brand)`; (6) light mobile nav active → blue-tinted pill + brand-blue text. Version bumped to `v=20260308b`.
+- `index.html` — Version bump for `styles.css`.
+
+**Behavior changed:**
+- Dark mobile: floating nav bar has midnight navy background with subtle gold rim; active tab shows warm gold pill + gold icon/label.
+- Dark desktop: active nav link shows gold-tinted pill with gold text.
+- Dark game: tile hover glows with gold border instead of old cold blue.
+- Dark game: selected choice/match button has gold border ring instead of old blue.
+- Light mobile: active tab shows blue-tinted pill with brand-blue text (matches desktop sidebar feel).
+- Light game: tile hover shows blue border (not gold).
+
+**Tests run:** `npm test` — 12/12 pass (CSS-only change).
+
+**Risks / regressions to check:** `.desktop-nav .nav-link.active` (no theme qualifier) overrides the generic `.nav-link.active` in dark mode — verify light mode desktop sidebar still shows gold pill via the more-specific `body[data-theme="light"] .desktop-nav .nav-link.active` rule (higher specificity wins).
+
+---
+
+### 2026-03-08 — Sabra color scheme + verb/abbreviation bug fixes
+
+**Requested:** Apply Sabra color scheme (Israeli flag blue, midnight navy, metallic gold) to both light and dark themes; fix "he standed"/"we puted" verb inflection; fix orphaned period in ז״א abbreviation choice button.
+
+**Files changed:**
+- `styles.css` — Full color variable overhaul in `:root` (dark) and `body[data-theme="light"]`; `.progress-fill` gradient changed from hardcoded `#7ab3ff` to `var(--brand-deep)→var(--brand)`; `.domain-ring` error segment updated to `rgba(230,57,70,0.82)` (dark) + light-mode override at `rgba(255,107,107,0.82)`; new `body[data-theme="light"] .desktop-nav` rules for solid blue sidebar with white text and gold active pill. Version bumped to `v=20260308a`.
+- `hebrew-verbs.js` — Added `["put","put"]` and `["stand","stood"]` to `inflectEnglishPast` irregular map. Version bumped to `v=20260308a`.
+- `abbreviation-data.js` — Removed trailing period from `abbr-015` (ז״א) `english` field: `"that is / i.e."` → `"that is / i.e"`.
+- `index.html` — Version bumps for `styles.css` and `hebrew-verbs.js`.
+
+**Behavior changed:**
+- Dark mode: midnight navy background, dusty navy cards, gold buttons/active states/progress bar.
+- Light mode: icy background, white cards, solid blue sidebar with white nav links and gold active pill, blue brand buttons.
+- Conjugation: "עמד" → "he stood"; "שמנו" → "we put" (previously "he standed"/"we puted").
+- Abbreviation game: ז״א choice button shows "that is / i.e" without orphaned period.
+
+**Tests run:** `npm test` — 12/12 pass.
+
+**Risks / regressions to check:** Gold brand color in dark mode may conflict with any hardcoded blue references elsewhere in `app.js` (none expected). Progress bar gradient now theme-adaptive — verify it renders cleanly in both modes. Light sidebar hides on mobile (`.desktop-nav { display:none }` by default) so no mobile regressions expected.
+
+---
+
 ### 2026-03-07 — Fix desktop language toggle button layout (display conflict)
 
 **Requested:** Fix the home-screen language toggle button on desktop where label and value were not separated left/right as intended.
@@ -271,5 +327,44 @@ Each entry records what was requested, what changed, what was tested, and what t
 - Verify עברית is flush-right in English mode.
 - Verify "English" is flush-left in Hebrew mode.
 - Verify Theme and Nikud values align correctly in both modes.
+
+---
+
+### 2026-03-08 — Visual Polish: Blue mobile nav, blue/gold topbar, red translation icon
+
+**Requested:** Four follow-up CSS-only polish changes after the Sabra palette rollout: (1) mobile bottom nav solid blue in light mode, (2) topbar gold accents in dark mode + solid blue in light mode, (3) translation tile icon red in dark mode (distinct from gold/teal/violet scheme), (4) version bump.
+**Files changed:**
+- `styles.css`: `body[data-theme="light"] .mobile-bottom-nav` → solid blue `rgba(0,56,184,0.96)`; `.mobile-nav-link` light-mode color → near-white; active pill → gold `#D4AF37` with dark text; new `.nav-link-icon` light-mode overrides (white glow inactive, dark tint active); `.shell-logo` → gold border/bg/glow via `var(--brand)`; `.shell-brand-title h1` → gold text-shadow; added `.shell-topbar { border-color: rgba(244,196,48,0.2) }` for dark mode; added light-mode topbar rules (solid blue bg, near-white text/logo); `#homeLessonBtn`/`#lessonBtn` `.game-tile-icon` → `var(--error)` with crimson drop-shadow; light-mode override keeps `var(--brand)` blue
+- `index.html`: CSS cache-bust `v=20260308c` → `v=20260308d`
+**Behavior changed:** Light mode: topbar and mobile nav are now solid blue `#0038B8` matching the desktop sidebar; active mobile tab shows gold pill with dark ink. Dark mode: ע logo glows gold; topbar card has faint gold border; translation game tile icon is now crimson/red (visually distinct from teal conjugation and violet abbreviation tiles).
+**Tests run:** `node --test tests/vocab-data.test.js` — 2/2 pass (CSS-only changes, no JS touched)
+**Risks / regressions to check:** Shell topbar `border-color` override applies to all shell topbars — verify no layout shifts; mobile nav blue may look too saturated on very bright OLED screens; confirm active mobile tab label is readable (`#1A202C` on `#D4AF37`); translation icon crimson vs light-mode blue — verify both look intentional
+
+---
+
+### 2026-03-08 — Custom SVG nav icons, persistent bottom nav, remove in-game home btn, fix ambiguous past labels
+
+**Requested:** Four improvements: (1) replace emoji nav icons with inline SVGs, (2) keep bottom nav visible during game sessions, (3) remove redundant in-game home button, (4) annotate past-tense English labels with "(past)" when verb past = base form (e.g. לשים "put/put").
+**Files changed:**
+- `index.html`: Replaced emoji (🏠 🔄 ⚙️) with inline SVG icons in both desktop nav and mobile bottom nav; version bump `v=20260308d` → `v=20260308e`
+- `styles.css`: Added `.nav-link-icon svg { display: block; flex-shrink: 0 }` rule; removed `body[data-learn-session="true"] .mobile-bottom-nav { display: none }` and associated `padding-bottom` override; replaced with `#homeBtn { display: none }`
+- `hebrew-verbs.js`: Added `pastTag` constant to `buildEnglishFormLabel`; appended `" (past)"` to all 9 past-tense case labels when `past === base`
+- `tests/hebrew-verbs.test.js`: Added test "past-tense labels for ambiguous put/put verbs include (past) annotation" with לשים entry; verifies past labels get annotation, present/future do not
+- `task-log.md`: This entry
+**Behavior changed:** Nav shows clean line-art SVG icons instead of emoji (consistent cross-platform rendering). Bottom nav remains visible during active game sessions; content stays clear via existing `.app-shell` bottom padding. No in-game 🏠 button in lesson header. לשים past-tense prompts now read "I put (past)", "we put (past)", etc.; unambiguous verbs like לשמור ("kept") are unaffected.
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — 12/12 pass (new test + all existing)
+**Risks / regressions to check:** Verify bottom nav doesn't obscure game content on small screens (normal `.app-shell` padding should provide clearance); confirm SVG stroke color inherits correctly in both light and dark themes and active state gold glow; verify lose-progress warning modal still fires when tapping nav during active session
+
+---
+
+### 2026-03-08 — Custom game tile SVG icons, elite ע logo, fix light-mode desktop nav icon visibility
+
+**Requested:** Three visual polish fixes: (1) replace emoji/letter game tile icons with purpose-drawn inline SVGs, (2) make ע logo gold and elite-looking in both themes, (3) fix desktop nav icons invisible in light mode (blue SVG on blue sidebar).
+**Files changed:**
+- `index.html`: Replaced all 6 `.game-tile-icon` spans (home tiles + review gamePicker tiles) with inline SVGs — aleph-stroke for Translation, branching fork for Conjugation, text-lines-with-geresh-dots for Abbreviation; version bump `v=20260308e` → `v=20260308f`
+- `styles.css`: (a) Added `.game-tile-icon svg { display: block; flex-shrink: 0 }` rule after `.game-tile-icon`; (b) Added `body[data-theme="light"] .desktop-nav .nav-link-icon` (white-ish) and `body[data-theme="light"] .desktop-nav .nav-link.active .nav-link-icon` (dark) rules after desktop nav active block; (c) Strengthened `.shell-logo` dark mode — richer border, bg, layered glow, inner shimmer; (d) Fixed `body[data-theme="light"] .shell-logo` — now gold `var(--brand)` with gold glow instead of near-white
+**Behavior changed:** Game tiles show consistent SVG icons that inherit per-tile color theming (crimson/teal/violet) in both dark and light modes. ע logo glows gold on the dark blue `#0038B8` header in light mode, matching dark-mode aesthetic. Desktop nav icons in light mode are now white-ish strokes visible on the dark blue sidebar; active tab icon remains dark on gold background. Mobile nav unaffected (general light-mode blue rule still applies there).
+**Tests run:** No JS changes; `npm test` passes (CSS/HTML only)
+**Risks / regressions to check:** Verify SVG icon sizes look centered in 42×42 icon squares; confirm translation aleph-stroke SVG is visually distinct enough from a plain letter; check that ע logo `var(--brand)` resolves correctly in light mode (CSS var must be defined for light theme)
 
 ---

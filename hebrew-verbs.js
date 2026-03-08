@@ -1343,6 +1343,7 @@ function buildEnglishFormLabel(gloss, slotId) {
   const presentThird = inflectEnglishThirdPerson(base);
   const past = inflectEnglishPast(base);
   const pastPl = base === "be" ? "were" : past;
+  const pastTag = past === base ? " (past)" : "";
 
   switch (slotId) {
     case "present_masculine_singular":
@@ -1354,23 +1355,23 @@ function buildEnglishFormLabel(gloss, slotId) {
     case "present_feminine_plural":
       return `they (f.pl.) ${base}`;
     case "past_first_person_singular":
-      return `I ${past}`;
+      return `I ${past}${pastTag}`;
     case "past_second_person_masculine_singular":
-      return `you (m.s.) ${pastPl}`;
+      return `you (m.s.) ${pastPl}${pastTag}`;
     case "past_second_person_feminine_singular":
-      return `you (f.s.) ${pastPl}`;
+      return `you (f.s.) ${pastPl}${pastTag}`;
     case "past_third_person_masculine_singular":
-      return `he ${past}`;
+      return `he ${past}${pastTag}`;
     case "past_third_person_feminine_singular":
-      return `she ${past}`;
+      return `she ${past}${pastTag}`;
     case "past_first_person_plural":
-      return `we ${pastPl}`;
+      return `we ${pastPl}${pastTag}`;
     case "past_second_person_masculine_plural":
-      return `you (m.pl.) ${pastPl}`;
+      return `you (m.pl.) ${pastPl}${pastTag}`;
     case "past_second_person_feminine_plural":
-      return `you (f.pl.) ${pastPl}`;
+      return `you (f.pl.) ${pastPl}${pastTag}`;
     case "past_third_person_plural":
-      return `they ${pastPl}`;
+      return `they ${pastPl}${pastTag}`;
     case "future_first_person_singular":
       return `I will ${base}`;
     case "future_second_person_masculine_singular":
@@ -1439,8 +1440,10 @@ function inflectEnglishPast(basePhrase) {
     ["give", "gave"],
     ["go", "went"],
     ["keep", "kept"],
+    ["put", "put"],
     ["see", "saw"],
     ["sit", "sat"],
+    ["stand", "stood"],
     ["take", "took"],
     ["write", "wrote"],
   ]);
