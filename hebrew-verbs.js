@@ -658,6 +658,94 @@ function buildStarterVerbEntries() {
       tags: ["starter", "seed", "curated", "irregular"],
       personal_priority: 82,
     }),
+    createVerbEntry({
+      id: "cooking-verb-lamoach",
+      availability: { translationQuiz: true, sentenceHints: true },
+      lemma: "למעוך",
+      root: ["מ", "ע", "ך"],
+      binyan: "paal",
+      regularity: "irregular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to mash", null, false)],
+      forms: makeForms(
+        makePresent(
+          {plain: "מועך", niqqud: "מוֹעֵךְ"},
+          {plain: "מועכת", niqqud: "מוֹעֶכֶת"},
+          {plain: "מועכים", niqqud: "מוֹעֲכִים"},
+          {plain: "מועכות", niqqud: "מוֹעֲכוֹת"}
+        ),
+        makePast(
+          {plain: "מעכתי", niqqud: "מָעַכְתִּי"},
+          {plain: "מעכת", niqqud: "מָעַכְתָּ"},
+          {plain: "מעכת", niqqud: "מָעַכְתְּ"},
+          {plain: "מעך", niqqud: "מָעַךְ"},
+          {plain: "מעכה", niqqud: "מָעֲכָה"},
+          {plain: "מעכנו", niqqud: "מָעַכְנוּ"},
+          {plain: "מעכתם", niqqud: "מָעַכְתֶּם"},
+          {plain: "מעכתן", niqqud: "מָעַכְתֶּן"},
+          {plain: "מעכו", niqqud: "מָעֲכוּ"}
+        ),
+        makeFuture(
+          {plain: "אמעך", niqqud: "אֶמְעַךְ"},
+          {plain: "תמעך", niqqud: "תִּמְעַךְ"},
+          {plain: "תמעכי", niqqud: "תִּמְעֲכִי"},
+          {plain: "ימעך", niqqud: "יִמְעַךְ"},
+          {plain: "תמעך", niqqud: "תִּמְעַךְ"},
+          {plain: "נמעך", niqqud: "נִמְעַךְ"},
+          {plain: "תמעכו", niqqud: "תִּמְעֲכוּ"},
+          {plain: "ימעכו", niqqud: "יִמְעֲכוּ"}
+        )
+      ),
+      review_status: "approved",
+      difficulty_level: 3,
+      tags: ["curated", "cooking_verbs", "irregular"],
+      personal_priority: 60,
+      category: "cooking_verbs",
+    }),
+    createVerbEntry({
+      id: "physical-verb-limchotz",
+      availability: { translationQuiz: true, sentenceHints: true },
+      lemma: "למחוץ",
+      root: ["מ", "ח", "ץ"],
+      binyan: "paal",
+      regularity: "irregular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to crush", null, false)],
+      forms: makeForms(
+        makePresent(
+          {plain: "מוחץ", niqqud: "מוֹחֵץ"},
+          {plain: "מוחצת", niqqud: "מוֹחֶצֶת"},
+          {plain: "מוחצים", niqqud: "מוֹחֲצִים"},
+          {plain: "מוחצות", niqqud: "מוֹחֲצוֹת"}
+        ),
+        makePast(
+          {plain: "מחצתי", niqqud: "מָחַצְתִּי"},
+          {plain: "מחצת", niqqud: "מָחַצְתָּ"},
+          {plain: "מחצת", niqqud: "מָחַצְתְּ"},
+          {plain: "מחץ", niqqud: "מָחַץ"},
+          {plain: "מחצה", niqqud: "מָחֲצָה"},
+          {plain: "מחצנו", niqqud: "מָחַצְנוּ"},
+          {plain: "מחצתם", niqqud: "מָחַצְתֶּם"},
+          {plain: "מחצתן", niqqud: "מָחַצְתֶּן"},
+          {plain: "מחצו", niqqud: "מָחֲצוּ"}
+        ),
+        makeFuture(
+          {plain: "אמחץ", niqqud: "אֶמְחַץ"},
+          {plain: "תמחץ", niqqud: "תִּמְחַץ"},
+          {plain: "תמחצי", niqqud: "תִּמְחֲצִי"},
+          {plain: "ימחץ", niqqud: "יִמְחַץ"},
+          {plain: "תמחץ", niqqud: "תִּמְחַץ"},
+          {plain: "נמחץ", niqqud: "נִמְחַץ"},
+          {plain: "תמחצו", niqqud: "תִּמְחֲצוּ"},
+          {plain: "ימחצו", niqqud: "יִמְחֲצוּ"}
+        )
+      ),
+      review_status: "approved",
+      difficulty_level: 3,
+      tags: ["curated", "physical_verbs", "irregular"],
+      personal_priority: 60,
+      category: "physical_verbs",
+    }),
   ];
 }
 

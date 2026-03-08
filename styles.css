@@ -444,21 +444,13 @@ h3 {
 .home-option-value {
   font-weight: 800;
   color: var(--ink);
-  text-align: left;
 }
 
-body[data-ui-lang="he"] .home-option-value {
-  text-align: right;
-}
-
-body .home-option-value[dir="rtl"] {
-  text-align: right;
-  direction: rtl;
-}
-
-body .home-option-value[dir="ltr"] {
-  text-align: left;
-  direction: ltr;
+.home-option-btn.settings-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .stats-grid {

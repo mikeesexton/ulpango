@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307m";
+const APP_BUILD = "20260307o";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -2148,6 +2148,8 @@ function renderHomeOptions() {
   if (el.homeLangValue) {
     el.homeLangValue.textContent = getLanguageToggleLabel();
     el.homeLangValue.setAttribute("dir", state.language === "en" ? "rtl" : "ltr");
+    el.homeLangValue.style.textAlign = "";
+    el.homeLangValue.style.direction = "";
   }
   if (el.homeThemeValue) {
     el.homeThemeValue.textContent = state.theme === "light" ? t("controls.lightMode") : t("controls.darkMode");
