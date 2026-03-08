@@ -368,3 +368,18 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify SVG icon sizes look centered in 42×42 icon squares; confirm translation aleph-stroke SVG is visually distinct enough from a plain letter; check that ע logo `var(--brand)` resolves correctly in light mode (CSS var must be defined for light theme)
 
 ---
+
+### 2026-03-08 — PNG logo images + Hebrew letter game tile icons
+
+**Requested:** Use rendered PNG images for the ע logo (light/dark variants), and replace game tile SVG icons with colored Hebrew letters (ת Translation, ק Conjugation, נ Abbreviation).
+**Files changed:**
+- `assets/logo-light.png` (new): Cropped 1300×1300 → 128×128 from light-bg Gemini image; white rounded-rect with gold 3D ע
+- `assets/logo-dark.png` (new): Cropped 1300×1300 → 128×128 from dark-bg Gemini image; charcoal rounded-rect with glowing gold ע
+- `index.html`: `.shell-logo` span emptied (text removed); all 6 `.game-tile-icon` spans replaced with single Hebrew letters ת/ק/נ; version bump `v=20260308f` → `v=20260308g`
+- `styles.css`: `.shell-logo` rewritten to use `background-image: url('./assets/logo-dark.png')` + `background-size: cover`; light-mode override swaps to `logo-light.png`; removed all text-based font/color/filter/border rules; removed now-unused `.game-tile-icon svg` rule
+- `task-log.md`: This entry
+**Behavior changed:** Logo is now the rendered premium PNG icon — dark background with glow in dark mode, white background in light mode. Game tiles show styled Hebrew letters inheriting per-tile colors (crimson ת, teal ק, violet נ) — consistent, crisp on all platforms.
+**Tests run:** CSS/HTML only; no JS changes
+**Risks / regressions to check:** Verify `./assets/` path resolves correctly from `index.html` root; confirm logo looks sharp on Retina (128px source → 48px display = ~2.67× density); check light-mode logo on blue topbar doesn't look washed out
+
+---

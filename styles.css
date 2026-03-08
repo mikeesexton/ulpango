@@ -326,20 +326,13 @@ h3 {
 }
 
 .shell-logo {
-  display: inline-grid;
-  place-items: center;
+  display: inline-block;
   width: 3rem;
   height: 3rem;
-  border-radius: 16px;
-  border: 1.5px solid rgba(244, 196, 48, 0.52);
-  background: rgba(244, 196, 48, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  font-family: "Assistant", sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  color: var(--brand);
-  filter: drop-shadow(0 0 12px rgba(244, 196, 48, 0.6)) drop-shadow(0 0 4px rgba(244, 196, 48, 0.3));
+  background-image: url('./assets/logo-dark.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .shell-topbar {
@@ -358,11 +351,7 @@ body[data-theme="light"] .shell-brand-title h1 {
 }
 
 body[data-theme="light"] .shell-logo {
-  color: var(--brand);
-  background: rgba(244, 196, 48, 0.15);
-  border-color: rgba(244, 196, 48, 0.5);
-  filter: drop-shadow(0 0 10px rgba(244, 196, 48, 0.55));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background-image: url('./assets/logo-light.png');
 }
 
 .shell-summary {
@@ -845,11 +834,6 @@ body[data-theme="light"] .game-tile:hover {
   font-size: 1.28rem;
   background: var(--tile-icon-bg);
   border: 1px solid var(--tile-icon-border);
-}
-
-.game-tile-icon svg {
-  display: block;
-  flex-shrink: 0;
 }
 
 #homeLessonBtn .game-tile-icon,
