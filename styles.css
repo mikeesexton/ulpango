@@ -333,6 +333,8 @@ h3 {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-radius: 22%;
+  overflow: hidden;
 }
 
 .shell-topbar {
@@ -351,7 +353,7 @@ body[data-theme="light"] .shell-brand-title h1 {
 }
 
 body[data-theme="light"] .shell-logo {
-  background-image: url('./assets/logo-dark.png');
+  background-image: url('./assets/logo-light.png');
 }
 
 .shell-summary {
