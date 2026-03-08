@@ -150,6 +150,7 @@ const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
   "starter-verb-laamod",
   "starter-verb-leechol",
   "starter-verb-lishtot",
+  "starter-verb-lichtov",
 ]);
 
 function normalizeAvailability(availability) {

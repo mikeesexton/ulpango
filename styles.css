@@ -43,7 +43,7 @@
   --error-bg: rgba(230, 57, 70, 0.14);
   --error-border: rgba(230, 57, 70, 0.34);
   --selection-glow: rgba(244, 196, 48, 0.2);
-  --overlay-bg: rgba(5, 9, 18, 0.72);
+  --overlay-bg: rgba(5, 9, 18, 0.94);
   --list-bg: rgba(11, 19, 43, 0.72);
   --row-bg: rgba(20, 30, 56, 0.80);
   --next-shadow: 0 10px 22px rgba(244, 196, 48, 0.32);
@@ -98,7 +98,7 @@ body[data-theme="light"] {
   --error-bg: rgba(255, 107, 107, 0.14);
   --error-border: rgba(255, 107, 107, 0.28);
   --selection-glow: rgba(0, 56, 184, 0.15);
-  --overlay-bg: rgba(220, 230, 245, 0.76);
+  --overlay-bg: rgba(220, 230, 245, 0.94);
   --list-bg: rgba(255, 255, 255, 0.82);
   --row-bg: rgba(255, 255, 255, 0.86);
   --next-shadow: 0 10px 22px rgba(0, 56, 184, 0.22);
@@ -1440,7 +1440,7 @@ body[data-ui-locked="true"] .app-shell {
   display: grid;
   place-items: center;
   background: var(--overlay-bg);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
 }
 
 .second-chance-scene {
