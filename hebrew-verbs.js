@@ -746,6 +746,26 @@ function buildStarterVerbEntries() {
       personal_priority: 60,
       category: "physical_verbs",
     }),
+    createVerbEntry({
+      id: "starter-verb-leshacharer",
+      availability: getStarterVerbAvailability("starter-verb-leshacharer"),
+      lemma: "לשחרר",
+      root: ["ש", "ח", "ר"],
+      binyan: "piel",
+      regularity: "regular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to free", null, true), makeSense("to liberate", null, true)],
+      forms: makeForms(
+        makePresent("מְשַׁחְרֵר", "מְשַׁחְרֶרֶת", "מְשַׁחְרְרִים", "מְשַׁחְרְרוֹת"),
+        makePast("שִׁחְרַרְתִּי", "שִׁחְרַרְתָּ", "שִׁחְרַרְתְּ", "שִׁחְרֵר", "שִׁחְרְרָה", "שִׁחְרַרְנוּ", "שִׁחְרַרְתֶּם", "שִׁחְרַרְתֶּן", "שִׁחְרְרוּ"),
+        makeFuture("אֲשַׁחְרֵר", "תְּשַׁחְרֵר", "תְּשַׁחְרְרִי", "יְשַׁחְרֵר", "תְּשַׁחְרֵר", "נְשַׁחְרֵר", "תְּשַׁחְרְרוּ", "יְשַׁחְרְרוּ")
+      ),
+      review_status: "approved",
+      notes: "Pi'el of ש-ח-ר with geminate resh. Gloss covers 'to free' (individuals) and 'to liberate' (peoples/nations).",
+      difficulty_level: 3,
+      tags: ["piel", "regular"],
+      personal_priority: 80,
+    }),
   ];
 }
 

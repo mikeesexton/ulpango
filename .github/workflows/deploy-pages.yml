@@ -38,6 +38,7 @@ jobs:
           cp abbreviation-data.js dist/
           cp hebrew-verbs.js dist/
           cp .nojekyll dist/
+          cp -r assets dist/
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3

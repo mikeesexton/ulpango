@@ -383,3 +383,15 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify `./assets/` path resolves correctly from `index.html` root; confirm logo looks sharp on Retina (128px source → 48px display = ~2.67× density); check light-mode logo on blue topbar doesn't look washed out
 
 ---
+
+### 2026-03-08 — Vocab edits + add לשחרר verb
+
+**Requested:** Replace two construct-state vocab entries with standalone forms, remove two irrelevant entries, and add לשחרר as a Pi'el verb entry.
+**Files changed:**
+- `vocab-data.js`: (1) Line 435: replaced `["scene (of)", "זירת", "זִירַת"]` → `["scene / arena", "זירה", "זִירָה"]`; (2) Line 447: replaced `["roar of", "שאגת", "שַׁאֲגַת"]` → `["roar", "שאגה", "שְׁאָגָה"]`; (3) Removed `["frontier model", "מודל חזית", "מוֹדֶל חֲזִית"]`; (4) Removed `["closure conversation", "שיחת סגירה", "שיחת סגירה"]`
+- `hebrew-verbs.js`: Added `createVerbEntry` for לשחרר (id: `starter-verb-leshacharer`) — Pi'el of ש-ח-ר with geminate resh, curated conjugation, senses "to free" / "to liberate", difficulty 3, priority 80
+**Behavior changed:** Translation game no longer surfaces construct-state-only or irrelevant entries; standalone "scene / arena" and "roar" cards now appear. Conjugation game now includes לשחרר with full present/past/future forms.
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Confirm לשחרר forms display correctly with niqqud in the conjugation game; verify אחסון compound entries (lines 532, 890) remain untouched
+
+---
