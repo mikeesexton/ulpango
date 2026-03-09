@@ -360,6 +360,7 @@ const I18N = {
       mistakes: "Session Mistakes",
       reviewPerformance: "Review Performance",
       niceJob: "Nice job!",
+      roomToImprove: "There's room to improve",
       amazing: "Amazing!",
       noMistakes: "No mistakes in this session.",
     },
@@ -603,6 +604,7 @@ const I18N = {
       mistakes: "טעויות מהסשן",
       reviewPerformance: "סקירת ביצועים",
       niceJob: "כל הכבוד!",
+      roomToImprove: "יש מקום לשיפור",
       amazing: "זה מדהים!",
       noMistakes: "לא היו טעויות בסשן הזה.",
     },
@@ -1929,7 +1931,7 @@ function renderSummaryState() {
   const scoreValue = getSummaryScoreValue();
   const scoreTotal = getSummaryScoreTotal();
   const accuracy = getSummaryAccuracyPercent();
-  const praise = isPerfectSummary() ? t("results.amazing") : t("results.niceJob");
+  const praise = isPerfectSummary() ? t("results.amazing") : accuracy < 50 ? t("results.roomToImprove") : t("results.niceJob");
 
   el.resultsTitle.textContent = titleText;
   el.resultsNote.textContent = praise;

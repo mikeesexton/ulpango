@@ -535,3 +535,19 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Confirm single icon looks correct in both dark and light themes; check icon sizing on mobile
 
 ---
+
+## 2026-03-08 — Low-score feedback message
+
+**Agent:** Claude Code
+**Files changed:** `app.js`
+
+**What was requested:** Show a different end-of-game message when the player scores under 50%.
+
+**Changes made:**
+- Added i18n keys `results.roomToImprove` in English ("There's room to improve") and Hebrew ("יש מקום לשיפור") to both locale objects
+- Updated `renderSummaryState()` praise logic: `< 50%` accuracy → `roomToImprove`; `50–99%` → `niceJob`; `100%` → `amazing`
+
+**Tests run:** Play a game, answer mostly wrong → confirm "There's room to improve" / "יש מקום לשיפור" appears on results screen; score ≥ 50% → "Nice job!"; perfect → "Amazing!"
+**Risks / regressions to check:** None — isolated logic change in one function
+
+---
