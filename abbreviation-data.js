@@ -1846,6 +1846,15 @@ const ABBREVIATIONS = [
     "bucket": "People, Health & Culture",
     "notes": "",
     "source": "abbreviations-xlsx"
+  },
+  {
+    "id": "abbr-207",
+    "abbr": "ר״ת",
+    "expansionHe": "ראשי תיבות",
+    "english": "acronym / abbreviation",
+    "bucket": "Ideas, Science & Tech",
+    "notes": "",
+    "source": "manual"
   }
 ];
 

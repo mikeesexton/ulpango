@@ -513,7 +513,7 @@ const I18N = {
       translationNote: "סבבי תרגום מהירים במתכונת בחירה מרובה.",
       conjugationName: "נטיות",
       conjugationNote: "התאם בין נטיות באנגלית לנטיות בעברית.",
-      abbreviationName: "קיצורים",
+      abbreviationName: "ראשי תיבות",
       abbreviationNote: "נחש את המשמעות באנגלית לפי קיצור בעברית.",
     },
     prompt: {

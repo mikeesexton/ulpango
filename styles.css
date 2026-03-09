@@ -32,8 +32,6 @@
   --prompt-bg: linear-gradient(160deg, rgba(28, 37, 65, 0.88) 0%, rgba(18, 26, 48, 0.84) 100%);
   --tile-bg: linear-gradient(160deg, rgba(28, 37, 65, 0.90) 0%, rgba(20, 28, 52, 0.86) 100%);
   --tile-border: rgba(244, 196, 48, 0.22);
-  --tile-icon-bg: rgba(244, 196, 48, 0.12);
-  --tile-icon-border: rgba(244, 196, 48, 0.2);
   --ring-center-bg: #0B132B;
   --ring-core-border: rgba(244, 247, 251, 0.14);
   --ring-track-empty: rgba(160, 174, 192, 0.25);
@@ -87,8 +85,6 @@ body[data-theme="light"] {
   --prompt-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 247, 251, 0.92) 100%);
   --tile-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 247, 251, 0.92) 100%);
   --tile-border: rgba(0, 56, 184, 0.2);
-  --tile-icon-bg: rgba(0, 56, 184, 0.1);
-  --tile-icon-border: rgba(0, 56, 184, 0.2);
   --ring-center-bg: #FFFFFF;
   --ring-core-border: rgba(0, 56, 184, 0.15);
   --ring-track-empty: rgba(0, 56, 184, 0.18);
@@ -330,11 +326,9 @@ h3 {
   width: 3rem;
   height: 3rem;
   background-image: url('./assets/logo-dark.png');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 22%;
-  overflow: hidden;
 }
 
 .shell-topbar {
@@ -833,38 +827,18 @@ body[data-theme="light"] .game-tile:hover {
   display: grid;
   place-items: center;
   border-radius: 14px;
-  font-size: 1.28rem;
-  background: var(--tile-icon-bg);
-  border: 1px solid var(--tile-icon-border);
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
 }
 
-#homeLessonBtn .game-tile-icon,
-#lessonBtn .game-tile-icon {
-  color: var(--error);
-  filter: drop-shadow(0 0 7px rgba(230, 57, 70, 0.55));
+.game-tile-icon img {
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
-body[data-theme="light"] #homeLessonBtn .game-tile-icon,
-body[data-theme="light"] #lessonBtn .game-tile-icon {
-  color: var(--brand);
-  filter: drop-shadow(0 0 7px rgba(0, 56, 184, 0.45));
-}
-
-#homeVerbMatchBtn .game-tile-icon,
-#verbMatchBtn .game-tile-icon {
-  color: #0ABFBC;
-  filter: drop-shadow(0 0 7px rgba(10, 191, 188, 0.55));
-  background: rgba(10, 191, 188, 0.12);
-  border-color: rgba(10, 191, 188, 0.24);
-}
-
-#homeAbbreviationBtn .game-tile-icon,
-#abbreviationBtn .game-tile-icon {
-  color: #9B5DE5;
-  filter: drop-shadow(0 0 7px rgba(155, 93, 229, 0.55));
-  background: rgba(155, 93, 229, 0.12);
-  border-color: rgba(155, 93, 229, 0.24);
-}
 
 #homeVerbMatchBtn:hover,
 #verbMatchBtn:hover {
@@ -1347,7 +1321,7 @@ body[data-theme="light"] .mobile-bottom-nav .nav-link.active .nav-link-icon {
 }
 
 .mobile-nav-link span:last-child {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   line-height: 1.1;
 }
 
@@ -1739,7 +1713,6 @@ body[data-ui-lang="he"] .mastered-row input {
     width: 2.1rem;
     height: 2.1rem;
     font-size: 1.44rem;
-    border-radius: 14px;
   }
 
   .shell-brand-title h1 {
@@ -1809,7 +1782,7 @@ body[data-ui-lang="he"] .mastered-row input {
 
   .status-row {
     gap: 0.22rem;
-    font-size: 0.68rem;
+    font-size: 0.74rem;
   }
 
   .status-row span {
@@ -1826,7 +1799,7 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .prompt-label {
-    font-size: 0.64rem;
+    font-size: 0.76rem;
   }
 
   .prompt-line {
@@ -1847,7 +1820,7 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .choice-btn {
-    min-height: 46px;
+    min-height: 50px;
     padding: 0.62rem 0.72rem;
     border-radius: 15px;
     font-size: 0.92rem;
@@ -1866,7 +1839,7 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .match-col-title {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     letter-spacing: 0.04em;
   }
 
@@ -1875,14 +1848,14 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .match-card {
-    min-height: 41px;
-    padding: 0.4rem 0.28rem;
+    min-height: 46px;
+    padding: 0.46rem 0.34rem;
     border-radius: 15px;
-    font-size: clamp(0.68rem, 2.5vw, 0.8rem);
+    font-size: clamp(0.78rem, 3vw, 0.92rem);
   }
 
   .match-card.hebrew {
-    font-size: clamp(0.78rem, 2.9vw, 0.92rem);
+    font-size: clamp(0.88rem, 3.2vw, 1.04rem);
   }
 
   .feedback {
@@ -1961,16 +1934,16 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .choice-btn {
-    min-height: 43px;
+    min-height: 46px;
     padding: 0.54rem 0.66rem;
   }
 
   .match-card {
     min-height: 38px;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
   }
 
   .match-card.hebrew {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
   }
 }

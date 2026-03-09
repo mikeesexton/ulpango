@@ -395,3 +395,143 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Confirm לשחרר forms display correctly with niqqud in the conjugation game; verify אחסון compound entries (lines 532, 890) remain untouched
 
 ---
+
+### 2026-03-08 — Clean up ע logo display in both themes
+
+**Requested:** Fix the double-border-radius artifact on the shell logo badge — the PNG's baked-in background colour fought the CSS `border-radius`, causing white-box-on-dark-topbar in light mode and mismatched corner curves.
+**Files changed:**
+- `assets/logo-light.png`: BFS flood-fill from seed `(64,8)`, tolerance 25 — cleared ~7640 white background pixels → fully transparent
+- `assets/logo-dark.png`: BFS flood-fill from seed `(64,8)`, tolerance 25 — cleared ~6063 dark background pixels → fully transparent
+- `styles.css`: Added `background-color: #1a1a1e` to `.shell-logo` (dark mode badge); added `background-color: #f5f0e8` to `body[data-theme="light"] .shell-logo` (light mode cream badge); CSS now owns the badge colour entirely
+- `index.html`: CSS cache-buster bumped `v=20260308j` → `v=20260308k`
+- `task-log.md`: This entry
+**Behavior changed:** Logo badge background and border-radius are now controlled entirely by CSS. Dark mode: near-black badge with gold ע. Light mode: cream/off-white badge with gold ע — no white box on the blue topbar.
+**Tests run:** CSS/HTML/PNG only; no JS changes; verify visually in both themes
+**Risks / regressions to check:** Confirm transparent PNGs render correctly on both Retina and non-Retina; check that flood-fill tolerance=25 did not eat into the gold ע letter pixels
+
+---
+
+### [2026-03-08] — Revert flood-fill damage; restore solid-background PNGs
+
+**Requested:** Fix double-background artifact on ע logo badge caused by a previous failed flood-fill attempt.
+**Files changed:**
+- `assets/logo-light.png` — restored via `git checkout HEAD` (solid-background full-frame badge)
+- `assets/logo-dark.png` — restored via `git checkout HEAD` (solid-background full-frame badge)
+- `styles.css` — removed `background-color: #1a1a1e` from `.shell-logo`; removed `background-color: #f5f0e8` from `body[data-theme="light"] .shell-logo`
+- `index.html` — bumped CSS cache-buster `v=20260308k` → `v=20260308l`
+**Behavior changed:** Double-background (donut artifact from incomplete flood-fill) eliminated. Dark mode: clean dark badge clipped by `border-radius: 22%`. Light mode: clean cream badge, single edge.
+**Tests run:** Visual only — no JS changes; hard-refresh and check both themes
+**Risks / regressions to check:** Confirm both PNGs restored to pre-flood-fill state; verify no `background-color` on `.shell-logo` in DevTools; check Retina display for crisp badge edges
+
+---
+
+### [2026-03-08] — Switch logo to shadow-free SVGs (user-supplied)
+
+**Requested:** Replace PNG logos with new shadow-free SVGs (1.svg=light, 2.svg=dark); strip white background rects so CSS controls badge color.
+**Files changed:**
+- `assets/logo-dark.svg` — new file (from 2.svg, white background rects stripped)
+- `assets/logo-light.svg` — new file (from 1.svg, white background rects stripped)
+- `styles.css` — `.shell-logo` now references `logo-dark.svg` with `background-color: #1a1a1e`; light theme rule references `logo-light.svg` with `background-color: #f5f0e8`
+- `index.html` — cache-buster bumped `v=20260308l` → `v=20260308m`
+**Behavior changed:** Logo badge now uses SVG assets; shadow gone; CSS background-color fills the transparent badge background.
+**Tests run:** Visual only — hard-refresh and verify both themes
+**Risks / regressions to check:** SVGs are ~2MB each (embedded raster); check load time; confirm transparent areas render correctly in both themes
+
+---
+
+### [2026-03-08] — Switch logo to new transparent-background PNGs
+
+**Requested:** Replace SVG logo assets with user-supplied PNGs that have pre-baked transparent corners; remove double-background CSS artifacts.
+**Files changed:**
+- `assets/logo-light.png` — replaced with new 1000×1000 RGBA PNG (white badge, transparent corners)
+- `assets/logo-dark.png` — replaced with new 1000×1000 RGBA PNG (dark badge, transparent corners)
+- `styles.css` — `.shell-logo`: removed `background-color`, `border-radius`, `overflow`; switched `logo-dark.svg` → `logo-dark.png`, `background-size: cover` → `contain`; light theme rule: removed `background-color`, switched `logo-light.svg` → `logo-light.png`; media query `.shell-logo`: removed `border-radius: 14px`
+- `index.html` — cache-buster bumped `v=20260308m` → `v=20260308n`
+**Behavior changed:** Logo uses transparent-corner PNGs; no CSS border-radius/background-color needed; badge shape fully baked into PNG assets.
+**Tests run:** Visual only — hard-refresh and verify dark/light themes; confirm no double-background artifact in DevTools
+**Risks / regressions to check:** Confirm transparent corners blend correctly into topbar in both themes; check at 2.1rem (responsive size)
+
+---
+
+## 2026-03-08 — Mobile Accessibility: Larger Fonts & Better Tap Targets
+
+**Agent:** Claude Code
+**Files changed:** `styles.css`, `index.html`
+
+**What was requested:** Improve mobile readability and tap-target sizes. Several font sizes in the ≤767px media query were below accessible minimums (as low as 9.6px), and `.choice-btn` min-height was 46px, slightly below the 48px iOS/Android recommendation.
+
+**Changes made:**
+
+*styles.css — `@media (max-width: 767px)` block:*
+- `.mobile-nav-link span:last-child`: `0.74rem` → `0.8rem`
+- `.status-row`: `font-size: 0.68rem` → `0.74rem`
+- `.prompt-label`: `font-size: 0.64rem` → `0.76rem`
+- `.choice-btn`: `min-height: 46px` → `50px`
+- `.match-col-title`: `font-size: 0.6rem` → `0.7rem`
+- `.match-card`: `min-height: 41px → 46px`, `padding: 0.4rem 0.28rem → 0.46rem 0.34rem`, `font-size: clamp(0.68rem, 2.5vw, 0.8rem) → clamp(0.78rem, 3vw, 0.92rem)`
+- `.match-card.hebrew`: `clamp(0.78rem, 2.9vw, 0.92rem)` → `clamp(0.88rem, 3.2vw, 1.04rem)`
+
+*styles.css — `@media (max-width: 767px) and (max-height: 760px)` block:*
+- `.choice-btn`: `min-height: 43px` → `46px`
+- `.match-card`: `font-size: 0.72rem` → `0.8rem`
+- `.match-card.hebrew`: `font-size: 0.82rem` → `0.9rem`
+
+*index.html:* cache-buster bumped `v=20260308n` → `v=20260308o`
+
+**Tests run:** Visual only — open DevTools, set to iPhone SE (375×667), verify conjugation cards, column titles, prompt label, and buttons are noticeably more readable; confirm no layout overflow on short screens (~560px height)
+**Risks / regressions to check:** Confirm match-card height increase doesn't cause overflow on very small phones; check that choice-btn labels don't wrap at new min-height
+
+---
+
+## 2026-03-08 — Game Mode Icons (PNG assets, theme-aware)
+
+**Agent:** Claude Code
+**Files changed:** `index.html`, `styles.css`, `assets/` (6 new PNGs)
+
+**What was requested:** Replace the Hebrew letter text characters in game-mode tile icons with custom PNG images. Each game has a dark-theme and a light-theme variant.
+
+**New assets added to `assets/`:**
+- `icon-translation-dark.png` / `icon-translation-light.png` — pink/salmon gradient, Hebrew ן
+- `icon-conjugation-dark.png` / `icon-conjugation-light.png` — teal/blue gradient, letter J
+- `icon-abbreviation-dark.png` / `icon-abbreviation-light.png` — blue/purple gradient, Hebrew פד
+
+**HTML changes (`index.html`):** Replaced `<span class="game-tile-icon">ת</span>` etc. with `<img class="icon-dark">` + `<img class="icon-light">` pairs in all 6 game-tile buttons (home dashboard + in-game picker).
+
+**CSS changes (`styles.css`):**
+- `.game-tile-icon`: removed text-based font-size, background, and border; added `overflow: hidden`, `background: transparent`, `border: none`
+- Added `.game-tile-icon img { width: 42px; height: 42px; display: block; }`
+- Added theme show/hide: `body[data-theme="dark"] .icon-light { display: none }` and vice versa
+- Removed per-game color/filter/background overrides (no longer needed)
+- Cache-buster bumped: `v=20260308o` → `v=20260308p`
+
+**Tests run:** Visual only — verify icons appear in dark and light themes, confirm correct icon shown per theme
+**Risks / regressions to check:** Confirm no layout shift on game-tile cards; check mobile tile sizing; verify theme toggle swaps icons correctly
+
+---
+
+## 2026-03-08 — Updated Game Icons, Hebrew Abbreviation Game Rename, New ר״ת Entry
+
+**Agent:** Claude Code
+**Files changed:** `index.html`, `styles.css`, `app.js`, `abbreviation-data.js`, `assets/` (3 new PNGs)
+
+**What was requested:**
+1. Replace game mode icons with new single-icon PNGs (same for dark and light themes)
+2. Rename abbreviation game in Hebrew from "קיצורים" to "ראשי תיבות"
+3. Add ראשי תיבות / ר״ת as a new entry in the abbreviation game
+
+**Changes:**
+
+*assets/:* Added `icon-translation.png`, `icon-conjugation.png`, `icon-abbreviation.png` (blue-gradient square icons, self-contained with rounded corners)
+
+*index.html:* Replaced dark/light img pairs in all 6 `.game-tile-icon` spans with single `<img>` tags pointing to the new assets. Cache-buster bumped `v=20260308p` → `v=20260308q`
+
+*styles.css:* Removed the `body[data-theme] .icon-dark/.icon-light` display-none toggle rules (no longer needed with single icons)
+
+*app.js (line 516):* Hebrew abbreviation game name: `"קיצורים"` → `"ראשי תיבות"`
+
+*abbreviation-data.js:* Added entry `abbr-207`: abbr `ר״ת`, expansionHe `ראשי תיבות`, english `"acronym / abbreviation"`, bucket `"Ideas, Science & Tech"`
+
+**Tests run:** Visual only — verify icons display on home screen and in-game picker; confirm Hebrew UI shows "ראשי תיבות"; play abbreviation game and confirm ר״ת appears as a question
+**Risks / regressions to check:** Confirm single icon looks correct in both dark and light themes; check icon sizing on mobile
+
+---
