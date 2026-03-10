@@ -272,6 +272,8 @@ const I18N = {
       conjugationNote: "Match English forms to Hebrew conjugations.",
       abbreviationName: "Abbreviation",
       abbreviationNote: "Guess English meanings from Hebrew abbreviations.",
+      advConjName: "Adv. Conjugation",
+      advConjNote: "Conjugate both subject and object of Hebrew verbal idioms.",
     },
     prompt: {
       lesson: "Lesson",
@@ -303,12 +305,15 @@ const I18N = {
       reviewIntro: "Second chance round: retry {count} words you missed.",
       matchDoneVerb: "Verb complete: {verb}.",
       matchDoneAll: "Conjugation session complete. Verbs covered: {count}.",
+      advConjCorrect: "Correct: {answer}",
+      advConjWrong: "Not quite. Correct answer: {answer}",
     },
     summary: {
       resultsHeader: "Session Results",
       lessonTitle: "Translation Complete",
       matchTitle: "Conjugation Complete",
       abbreviationTitle: "Abbreviation Complete",
+      advConjTitle: "Adv. Conjugation Complete",
       score: "Score: {score}/{total}",
       lessonNote: "Second-chance rounds: {count}",
       lessonNoteNone: "No second-chance rounds this run.",
@@ -405,10 +410,10 @@ const I18N = {
       restored: "Restored {count} words to translation.",
     },
     domain: {
-      daily: "Daily Life & Home",
-      people: "People, Health & Culture",
-      systems: "Civics, Law & Work",
-      ideas: "Ideas, Science & Tech",
+      colloquial: "Colloquial & Street",
+      everyday: "Everyday Functional",
+      professional: "Professional",
+      formal: "Formal & Analytical",
     },
   },
   he: {
@@ -516,6 +521,8 @@ const I18N = {
       conjugationNote: "התאם בין נטיות באנגלית לנטיות בעברית.",
       abbreviationName: "ראשי תיבות",
       abbreviationNote: "נחש את המשמעות באנגלית לפי קיצור בעברית.",
+      advConjName: "נטיות מתקדמות",
+      advConjNote: "נטה גם את הנושא וגם את המושא של ביטויים פועלים עבריים.",
     },
     prompt: {
       lesson: "שיעור",
@@ -547,12 +554,15 @@ const I18N = {
       reviewIntro: "סבב הזדמנות שנייה: נסה שוב {count} מילים שפספסת.",
       matchDoneVerb: "הפועל הושלם: {verb}.",
       matchDoneAll: "אימון הנטיות הושלם. פעלים שכוסו: {count}.",
+      advConjCorrect: "נכון: {answer}",
+      advConjWrong: "לא מדויק. התשובה הנכונה: {answer}",
     },
     summary: {
       resultsHeader: "סיכום אימון",
       lessonTitle: "תרגום הושלם",
       matchTitle: "נטיות הושלמו",
       abbreviationTitle: "קיצורים הושלמו",
+      advConjTitle: "נטיות מתקדמות הושלמו",
       score: "ציון: {score}/{total}",
       lessonNote: "סבבי הזדמנות שנייה: {count}",
       lessonNoteNone: "בסבב הזה לא היו סבבי הזדמנות שנייה.",
@@ -649,10 +659,10 @@ const I18N = {
       restored: "הוחזרו {count} מילים לתרגול תרגום.",
     },
     domain: {
-      daily: "חיי יום־יום ובית",
-      people: "אנשים, בריאות ותרבות",
-      systems: "אזרחות, משפט ועבודה",
-      ideas: "רעיונות, מדע וטכנולוגיה",
+      colloquial: "דיבורי ורחוב",
+      everyday: "יומיומי ופונקציונלי",
+      professional: "מקצועי",
+      formal: "פורמלי ואנליטי",
     },
   },
 };
@@ -664,6 +674,7 @@ const STORAGE_KEYS = {
   ui: "ivriquest-ui-v1",
   session: "ivriquest-session-v1",
   welcomeSeen: "ivriquest-welcome-seen-v1",
+  advConjStats: "advConjStats",
 };
 
 const storage = getStorage();
@@ -682,6 +693,24 @@ const LEITNER_INTERVALS = [
 ];
 const LESSON_ROUNDS = 10;
 const ABBREVIATION_ROUNDS = 10;
+const ADV_CONJ_ROUNDS = 10;
+
+const ADV_CONJ_SUBJECTS = [
+  { form: "msg", pronoun: "הוא", en: "he" },
+  { form: "fsg", pronoun: "היא", en: "she" },
+  { form: "mpl", pronoun: "הם", en: "they (m.)" },
+  { form: "fpl", pronoun: "הן", en: "they (f.)" },
+];
+
+const ADV_CONJ_OBJECTS = [
+  { key: "1sg",  dirObj: "אותי",  lObj: "לי",   en: "me",       poss: "my" },
+  { key: "2msg", dirObj: "אותך",  lObj: "לך",   en: "you (m.)", poss: "your" },
+  { key: "3msg", dirObj: "אותו",  lObj: "לו",   en: "him",      poss: "his" },
+  { key: "3fsg", dirObj: "אותה",  lObj: "לה",   en: "her",      poss: "her" },
+  { key: "1pl",  dirObj: "אותנו", lObj: "לנו",  en: "us",       poss: "our" },
+  { key: "2mpl", dirObj: "אתכם",  lObj: "לכם",  en: "you (pl.)", poss: "your" },
+  { key: "3mpl", dirObj: "אותם",  lObj: "להם",  en: "them",     poss: "their" },
+];
 const VERB_MATCH_ROUNDS = 1;
 const MATCH_MAX_PAIRS = 12;
 const MATCH_VISIBLE_ROWS = 5;
@@ -708,53 +737,54 @@ const HEBREW_MEDIAL_TO_FINAL = {
 
 const PERFORMANCE_DOMAINS = [
   {
-    id: "daily",
-    emoji: "🏠",
-    label: "Daily Life & Home",
+    id: "colloquial",
+    emoji: "🗣️",
+    label: "Colloquial & Street",
     categories: new Set([
-      "cooking_utensils",
-      "cooking_verbs",
-      "home_everyday_life",
-      "everyday_survival_expanded",
-    ]),
-  },
-  {
-    id: "people",
-    emoji: "💬",
-    label: "People, Health & Culture",
-    categories: new Set([
-      "health",
-      "health_body_expanded",
-      "emotional_nuance",
-      "emotional_psychological_expanded",
+      "conversation_glue",
       "dating_relationships",
       "relationships_dating_expanded",
-      "communication_mastery_expanded",
-      "conversation_glue",
       "media_digital_life_expanded",
+      "emotional_nuance",
+      "emotional_psychological_expanded",
       "social_cultural",
       "culture_identity_expanded",
     ]),
   },
   {
-    id: "systems",
-    emoji: "⚖️",
-    label: "Civics, Law & Work",
+    id: "everyday",
+    emoji: "🏠",
+    label: "Everyday Functional",
     categories: new Set([
+      "cooking_utensils",
+      "cooking_verbs",
+      "home_everyday_life",
+      "everyday_survival_expanded",
+      "health",
+      "health_body_expanded",
       "bureaucracy",
-      "legal_civic",
-      "law_legal_systems_expanded",
-      "politics_society_expanded",
-      "high_level_discourse_expanded",
-      "work_business",
-      "finance_investing",
-      "business_finance_expanded",
     ]),
   },
   {
-    id: "ideas",
+    id: "professional",
+    emoji: "💼",
+    label: "Professional",
+    categories: new Set([
+      "work_business",
+      "business_finance_expanded",
+      "finance_investing",
+      "legal_civic",
+      "law_legal_systems_expanded",
+      "politics_society_expanded",
+      "communication_mastery_expanded",
+      "technology_ai",
+      "technology_ai_expanded",
+    ]),
+  },
+  {
+    id: "formal",
     emoji: "📚",
-    label: "Ideas, Science & Tech",
+    label: "Formal & Analytical",
     categories: new Set([
       "core_advanced",
       "abstract_philosophy",
@@ -764,13 +794,12 @@ const PERFORMANCE_DOMAINS = [
       "scientific_analytical",
       "science_research_expanded",
       "philosophy_intellectual_expanded",
-      "technology_ai",
-      "technology_ai_expanded",
+      "high_level_discourse_expanded",
     ]),
   },
 ];
 const DOMAIN_BY_CATEGORY = buildDomainByCategoryMap(PERFORMANCE_DOMAINS);
-const FALLBACK_DOMAIN_ID = PERFORMANCE_DOMAINS[PERFORMANCE_DOMAINS.length - 1]?.id || "ideas";
+const FALLBACK_DOMAIN_ID = PERFORMANCE_DOMAINS[PERFORMANCE_DOMAINS.length - 1]?.id || "formal";
 const VOCABULARY_AVAILABILITY_DEFAULTS = Object.freeze({
   translationQuiz: true,
   sentenceHints: true,
@@ -856,6 +885,9 @@ const el = {
   verbMatchContinue: document.querySelector("#verbMatchContinue"),
   abbreviationIntro: document.querySelector("#abbreviationIntro"),
   abbreviationContinue: document.querySelector("#abbreviationContinue"),
+  homeAdvConjBtn: document.querySelector("#homeAdvConjBtn"),
+  advConjBtn:     document.querySelector("#advConjBtn"),
+  advConjIntro:   document.querySelector("#advConjIntro"),
   welcomeModal: document.querySelector("#welcomeModal"),
   welcomeModalCloseBtn: document.querySelector("#welcomeModalCloseBtn"),
   welcomeSurveyLink: document.querySelector("#welcomeSurveyLink"),
@@ -922,6 +954,18 @@ const state = {
     timerId: null,
     askedEntryIds: [],
     introActive: false,
+    currentQuestion: null,
+    wrongAnswers: 0,
+    sessionMistakeIds: [],
+  },
+  advConj: {
+    active: false,
+    introActive: false,
+    currentRound: 0,
+    startMs: 0,
+    elapsedSeconds: 0,
+    timerId: null,
+    questionQueue: [],
     currentQuestion: null,
     wrongAnswers: 0,
     sessionMistakeIds: [],
@@ -993,6 +1037,8 @@ function bindUi() {
   el.homeLessonBtn?.addEventListener("click", () => openHomeLesson("lesson"));
   el.homeVerbMatchBtn?.addEventListener("click", () => openHomeLesson("verbMatch"));
   el.homeAbbreviationBtn?.addEventListener("click", () => openHomeLesson("abbreviation"));
+  el.homeAdvConjBtn?.addEventListener("click", () => openHomeLesson("advConj"));
+  el.advConjBtn?.addEventListener("click", () => openHomeLesson("advConj"));
   el.lessonBtn.addEventListener("click", () => {
     state.lastPlayedMode = "lesson";
     state.mode = "lesson";
@@ -1111,6 +1157,13 @@ function openHomeLesson(mode) {
     return;
   }
 
+  if (mode === "advConj") {
+    state.lastPlayedMode = "advConj";
+    state.mode = "advConj";
+    startAdvConj();
+    return;
+  }
+
   state.lastPlayedMode = "lesson";
   state.mode = "lesson";
   startLesson();
@@ -1123,6 +1176,10 @@ function continueFromResults() {
   }
   if (state.summary.game === "abbreviation") {
     startAbbreviation();
+    return;
+  }
+  if (state.summary.game === "advConj") {
+    startAdvConj();
     return;
   }
   startLesson();
@@ -1146,6 +1203,8 @@ function hasActiveLearnSession() {
       state.lesson.secondChanceIntroActive ||
       state.abbreviation.active ||
       state.abbreviation.introActive ||
+      state.advConj.active ||
+      state.advConj.introActive ||
       state.match.active ||
       state.match.verbIntroActive
   );
@@ -1157,6 +1216,9 @@ function isModeSessionActive(mode) {
   }
   if (mode === "abbreviation") {
     return Boolean(state.abbreviation.active || state.abbreviation.introActive);
+  }
+  if (mode === "advConj") {
+    return Boolean(state.advConj.active || state.advConj.introActive);
   }
   return Boolean(state.lesson.active || state.lesson.lessonStartIntroActive || state.lesson.secondChanceIntroActive);
 }
@@ -1476,6 +1538,15 @@ function renderLearnState() {
     return;
   }
 
+  if (state.mode === "advConj") {
+    if (state.advConj.active && state.advConj.currentQuestion) {
+      renderAdvConjQuestion();
+    } else if (state.advConj.active) {
+      renderSessionHeader();
+    }
+    return;
+  }
+
   if (state.lesson.active || state.mode === "lesson") {
     if (state.lesson.active && state.currentQuestion) {
       renderQuestion();
@@ -1560,6 +1631,23 @@ function renderSessionHeader() {
     el.nextBtn.disabled = questionNeedsSelection(state.abbreviation.currentQuestion);
     el.nextBtn.textContent = hasQuestion && !state.abbreviation.currentQuestion?.locked ? t("session.submit") : t("session.next");
     el.nextBtn.classList.toggle("hidden", !hasQuestion);
+    persistSessionState();
+    return;
+  }
+
+  if (state.mode === "advConj") {
+    const hasQuestion = state.advConj.active && Boolean(state.advConj.currentQuestion);
+    el.modeTitle.textContent = t("game.advConjName");
+    el.lessonStatus.textContent = t("session.round", {
+      current: state.advConj.currentRound,
+      total: ADV_CONJ_ROUNDS,
+    });
+    el.vocabCount.classList.remove("hidden");
+    el.vocabCount.textContent = t("session.timer", { seconds: state.advConj.elapsedSeconds });
+    updateLessonProgress(ADV_CONJ_ROUNDS ? Math.round((state.advConj.currentRound / ADV_CONJ_ROUNDS) * 100) : 0);
+    el.nextBtn.disabled = !hasQuestion || !state.advConj.currentQuestion?.locked;
+    el.nextBtn.textContent = t("session.next");
+    el.nextBtn.classList.toggle("hidden", !hasQuestion || !state.advConj.currentQuestion?.locked);
     persistSessionState();
     return;
   }
@@ -1765,6 +1853,12 @@ function calculateGameModeStats() {
 
   modeStats.abbreviation.wrong = Math.max(0, modeStats.abbreviation.attempts - modeStats.abbreviation.correct);
   modeStats.conjugation.wrong = Math.max(0, modeStats.conjugation.attempts - modeStats.conjugation.correct);
+
+  const advConjStored = loadJson(STORAGE_KEYS.advConjStats, { attempts: 0, correct: 0 });
+  modeStats.conjugation.attempts += Math.max(0, advConjStored.attempts);
+  modeStats.conjugation.correct += Math.max(0, Math.min(advConjStored.attempts, advConjStored.correct));
+  modeStats.conjugation.wrong = Math.max(0, modeStats.conjugation.attempts - modeStats.conjugation.correct);
+
   return modeStats;
 }
 
@@ -2589,6 +2683,309 @@ function stopAbbreviationTimer() {
   state.abbreviation.timerId = null;
 }
 
+// ── Advanced Conjugation (advConj) ──────────────────────────────────────────
+
+function buildAdvConjHebrewAnswer(idiom, subjectForm, subjectPronoun, objectKey) {
+  const obj = ADV_CONJ_OBJECTS.find(o => o.key === objectKey);
+  if (!obj) return "";
+  const verbForm = idiom.present_tense[subjectForm];
+  if (!verbForm) return "";
+  const neg = idiom.negated ? "לא " : "";
+  if (idiom.object_type === "direct") {
+    return `${neg}${verbForm} ${obj.dirObj}`;
+  } else if (idiom.object_type === "l_dative") {
+    return `${neg}${verbForm} ${obj.lObj} ${idiom.fixed_object}`;
+  } else if (idiom.object_type === "possessive_suffix") {
+    const suffix = idiom.suffix_forms[objectKey];
+    if (!suffix) return "";
+    return `${neg}${verbForm} ${obj.dirObj} ${suffix}`;
+  }
+  return "";
+}
+
+function buildAdvConjEnglishSentence(idiom, subj, obj) {
+  const tpl = (subj.form === "mpl" || subj.form === "fpl") ? idiom.literal_pl : idiom.literal_sg;
+  if (!tpl) return "";
+  return tpl.replace(/\{s\}/g, subj.en).replace(/\{o\}/g, obj.en).replace(/\{p\}/g, obj.poss);
+}
+
+function buildAdvConjDeck() {
+  const deck = [];
+  for (const idiom of HEBREW_IDIOMS) {
+    if (!idiom.literal_sg) continue;
+    for (const subj of ADV_CONJ_SUBJECTS) {
+      if (!idiom.present_tense[subj.form]) continue;
+      for (const obj of ADV_CONJ_OBJECTS) {
+        if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[obj.key]) continue;
+        const hebrewAnswer = buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key);
+        if (!hebrewAnswer) continue;
+        const englishSentence = buildAdvConjEnglishSentence(idiom, subj, obj);
+        if (!englishSentence) continue;
+        const direction = Math.random() < 0.5 ? "en2he" : "he2en";
+
+        // For he2en: skip if verb form is ambiguous (same for msg/fsg)
+        if (direction === "he2en") {
+          const verbForm = idiom.present_tense[subj.form];
+          const ambiguous = ADV_CONJ_SUBJECTS.some(s =>
+            s.form !== subj.form && idiom.present_tense[s.form] === verbForm
+          );
+          if (ambiguous) continue;
+        }
+
+        const otherObjs = ADV_CONJ_OBJECTS.filter(o => o.key !== obj.key);
+        const otherSubjs = ADV_CONJ_SUBJECTS.filter(s => s.form !== subj.form);
+        const correctText = direction === "en2he" ? hebrewAnswer : englishSentence;
+
+        // Build distractors in the answer language
+        function buildDistractor(s, o) {
+          if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[o.key]) return null;
+          if (!idiom.present_tense[s.form]) return null;
+          if (direction === "en2he") {
+            return buildAdvConjHebrewAnswer(idiom, s.form, s.pronoun, o.key);
+          } else {
+            return buildAdvConjEnglishSentence(idiom, s, o);
+          }
+        }
+
+        // Distractor 1: correct subject, wrong object
+        let d1 = null;
+        for (const wo of shuffle([...otherObjs])) {
+          const ans = buildDistractor(subj, wo);
+          if (ans && ans !== correctText) { d1 = ans; break; }
+        }
+        // Distractor 2: wrong subject, correct object
+        let d2 = null;
+        for (const ws of shuffle([...otherSubjs])) {
+          const ans = buildDistractor(ws, obj);
+          if (ans && ans !== correctText && ans !== d1) { d2 = ans; break; }
+        }
+        // Distractor 3: wrong subject, wrong object
+        let d3 = null;
+        for (const ws of shuffle([...otherSubjs])) {
+          for (const wo of shuffle([...otherObjs])) {
+            const ans = buildDistractor(ws, wo);
+            if (ans && ans !== correctText && ans !== d1 && ans !== d2) { d3 = ans; break; }
+          }
+          if (d3) break;
+        }
+        if (!d1 || !d2 || !d3) continue;
+        const options = shuffle([
+          { id: "correct", text: correctText, isCorrect: true },
+          { id: "d1", text: d1, isCorrect: false },
+          { id: "d2", text: d2, isCorrect: false },
+          { id: "d3", text: d3, isCorrect: false },
+        ]);
+        deck.push({
+          idiomId: idiom.id,
+          direction,
+          promptText: direction === "en2he" ? englishSentence : hebrewAnswer,
+          promptIsHebrew: direction === "he2en",
+          correctAnswer: correctText,
+          correctAnswerIsHebrew: direction === "en2he",
+          options,
+          selectedOptionId: null,
+          locked: false,
+        });
+      }
+    }
+  }
+  return deck;
+}
+
+function resetAdvConjState() {
+  if (state.advConj.timerId) clearInterval(state.advConj.timerId);
+  state.advConj = {
+    active: false,
+    introActive: false,
+    currentRound: 0,
+    startMs: 0,
+    elapsedSeconds: 0,
+    timerId: null,
+    questionQueue: [],
+    currentQuestion: null,
+    wrongAnswers: 0,
+    sessionMistakeIds: [],
+  };
+}
+
+function clearAdvConjIntro() {
+  if (el.advConjIntro) {
+    el.advConjIntro.classList.add("hidden");
+    el.advConjIntro.setAttribute("aria-hidden", "true");
+  }
+  state.advConj.introActive = false;
+}
+
+function startAdvConj() {
+  stopVerbMatchTimer();
+  stopLessonTimer();
+  stopAbbreviationTimer();
+  resetAbbreviationState();
+  clearAbbreviationIntro();
+  resetAdvConjState();
+  const deck = shuffle(buildAdvConjDeck());
+  state.advConj.questionQueue = deck.slice(0, ADV_CONJ_ROUNDS);
+  state.advConj.active = true;
+  state.advConj.startMs = Date.now();
+  state.advConj.timerId = global.setInterval(() => {
+    state.advConj.elapsedSeconds = Math.floor((Date.now() - state.advConj.startMs) / 1000);
+    renderAll();
+  }, 1000);
+  playAdvConjIntro();
+}
+
+function playAdvConjIntro() {
+  state.advConj.introActive = true;
+  if (el.advConjIntro) {
+    el.advConjIntro.classList.remove("hidden");
+    el.advConjIntro.setAttribute("aria-hidden", "false");
+  }
+  setTimeout(beginAdvConjFromIntro, 1800);
+}
+
+function beginAdvConjFromIntro() {
+  clearAdvConjIntro();
+  loadAdvConjQuestion();
+}
+
+function loadAdvConjQuestion() {
+  state.advConj.currentRound++;
+  if (state.advConj.questionQueue.length === 0) {
+    finishAdvConj();
+    return;
+  }
+  state.advConj.currentQuestion = state.advConj.questionQueue.shift();
+  renderAll();
+}
+
+function renderAdvConjQuestion() {
+  const q = state.advConj.currentQuestion;
+  if (!q) return;
+  setGamePickerVisibility(false);
+  setPromptCardVisibility(true);
+  el.choiceContainer.classList.remove("summary-grid");
+  el.choiceContainer.classList.remove("match-grid");
+  renderSessionHeader();
+  if (el.promptLabel) {
+    el.promptLabel.textContent = q.idiomEn;
+    el.promptLabel.classList.remove("hidden");
+  }
+  if (el.promptText) {
+    el.promptText.textContent = `${q.subjectEn} \u2192 ${q.objectEn}`;
+    el.promptText.classList.remove("hidden");
+    el.promptText.classList.remove("hebrew");
+  }
+  renderAdvConjChoices(q);
+}
+
+function renderAdvConjChoices(question) {
+  if (!el.choiceContainer) return;
+  el.choiceContainer.innerHTML = "";
+  for (const opt of question.options) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-btn";
+    btn.dir = "rtl";
+    btn.setAttribute("lang", "he");
+    btn.textContent = opt.text;
+    btn.addEventListener("click", () => {
+      if (question.locked) return;
+      question.selectedOptionId = opt.id;
+      applyAdvConjAnswer();
+    });
+    el.choiceContainer.appendChild(btn);
+  }
+  if (question.locked) {
+    markAdvConjChoiceResults(question);
+  }
+}
+
+function markAdvConjChoiceResults(question) {
+  if (!el.choiceContainer) return;
+  const btns = el.choiceContainer.querySelectorAll(".choice-btn");
+  question.options.forEach((opt, i) => {
+    if (!btns[i]) return;
+    if (opt.isCorrect) btns[i].classList.add("correct");
+    else if (opt.id === question.selectedOptionId) btns[i].classList.add("wrong");
+    btns[i].disabled = true;
+  });
+}
+
+function applyAdvConjAnswer() {
+  const q = state.advConj.currentQuestion;
+  if (!q || q.locked) return;
+  q.locked = true;
+  const selected = q.options.find(o => o.id === q.selectedOptionId);
+  const isCorrect = selected?.isCorrect ?? false;
+  if (isCorrect) {
+    state.sessionStreak++;
+    state.sessionScore++;
+  } else {
+    state.sessionStreak = 0;
+    state.advConj.wrongAnswers++;
+    if (!state.advConj.sessionMistakeIds.includes(q.idiomId)) {
+      state.advConj.sessionMistakeIds.push(q.idiomId);
+    }
+  }
+  const idiom = HEBREW_IDIOMS.find(i => i.id === q.idiomId);
+  let feedbackAnswer = q.correctAnswer;
+  if (idiom?.showMeaning) {
+    feedbackAnswer += ` (${idiom.english})`;
+  }
+  setFeedback(
+    isCorrect
+      ? t("feedback.advConjCorrect", { answer: feedbackAnswer })
+      : t("feedback.advConjWrong", { answer: feedbackAnswer }),
+    isCorrect
+  );
+  updateAdvConjStats(isCorrect);
+  renderAll();
+}
+
+function updateAdvConjStats(isCorrect) {
+  const stats = loadJson(STORAGE_KEYS.advConjStats, { attempts: 0, correct: 0 });
+  stats.attempts++;
+  if (isCorrect) stats.correct++;
+  saveJson(STORAGE_KEYS.advConjStats, stats);
+}
+
+function finishAdvConj() {
+  if (state.advConj.timerId) {
+    global.clearInterval(state.advConj.timerId);
+    state.advConj.timerId = null;
+  }
+  state.advConj.active = false;
+  const rounds = ADV_CONJ_ROUNDS;
+  const correct = rounds - state.advConj.wrongAnswers;
+  const wrong = state.advConj.wrongAnswers;
+  const seconds = state.advConj.elapsedSeconds;
+  const mistakes = buildAdvConjMistakeSummary();
+  showSessionSummary({
+    game: "advConj",
+    titleKey: "summary.advConjTitle",
+    correctCount: correct,
+    incorrectCount: wrong,
+    elapsedSeconds: seconds,
+    mistakes,
+  });
+}
+
+function buildAdvConjMistakeSummary() {
+  return state.advConj.sessionMistakeIds.map(id => {
+    const idiom = HEBREW_IDIOMS.find(i => i.id === id);
+    if (!idiom) return null;
+    const subj = ADV_CONJ_SUBJECTS.find(s => idiom.present_tense[s.form]);
+    const obj = ADV_CONJ_OBJECTS[0];
+    const ans = subj ? buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key) : "";
+    return {
+      primary: ans,
+      secondary: idiom.english_meaning,
+    };
+  }).filter(Boolean);
+}
+
+// ── End Advanced Conjugation ─────────────────────────────────────────────────
+
 function clearLessonStartIntro() {
   state.lesson.lessonStartIntroActive = false;
   clearIntroAutoAdvance();
@@ -2927,6 +3324,13 @@ function handleNextAction() {
     return;
   }
 
+  if (state.mode === "advConj") {
+    if (state.advConj.currentQuestion && state.advConj.currentQuestion.locked) {
+      loadAdvConjQuestion();
+    }
+    return;
+  }
+
   if (!state.lesson.active || !state.currentQuestion) {
     return;
   }
@@ -2957,23 +3361,43 @@ function renderMostMissed() {
   el.mostMissedList.innerHTML = "";
   el.mostMissedEmpty.classList.toggle("hidden", ranked.length > 0);
 
-  ranked.forEach((entry) => {
-    const word = wordsById.get(entry.wordId);
-    if (!word) return;
+  el.mostMissedList.style.display = "flex";
+  el.mostMissedList.style.gap = "1.25rem";
+  el.mostMissedList.style.alignItems = "flex-start";
 
-    const item = document.createElement("li");
-    const line = document.createElement("p");
-    line.className = "missed-word";
-    line.textContent = getHebrewText(word, true);
-    line.title = word.en;
-    item.title = word.en;
+  const isRTL = document.documentElement.dataset.uiLang === "he";
+  const half = Math.ceil(ranked.length / 2);
+  const cols = [ranked.slice(0, half), ranked.slice(half)];
 
-    const meta = document.createElement("p");
-    meta.className = "missed-meta";
-    meta.textContent = String(entry.missed);
+  cols.forEach((col, colIdx) => {
+    const ol = document.createElement("ol");
+    ol.className = "missed-col";
+    ol.start = colIdx * half + 1;
+    ol.style.flex = "1";
+    ol.style.margin = "0";
+    ol.style.paddingLeft = isRTL ? "0" : "1.25rem";
+    ol.style.paddingRight = isRTL ? "1.25rem" : "0";
 
-    item.append(line, meta);
-    el.mostMissedList.append(item);
+    col.forEach((entry) => {
+      const word = wordsById.get(entry.wordId);
+      if (!word) return;
+
+      const item = document.createElement("li");
+      const line = document.createElement("p");
+      line.className = "missed-word";
+      line.textContent = getHebrewText(word, true);
+      line.title = word.en;
+      item.title = word.en;
+
+      const meta = document.createElement("p");
+      meta.className = "missed-meta";
+      meta.textContent = String(entry.missed);
+
+      item.append(line, meta);
+      ol.append(item);
+    });
+
+    el.mostMissedList.append(ol);
   });
 }
 

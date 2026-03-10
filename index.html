@@ -82,6 +82,11 @@
                         <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
                         <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
                       </button>
+                      <button type="button" id="homeAdvConjBtn" class="game-tile home-game-tile">
+                        <span class="game-tile-icon" aria-hidden="true"><img src="./assets/icon-adv-conjugation.png" alt=""></span>
+                        <span class="game-tile-title" data-i18n="game.advConjName">Adv. Conjugation</span>
+                        <span class="game-tile-note" data-i18n="game.advConjNote">Conjugate both subject and object of Hebrew verbal idioms.</span>
+                      </button>
                     </div>
                   </article>
                 </div>
@@ -130,6 +135,11 @@
                       <span class="game-tile-icon" aria-hidden="true"><img src="./assets/icon-abbreviation.png" alt=""></span>
                       <span class="game-tile-title" data-i18n="game.abbreviationName">Abbreviation</span>
                       <span class="game-tile-note" data-i18n="game.abbreviationNote">Guess English meanings from Hebrew abbreviations.</span>
+                    </button>
+                    <button type="button" id="advConjBtn" class="game-tile">
+                      <span class="game-tile-icon" aria-hidden="true"><img src="./assets/icon-adv-conjugation.png" alt=""></span>
+                      <span class="game-tile-title" data-i18n="game.advConjName">Adv. Conjugation</span>
+                      <span class="game-tile-note" data-i18n="game.advConjNote">Conjugate both subject and object of Hebrew verbal idioms.</span>
                     </button>
                   </section>
 
@@ -199,7 +209,7 @@
                 <div class="section-head">
                   <h2 data-i18n="missed.title">Most Missed</h2>
                 </div>
-                <ol id="mostMissedList" class="missed-list"></ol>
+                <div id="mostMissedList" class="missed-list"></div>
                 <p id="mostMissedEmpty" class="small-note" data-i18n="missed.empty">No misses yet.</p>
               </article>
 
@@ -304,6 +314,13 @@
       </div>
     </div>
 
+    <div id="advConjIntro" class="second-chance-intro hidden" aria-hidden="true">
+      <div class="second-chance-scene" role="dialog" aria-modal="true" aria-label="Advanced conjugation intro">
+        <p class="second-chance-bubble" dir="rtl">יאללה!</p>
+        <p class="second-chance-note" data-i18n="session.starting">Starting...</p>
+      </div>
+    </div>
+
     <div id="welcomeModal" class="session-leave-modal hidden" aria-hidden="true">
       <section class="welcome-dialog card" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
         <div class="welcome-head">
@@ -383,6 +400,7 @@
     <script src="./vocab-data.js?v=20260307f"></script>
     <script src="./abbreviation-data.js?v=20260306d"></script>
     <script src="./hebrew-verbs.js?v=20260308b"></script>
+    <script src="./hebrew-idioms.js"></script>
     <script src="./app.js?v=20260308r"></script>
   </body>
 </html>

@@ -850,6 +850,11 @@ body[data-theme="light"] .game-tile:hover {
   border-color: rgba(155, 93, 229, 0.42);
 }
 
+#homeAdvConjBtn:hover,
+#advConjBtn:hover {
+  border-color: rgba(175, 82, 222, 0.45);
+}
+
 .game-tile-title {
   font-family: "Alegreya", serif;
   font-size: 1.1rem;
@@ -1192,17 +1197,17 @@ body[data-theme="light"] .game-tile:hover {
 
 .missed-list {
   margin: 0;
-  padding-left: 1.05rem;
-  display: grid;
-  gap: 0.5rem;
 }
 
-.missed-list li {
+.missed-col {
+}
+
+.missed-col li {
   border-bottom: 1px solid rgba(166, 186, 214, 0.16);
   padding-bottom: 0.46rem;
 }
 
-.missed-list li:last-child {
+.missed-col li:last-child {
   border-bottom: none;
 }
 
@@ -1580,10 +1585,6 @@ body[data-ui-lang="he"] .option-button {
   text-align: right;
 }
 
-body[data-ui-lang="he"] .missed-list {
-  padding-left: 0;
-  padding-right: 1.05rem;
-}
 
 body[data-ui-lang="he"] .mastered-row {
   grid-template-columns: 1fr auto;

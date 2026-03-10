@@ -24,6 +24,21 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-09 — Advanced Conjugation game mode
+
+**Requested:** Implement a new "Advanced Conjugation" game mode where players conjugate both the subject and object of Hebrew verbal idioms (present tense, multiple object types: direct, l-dative, possessive suffix).
+**Files changed:**
+- `hebrew-idioms.js`: New file — 21 idiom entries from `hebrew_idioms.json`, wrapped with normalized `present_tense` and `english_meaning` aliases for the `HEBREW_IDIOMS` global array
+- `assets/icon-adv-conjugation.png`: New icon asset (placeholder copy of abbreviation icon)
+- `index.html`: Added `<script src="./hebrew-idioms.js">` tag; added `#homeAdvConjBtn` home tile; added `#advConjBtn` game picker tile; added `#advConjIntro` overlay
+- `app.js`: Added `ADV_CONJ_ROUNDS`, `ADV_CONJ_SUBJECTS`, `ADV_CONJ_OBJECTS` constants; added `advConj` to `state`; added `advConjStats` to `STORAGE_KEYS`; added `el.homeAdvConjBtn`, `el.advConjBtn`, `el.advConjIntro`; added all advConj functions (`buildAdvConjHebrewAnswer`, `buildAdvConjDeck`, `resetAdvConjState`, `clearAdvConjIntro`, `startAdvConj`, `playAdvConjIntro`, `beginAdvConjFromIntro`, `loadAdvConjQuestion`, `renderAdvConjQuestion`, `renderAdvConjChoices`, `markAdvConjChoiceResults`, `applyAdvConjAnswer`, `updateAdvConjStats`, `finishAdvConj`, `buildAdvConjMistakeSummary`); wired event listeners; updated `openHomeLesson`, `isModeSessionActive`, `hasActiveLearnSession`, `continueFromResults`, `calculateGameModeStats`, `renderLearnState`, `renderSessionHeader`, `handleNextAction`; added i18n strings in both `en` and `he`
+- `styles.css`: Added hover border-color rule for `#homeAdvConjBtn` and `#advConjBtn`
+**Behavior changed:** New "Adv. Conjugation" game tile appears on the home screen and in the game picker. Clicking it launches a 10-round session where each question shows an idiom's English meaning and asks the player to select the correct present-tense Hebrew conjugation for a given subject+object pair (4 choices). Session summary shows mistakes. Stats fold into the Conjugation mode analytics ring.
+**Tests run:** Not run (no test file for advConj; existing tests unchanged)
+**Risks / regressions to check:** `HEBREW_IDIOMS` must load before `app.js`; `present_tense` and `english_meaning` normalization in `hebrew-idioms.js` must be correct; `shuffle` (not `shuffleArray`) is used throughout; `state.sessionScore`/`state.sessionStreak` (not `state.score`/`state.streak`) used in `applyAdvConjAnswer`; `el.choiceContainer` (not `el.choicesContainer`) used throughout
+
+---
+
 ### 2026-03-08 — Visual Pop: icon tinting, per-mode colors, red ambient, section headings
 
 **Requested:** 8 targeted visual polish changes: nav icon emoji upgrade, nav icon gold/blue glow, per-mode game tile color identity (gold/teal/violet), section heading brand color, domain emoji glow, red ambient blob, version bump.
@@ -549,5 +564,58 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 **Tests run:** Play a game, answer mostly wrong → confirm "There's room to improve" / "יש מקום לשיפור" appears on results screen; score ≥ 50% → "Nice job!"; perfect → "Amazing!"
 **Risks / regressions to check:** None — isolated logic change in one function
+
+---
+
+## 2026-03-09 — Register-based taxonomy + vocabulary fixes
+
+**Agent:** Claude Code
+**Files changed:** `app.js`, `vocab-data.js`
+
+**What was requested:**
+1. Replace the four topic-based `PERFORMANCE_DOMAINS` with a register-based taxonomy ("How formal is this?")
+2. Fix inaccurate/misleading vocabulary translations and add disambiguation notes
+
+**Changes made:**
+
+`app.js`:
+- Replaced all four `PERFORMANCE_DOMAINS` objects with new register-based domains:
+  - 🗣️ Colloquial & Street (id: `colloquial`) — conversation glue, dating, media, emotional/social
+  - 🏠 Everyday Functional (id: `everyday`) — home, cooking, health, bureaucracy
+  - 💼 Professional (id: `professional`) — work, finance, legal, civic, tech
+  - 📚 Formal & Analytical (id: `formal`) — abstract, philosophy, science, linguistics, discourse
+- Updated `FALLBACK_DOMAIN_ID` fallback string from `"ideas"` to `"formal"`
+
+`vocab-data.js` (17 targeted edits):
+- Critical fixes: diet תפריט→דיאטה; deployment הטמעה→פריסה; payroll שכר→תשלום שכר; "to lead someone on" למשוך מישהו→להוליך שולל; white paper נייר עמדה→מסמך מדיניות
+- English label corrections: squalor→wretchedness/patheticness; paramedic→medic (field/EMT); in-laws→in-laws (parents' relationship)
+- Duplicate disambiguation: "to blanch" and "to toss" noted as sharing Hebrew with "to poach" / "to sauté"; reasoning הסקה→הנמקה (disambiguated from inference); tradeoff פשרה→תמורה (disambiguated from compromise)
+- Dual-meaning notes: attempt/experience (ניסיון); similarity/imagination (דמיון); confidence→ביטחון עצמי
+- Register notes: apparently/probably (כנראה); fair enough/acceptable (מקובל)
+
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Confirm home screen shows 4 new domain cards with correct labels and emojis; verify distractor logic still works (same-category groupings intact); spot-check updated vocab in quiz
+
+---
+
+## 2026-03-09 — Fix Most-Missed Two-Column Layout (Claude Code)
+
+**Requested:** Apply inline styles in `renderMostMissed()` to force two-column flex layout that CSS alone couldn't achieve due to `.page-card { display: grid }` parent context overriding `.missed-list { display: flex }`.
+
+**Root cause:** `.missed-list` is a direct grid item of `.page-card`; grid containers can suppress flex display on children. Inline styles have higher specificity and bypass stylesheet cascade.
+
+**Changes made:**
+
+`app.js` (`renderMostMissed()`, ~line 2957):
+- Added inline styles on `el.mostMissedList`: `display: flex`, `gap: 1.25rem`, `alignItems: flex-start`
+- Added inline styles on each `<ol>`: `flex: 1`, `margin: 0`, `paddingLeft`/`paddingRight` set conditionally based on `document.documentElement.dataset.uiLang === "he"` for RTL support
+
+`styles.css`:
+- Simplified `.missed-list` to `margin: 0` only (removed `display: flex` and `gap`)
+- Emptied `.missed-col` block (layout now inline)
+- Removed `body[data-ui-lang="he"] .missed-col` RTL override (now handled inline in JS)
+
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Verify two columns appear side by side in Review tab; check RTL (Hebrew UI lang) still pads correctly on the right side; check mobile view (~400px) still shows two columns
 
 ---
