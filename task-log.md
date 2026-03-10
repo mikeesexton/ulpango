@@ -681,3 +681,18 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify two columns appear side by side in Review tab; check RTL (Hebrew UI lang) still pads correctly on the right side; check mobile view (~400px) still shows two columns
 
 ---
+
+### 2026-03-10 — AdvConj past/future tenses, new vocab & idioms
+
+**Requested:** (1) Add past and future tenses to Advanced Conjugation game. (2) Add רצף (sequence) and ברצף (in a row) to vocabulary. (3) Add קורע to vocabulary and advConj game with figurative meaning "(to kill/send someone [funny])". (4) Add לכבות to vocabulary and regular conjugation game. (5) Add מכה to vocabulary. (6) Update מפיל לו את האסימון figurative meaning to "(to make it click/make sense for someone)". (7) Remove לבשל פחות מדי from vocabulary.
+**Files changed:**
+- `hebrew-idioms.js`: Added `past` and `future` conjugation keys (msg/fsg/mpl/fpl forms) and `literal_past`/`literal_future` English templates to all 22 existing idioms. Added new קורע (kara) idiom entry with all 3 tenses, `showMeaning: true`. Changed `hfalat_asiman` english to "(to make it click/make sense for someone)". Updated normalize step to create `past_tense` and `future_tense` aliases.
+- `app.js`: Updated `buildAdvConjHebrewAnswer()` and `buildAdvConjEnglishSentence()` to accept a `tense` parameter. Updated `buildAdvConjDeck()` to iterate over ["present", "past", "future"] tenses, generating questions for all available tenses per idiom. Tense stored in question object. Ambiguity check uses per-tense data. Updated intro preview caller to pass "present".
+- `vocab-data.js`: Added רצף and מכה to `core_advanced`. Added ברצף and קורע to `conversation_glue`. Added לכבות to `home_everyday_life`. Removed לבשל פחות מדי from `cooking_verbs`.
+- `hebrew-verbs.js`: Added לכבות (pi'el, כ-ב-ה) as a starter verb entry with full present/past/future conjugations sourced from lekhabot_conjugations_modern_v2.json.
+
+**Behavior changed:** Advanced Conjugation game now tests all three tenses — prompts like "he drove her crazy" (past) and "she will break his heart" (future) appear alongside present-tense questions. New vocab words appear in translation game. לכבות appears in conjugation game. קורע appears in both translation and advConj games with its figurative meaning shown after answering.
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Verify past/future English templates read naturally for all idioms. Check that ambiguity filtering correctly skips he2en questions where mpl/fpl share the same past/future verb form. Verify לכבות conjugation forms are correct in the conjugation game. Confirm לבשל פחות מדי no longer appears in translation quiz.
+
+---

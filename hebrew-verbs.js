@@ -767,6 +767,26 @@ function buildStarterVerbEntries() {
       tags: ["piel", "regular"],
       personal_priority: 80,
     }),
+    createVerbEntry({
+      id: "starter-verb-lekhabot",
+      availability: getStarterVerbAvailability("starter-verb-lekhabot"),
+      lemma: "לכבות",
+      root: ["כ", "ב", "ה"],
+      binyan: "piel",
+      regularity: "regular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to turn off", null, true), makeSense("to extinguish", null, true)],
+      forms: makeForms(
+        makePresent("מכבה", "מכבה", "מכבים", "מכבות"),
+        makePast("כיביתי", "כיבית", "כיבית", "כיבה", "כיבתה", "כיבינו", "כיביתם", "כיביתן", "כיבו"),
+        makeFuture("אכבה", "תכבה", "תכבי", "יכבה", "תכבה", "נכבה", "תכבו", "יכבו")
+      ),
+      review_status: "approved",
+      notes: "Pi'el of כ-ב-ה. Common everyday verb for turning off lights, electronics, extinguishing fire.",
+      difficulty_level: 2,
+      tags: ["piel", "seed"],
+      personal_priority: 79,
+    }),
   ];
 }
 

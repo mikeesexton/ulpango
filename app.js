@@ -2719,10 +2719,14 @@ function stopAbbreviationTimer() {
 
 // ── Advanced Conjugation (advConj) ──────────────────────────────────────────
 
-function buildAdvConjHebrewAnswer(idiom, subjectForm, subjectPronoun, objectKey) {
+function buildAdvConjHebrewAnswer(idiom, subjectForm, subjectPronoun, objectKey, tense) {
   const obj = ADV_CONJ_OBJECTS.find(o => o.key === objectKey);
   if (!obj) return "";
-  const verbForm = idiom.present_tense[subjectForm];
+  const tenseData = tense === "past" ? idiom.past_tense
+                  : tense === "future" ? idiom.future_tense
+                  : idiom.present_tense;
+  if (!tenseData) return "";
+  const verbForm = tenseData[subjectForm];
   if (!verbForm) return "";
   const neg = idiom.negated ? "לא " : "";
   if (idiom.object_type === "direct") {
@@ -2737,89 +2741,104 @@ function buildAdvConjHebrewAnswer(idiom, subjectForm, subjectPronoun, objectKey)
   return "";
 }
 
-function buildAdvConjEnglishSentence(idiom, subj, obj) {
-  const tpl = (subj.form === "mpl" || subj.form === "fpl") ? idiom.literal_pl : idiom.literal_sg;
+function buildAdvConjEnglishSentence(idiom, subj, obj, tense) {
+  let tpl;
+  if (tense === "past") {
+    tpl = idiom.literal_past;
+  } else if (tense === "future") {
+    tpl = idiom.literal_future;
+  } else {
+    tpl = (subj.form === "mpl" || subj.form === "fpl") ? idiom.literal_pl : idiom.literal_sg;
+  }
   if (!tpl) return "";
   return tpl.replace(/\{s\}/g, subj.en).replace(/\{o\}/g, obj.en).replace(/\{p\}/g, obj.poss);
 }
 
 function buildAdvConjDeck() {
   const deck = [];
+  const tenses = ["present", "past", "future"];
   for (const idiom of HEBREW_IDIOMS) {
     if (!idiom.literal_sg) continue;
-    for (const subj of ADV_CONJ_SUBJECTS) {
-      if (!idiom.present_tense[subj.form]) continue;
-      for (const obj of ADV_CONJ_OBJECTS) {
-        if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[obj.key]) continue;
-        const hebrewAnswer = buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key);
-        if (!hebrewAnswer) continue;
-        const englishSentence = buildAdvConjEnglishSentence(idiom, subj, obj);
-        if (!englishSentence) continue;
-        const direction = Math.random() < 0.5 ? "en2he" : "he2en";
+    for (const tense of tenses) {
+      const tenseData = tense === "past" ? idiom.past_tense
+                      : tense === "future" ? idiom.future_tense
+                      : idiom.present_tense;
+      if (!tenseData) continue;
+      for (const subj of ADV_CONJ_SUBJECTS) {
+        if (!tenseData[subj.form]) continue;
+        for (const obj of ADV_CONJ_OBJECTS) {
+          if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[obj.key]) continue;
+          const hebrewAnswer = buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key, tense);
+          if (!hebrewAnswer) continue;
+          const englishSentence = buildAdvConjEnglishSentence(idiom, subj, obj, tense);
+          if (!englishSentence) continue;
+          const direction = Math.random() < 0.5 ? "en2he" : "he2en";
 
-        // For he2en: skip if verb form is ambiguous (same for msg/fsg)
-        if (direction === "he2en") {
-          const verbForm = idiom.present_tense[subj.form];
-          const ambiguous = ADV_CONJ_SUBJECTS.some(s =>
-            s.form !== subj.form && idiom.present_tense[s.form] === verbForm
-          );
-          if (ambiguous) continue;
-        }
-
-        const otherObjs = ADV_CONJ_OBJECTS.filter(o => o.key !== obj.key);
-        const otherSubjs = ADV_CONJ_SUBJECTS.filter(s => s.form !== subj.form);
-        const correctText = direction === "en2he" ? hebrewAnswer : englishSentence;
-
-        // Build distractors in the answer language
-        function buildDistractor(s, o) {
-          if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[o.key]) return null;
-          if (!idiom.present_tense[s.form]) return null;
-          if (direction === "en2he") {
-            return buildAdvConjHebrewAnswer(idiom, s.form, s.pronoun, o.key);
-          } else {
-            return buildAdvConjEnglishSentence(idiom, s, o);
+          // For he2en: skip if verb form is ambiguous (same for msg/fsg or mpl/fpl)
+          if (direction === "he2en") {
+            const verbForm = tenseData[subj.form];
+            const ambiguous = ADV_CONJ_SUBJECTS.some(s =>
+              s.form !== subj.form && tenseData[s.form] === verbForm
+            );
+            if (ambiguous) continue;
           }
-        }
 
-        // Distractor 1: correct subject, wrong object
-        let d1 = null;
-        for (const wo of shuffle([...otherObjs])) {
-          const ans = buildDistractor(subj, wo);
-          if (ans && ans !== correctText) { d1 = ans; break; }
-        }
-        // Distractor 2: wrong subject, correct object
-        let d2 = null;
-        for (const ws of shuffle([...otherSubjs])) {
-          const ans = buildDistractor(ws, obj);
-          if (ans && ans !== correctText && ans !== d1) { d2 = ans; break; }
-        }
-        // Distractor 3: wrong subject, wrong object
-        let d3 = null;
-        for (const ws of shuffle([...otherSubjs])) {
+          const otherObjs = ADV_CONJ_OBJECTS.filter(o => o.key !== obj.key);
+          const otherSubjs = ADV_CONJ_SUBJECTS.filter(s => s.form !== subj.form);
+          const correctText = direction === "en2he" ? hebrewAnswer : englishSentence;
+
+          // Build distractors in the answer language (same tense)
+          function buildDistractor(s, o) {
+            if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[o.key]) return null;
+            if (!tenseData[s.form]) return null;
+            if (direction === "en2he") {
+              return buildAdvConjHebrewAnswer(idiom, s.form, s.pronoun, o.key, tense);
+            } else {
+              return buildAdvConjEnglishSentence(idiom, s, o, tense);
+            }
+          }
+
+          // Distractor 1: correct subject, wrong object
+          let d1 = null;
           for (const wo of shuffle([...otherObjs])) {
-            const ans = buildDistractor(ws, wo);
-            if (ans && ans !== correctText && ans !== d1 && ans !== d2) { d3 = ans; break; }
+            const ans = buildDistractor(subj, wo);
+            if (ans && ans !== correctText) { d1 = ans; break; }
           }
-          if (d3) break;
+          // Distractor 2: wrong subject, correct object
+          let d2 = null;
+          for (const ws of shuffle([...otherSubjs])) {
+            const ans = buildDistractor(ws, obj);
+            if (ans && ans !== correctText && ans !== d1) { d2 = ans; break; }
+          }
+          // Distractor 3: wrong subject, wrong object
+          let d3 = null;
+          for (const ws of shuffle([...otherSubjs])) {
+            for (const wo of shuffle([...otherObjs])) {
+              const ans = buildDistractor(ws, wo);
+              if (ans && ans !== correctText && ans !== d1 && ans !== d2) { d3 = ans; break; }
+            }
+            if (d3) break;
+          }
+          if (!d1 || !d2 || !d3) continue;
+          const options = shuffle([
+            { id: "correct", text: correctText, isCorrect: true },
+            { id: "d1", text: d1, isCorrect: false },
+            { id: "d2", text: d2, isCorrect: false },
+            { id: "d3", text: d3, isCorrect: false },
+          ]);
+          deck.push({
+            idiomId: idiom.id,
+            tense,
+            direction,
+            promptText: direction === "en2he" ? englishSentence : hebrewAnswer,
+            promptIsHebrew: direction === "he2en",
+            correctAnswer: correctText,
+            correctAnswerIsHebrew: direction === "en2he",
+            options,
+            selectedOptionId: null,
+            locked: false,
+          });
         }
-        if (!d1 || !d2 || !d3) continue;
-        const options = shuffle([
-          { id: "correct", text: correctText, isCorrect: true },
-          { id: "d1", text: d1, isCorrect: false },
-          { id: "d2", text: d2, isCorrect: false },
-          { id: "d3", text: d3, isCorrect: false },
-        ]);
-        deck.push({
-          idiomId: idiom.id,
-          direction,
-          promptText: direction === "en2he" ? englishSentence : hebrewAnswer,
-          promptIsHebrew: direction === "he2en",
-          correctAnswer: correctText,
-          correctAnswerIsHebrew: direction === "en2he",
-          options,
-          selectedOptionId: null,
-          locked: false,
-        });
       }
     }
   }
@@ -3026,7 +3045,7 @@ function buildAdvConjMistakeSummary() {
     if (!idiom) return null;
     const subj = ADV_CONJ_SUBJECTS.find(s => idiom.present_tense[s.form]);
     const obj = ADV_CONJ_OBJECTS[0];
-    const ans = subj ? buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key) : "";
+    const ans = subj ? buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key, "present") : "";
     return {
       primary: ans,
       secondary: idiom.english_meaning,

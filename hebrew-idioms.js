@@ -1,6 +1,8 @@
 // Hebrew idioms data for Advanced Conjugation game mode.
 // Each entry exposes a normalized shape used by advConj functions in app.js:
 //   present_tense  — alias for conjugations.present
+//   past_tense     — alias for conjugations.past
+//   future_tense   — alias for conjugations.future
 //   english_meaning — alias for english
 const HEBREW_IDIOMS = (function () {
   const raw = [
@@ -18,9 +20,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} drives {o} crazy",
     "literal_pl": "{s} drive {o} crazy",
+    "literal_past": "{s} drove {o} crazy",
+    "literal_future": "{s} will drive {o} crazy",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "משגע", "fsg": "משגעת", "mpl": "משגעים", "fpl": "משגעות" }
+      "present": { "msg": "משגע", "fsg": "משגעת", "mpl": "משגעים", "fpl": "משגעות" },
+      "past":    { "msg": "שיגע", "fsg": "שיגעה", "mpl": "שיגעו", "fpl": "שיגעו" },
+      "future":  { "msg": "ישגע", "fsg": "תשגע", "mpl": "ישגעו", "fpl": "ישגעו" }
     }
   },
   {
@@ -37,9 +43,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} annoys {o}",
     "literal_pl": "{s} annoy {o}",
+    "literal_past": "{s} annoyed {o}",
+    "literal_future": "{s} will annoy {o}",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "מעצבן", "fsg": "מעצבנת", "mpl": "מעצבנים", "fpl": "מעצבנות" }
+      "present": { "msg": "מעצבן", "fsg": "מעצבנת", "mpl": "מעצבנים", "fpl": "מעצבנות" },
+      "past":    { "msg": "עיצבן", "fsg": "עיצבנה", "mpl": "עיצבנו", "fpl": "עיצבנו" },
+      "future":  { "msg": "יעצבן", "fsg": "תעצבן", "mpl": "יעצבנו", "fpl": "יעצבנו" }
     }
   },
   {
@@ -56,9 +66,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} lights {o} up",
     "literal_pl": "{s} light {o} up",
+    "literal_past": "{s} lit {o} up",
+    "literal_future": "{s} will light {o} up",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "מדליק", "fsg": "מדליקה", "mpl": "מדליקים", "fpl": "מדליקות" }
+      "present": { "msg": "מדליק", "fsg": "מדליקה", "mpl": "מדליקים", "fpl": "מדליקות" },
+      "past":    { "msg": "הדליק", "fsg": "הדליקה", "mpl": "הדליקו", "fpl": "הדליקו" },
+      "future":  { "msg": "ידליק", "fsg": "תדליק", "mpl": "ידליקו", "fpl": "ידליקו" }
     }
   },
   {
@@ -75,9 +89,36 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} drives {o} insane",
     "literal_pl": "{s} drive {o} insane",
+    "literal_past": "{s} drove {o} insane",
+    "literal_future": "{s} will drive {o} insane",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "מטריף", "fsg": "מטריפה", "mpl": "מטריפים", "fpl": "מטריפות" }
+      "present": { "msg": "מטריף", "fsg": "מטריפה", "mpl": "מטריפים", "fpl": "מטריפות" },
+      "past":    { "msg": "הטריף", "fsg": "הטריפה", "mpl": "הטריפו", "fpl": "הטריפו" },
+      "future":  { "msg": "יטריף", "fsg": "תטריף", "mpl": "יטריפו", "fpl": "יטריפו" }
+    }
+  },
+  {
+    "id": "kara",
+    "level": 1,
+    "infinitive": "לקרוע מישהו",
+    "english": "(to kill/send someone [funny])",
+    "verb": "לקרוע",
+    "root": "ק.ר.ע",
+    "binyan": "qal",
+    "object_type": "direct",
+    "template": "⟨VERB⟩ ⟨DIR_OBJ⟩",
+    "example": "הוא קורע אותי",
+    "negated": false,
+    "literal_sg": "{s} tears {o}",
+    "literal_pl": "{s} tear {o}",
+    "literal_past": "{s} tore {o}",
+    "literal_future": "{s} will tear {o}",
+    "showMeaning": true,
+    "conjugations": {
+      "present": { "msg": "קורע", "fsg": "קורעת", "mpl": "קורעים", "fpl": "קורעות" },
+      "past":    { "msg": "קרע", "fsg": "קרעה", "mpl": "קרעו", "fpl": "קרעו" },
+      "future":  { "msg": "יקרע", "fsg": "תקרע", "mpl": "יקרעו", "fpl": "יקרעו" }
     }
   },
   {
@@ -95,9 +136,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} raises {p} paragraph",
     "literal_pl": "{s} raise {p} paragraph",
+    "literal_past": "{s} raised {p} paragraph",
+    "literal_future": "{s} will raise {p} paragraph",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "מעלה", "fsg": "מעלה", "mpl": "מעלים", "fpl": "מעלות" }
+      "present": { "msg": "מעלה", "fsg": "מעלה", "mpl": "מעלים", "fpl": "מעלות" },
+      "past":    { "msg": "העלה", "fsg": "העלתה", "mpl": "העלו", "fpl": "העלו" },
+      "future":  { "msg": "יעלה", "fsg": "תעלה", "mpl": "יעלו", "fpl": "יעלו" }
     }
   },
   {
@@ -115,9 +160,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} brings down {p} desire",
     "literal_pl": "{s} bring down {p} desire",
+    "literal_past": "{s} brought down {p} desire",
+    "literal_future": "{s} will bring down {p} desire",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "מוריד", "fsg": "מורידה", "mpl": "מורידים", "fpl": "מורידות" }
+      "present": { "msg": "מוריד", "fsg": "מורידה", "mpl": "מורידים", "fpl": "מורידות" },
+      "past":    { "msg": "הוריד", "fsg": "הורידה", "mpl": "הורידו", "fpl": "הורידו" },
+      "future":  { "msg": "יוריד", "fsg": "תוריד", "mpl": "יורידו", "fpl": "יורידו" }
     }
   },
   {
@@ -135,9 +184,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} takes out {p} juice",
     "literal_pl": "{s} take out {p} juice",
+    "literal_past": "{s} took out {p} juice",
+    "literal_future": "{s} will take out {p} juice",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" }
+      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" },
+      "past":    { "msg": "הוציא", "fsg": "הוציאה", "mpl": "הוציאו", "fpl": "הוציאו" },
+      "future":  { "msg": "יוציא", "fsg": "תוציא", "mpl": "יוציאו", "fpl": "יוציאו" }
     }
   },
   {
@@ -155,9 +208,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} breaks {p} heart",
     "literal_pl": "{s} break {p} heart",
+    "literal_past": "{s} broke {p} heart",
+    "literal_future": "{s} will break {p} heart",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "שובר", "fsg": "שוברת", "mpl": "שוברים", "fpl": "שוברות" }
+      "present": { "msg": "שובר", "fsg": "שוברת", "mpl": "שוברים", "fpl": "שוברות" },
+      "past":    { "msg": "שבר", "fsg": "שברה", "mpl": "שברו", "fpl": "שברו" },
+      "future":  { "msg": "ישבור", "fsg": "תשבור", "mpl": "ישברו", "fpl": "ישברו" }
     }
   },
   {
@@ -175,16 +232,20 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} makes {p} life difficult",
     "literal_pl": "{s} make {p} life difficult",
+    "literal_past": "{s} made {p} life difficult",
+    "literal_future": "{s} will make {p} life difficult",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "עושה", "fsg": "עושה", "mpl": "עושים", "fpl": "עושות" }
+      "present": { "msg": "עושה", "fsg": "עושה", "mpl": "עושים", "fpl": "עושות" },
+      "past":    { "msg": "עשה", "fsg": "עשתה", "mpl": "עשו", "fpl": "עשו" },
+      "future":  { "msg": "יעשה", "fsg": "תעשה", "mpl": "יעשו", "fpl": "יעשו" }
     }
   },
   {
     "id": "hfalat_asiman",
     "level": 2,
     "infinitive": "להפיל למישהו את האסימון",
-    "english": "to make the penny drop for someone",
+    "english": "(to make it click/make sense for someone)",
     "verb": "להפיל",
     "root": "נ.פ.ל",
     "binyan": "hifil",
@@ -195,9 +256,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} drops {p} token",
     "literal_pl": "{s} drop {p} token",
+    "literal_past": "{s} dropped {p} token",
+    "literal_future": "{s} will drop {p} token",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "מפיל", "fsg": "מפילה", "mpl": "מפילים", "fpl": "מפילות" }
+      "present": { "msg": "מפיל", "fsg": "מפילה", "mpl": "מפילים", "fpl": "מפילות" },
+      "past":    { "msg": "הפיל", "fsg": "הפילה", "mpl": "הפילו", "fpl": "הפילו" },
+      "future":  { "msg": "יפיל", "fsg": "תפיל", "mpl": "יפילו", "fpl": "יפילו" }
     }
   },
   {
@@ -215,9 +280,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} opens {p} eyes",
     "literal_pl": "{s} open {p} eyes",
+    "literal_past": "{s} opened {p} eyes",
+    "literal_future": "{s} will open {p} eyes",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "פותח", "fsg": "פותחת", "mpl": "פותחים", "fpl": "פותחות" }
+      "present": { "msg": "פותח", "fsg": "פותחת", "mpl": "פותחים", "fpl": "פותחות" },
+      "past":    { "msg": "פתח", "fsg": "פתחה", "mpl": "פתחו", "fpl": "פתחו" },
+      "future":  { "msg": "יפתח", "fsg": "תפתח", "mpl": "יפתחו", "fpl": "יפתחו" }
     }
   },
   {
@@ -235,9 +304,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} sits on {p} soul",
     "literal_pl": "{s} sit on {p} soul",
+    "literal_past": "{s} sat on {p} soul",
+    "literal_future": "{s} will sit on {p} soul",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "יושב", "fsg": "יושבת", "mpl": "יושבים", "fpl": "יושבות" }
+      "present": { "msg": "יושב", "fsg": "יושבת", "mpl": "יושבים", "fpl": "יושבות" },
+      "past":    { "msg": "ישב", "fsg": "ישבה", "mpl": "ישבו", "fpl": "ישבו" },
+      "future":  { "msg": "יישב", "fsg": "תישב", "mpl": "יישבו", "fpl": "יישבו" }
     }
   },
   {
@@ -255,9 +328,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} gets off {p} back",
     "literal_pl": "{s} get off {p} back",
+    "literal_past": "{s} got off {p} back",
+    "literal_future": "{s} will get off {p} back",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "יורד", "fsg": "יורדת", "mpl": "יורדים", "fpl": "יורדות" }
+      "present": { "msg": "יורד", "fsg": "יורדת", "mpl": "יורדים", "fpl": "יורדות" },
+      "past":    { "msg": "ירד", "fsg": "ירדה", "mpl": "ירדו", "fpl": "ירדו" },
+      "future":  { "msg": "יירד", "fsg": "תירד", "mpl": "יירדו", "fpl": "יירדו" }
     }
   },
   {
@@ -275,9 +352,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} stands in {p} way",
     "literal_pl": "{s} stand in {p} way",
+    "literal_past": "{s} stood in {p} way",
+    "literal_future": "{s} will stand in {p} way",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "עומד", "fsg": "עומדת", "mpl": "עומדים", "fpl": "עומדות" }
+      "present": { "msg": "עומד", "fsg": "עומדת", "mpl": "עומדים", "fpl": "עומדות" },
+      "past":    { "msg": "עמד", "fsg": "עמדה", "mpl": "עמדו", "fpl": "עמדו" },
+      "future":  { "msg": "יעמוד", "fsg": "תעמוד", "mpl": "יעמדו", "fpl": "יעמדו" }
     }
   },
   {
@@ -295,9 +376,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} enters {p} head",
     "literal_pl": "{s} enter {p} head",
+    "literal_past": "{s} entered {p} head",
+    "literal_future": "{s} will enter {p} head",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "נכנס", "fsg": "נכנסת", "mpl": "נכנסים", "fpl": "נכנסות" }
+      "present": { "msg": "נכנס", "fsg": "נכנסת", "mpl": "נכנסים", "fpl": "נכנסות" },
+      "past":    { "msg": "נכנס", "fsg": "נכנסה", "mpl": "נכנסו", "fpl": "נכנסו" },
+      "future":  { "msg": "ייכנס", "fsg": "תיכנס", "mpl": "ייכנסו", "fpl": "ייכנסו" }
     }
   },
   {
@@ -315,9 +400,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": true,
     "literal_sg": "{s} doesn't leave {p} head",
     "literal_pl": "{s} don't leave {p} head",
+    "literal_past": "{s} didn't leave {p} head",
+    "literal_future": "{s} won't leave {p} head",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "יוצא", "fsg": "יוצאת", "mpl": "יוצאים", "fpl": "יוצאות" }
+      "present": { "msg": "יוצא", "fsg": "יוצאת", "mpl": "יוצאים", "fpl": "יוצאות" },
+      "past":    { "msg": "יצא", "fsg": "יצאה", "mpl": "יצאו", "fpl": "יצאו" },
+      "future":  { "msg": "ייצא", "fsg": "תצא", "mpl": "ייצאו", "fpl": "ייצאו" }
     }
   },
   {
@@ -335,9 +424,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} gives {o} in the head",
     "literal_pl": "{s} give {o} in the head",
+    "literal_past": "{s} gave {o} in the head",
+    "literal_future": "{s} will give {o} in the head",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "נותן", "fsg": "נותנת", "mpl": "נותנים", "fpl": "נותנות" }
+      "present": { "msg": "נותן", "fsg": "נותנת", "mpl": "נותנים", "fpl": "נותנות" },
+      "past":    { "msg": "נתן", "fsg": "נתנה", "mpl": "נתנו", "fpl": "נתנו" },
+      "future":  { "msg": "ייתן", "fsg": "תיתן", "mpl": "ייתנו", "fpl": "ייתנו" }
     }
   },
   {
@@ -355,9 +448,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} eats {p} head",
     "literal_pl": "{s} eat {p} head",
+    "literal_past": "{s} ate {p} head",
+    "literal_future": "{s} will eat {p} head",
     "showMeaning": true,
     "conjugations": {
-      "present": { "msg": "אוכל", "fsg": "אוכלת", "mpl": "אוכלים", "fpl": "אוכלות" }
+      "present": { "msg": "אוכל", "fsg": "אוכלת", "mpl": "אוכלים", "fpl": "אוכלות" },
+      "past":    { "msg": "אכל", "fsg": "אכלה", "mpl": "אכלו", "fpl": "אכלו" },
+      "future":  { "msg": "יאכל", "fsg": "תאכל", "mpl": "יאכלו", "fpl": "יאכלו" }
     }
   },
   {
@@ -375,9 +472,13 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} steals {p} heart",
     "literal_pl": "{s} steal {p} heart",
+    "literal_past": "{s} stole {p} heart",
+    "literal_future": "{s} will steal {p} heart",
     "showMeaning": false,
     "conjugations": {
-      "present": { "msg": "גונב", "fsg": "גונבת", "mpl": "גונבים", "fpl": "גונבות" }
+      "present": { "msg": "גונב", "fsg": "גונבת", "mpl": "גונבים", "fpl": "גונבות" },
+      "past":    { "msg": "גנב", "fsg": "גנבה", "mpl": "גנבו", "fpl": "גנבו" },
+      "future":  { "msg": "יגנוב", "fsg": "תגנוב", "mpl": "יגנבו", "fpl": "יגנבו" }
     }
   },
   {
@@ -396,6 +497,8 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} takes {o} out of {p} mind",
     "literal_pl": "{s} take {o} out of {p} mind",
+    "literal_past": "{s} took {o} out of {p} mind",
+    "literal_future": "{s} will take {o} out of {p} mind",
     "showMeaning": false,
     "suffix_forms": {
       "1sg": "מדעתי", "2msg": "מדעתך", "2fsg": "מדעתך",
@@ -403,7 +506,9 @@ const HEBREW_IDIOMS = (function () {
       "2mpl": "מדעתכם", "2fpl": "מדעתכן", "3mpl": "מדעתם", "3fpl": "מדעתן"
     },
     "conjugations": {
-      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" }
+      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" },
+      "past":    { "msg": "הוציא", "fsg": "הוציאה", "mpl": "הוציאו", "fpl": "הוציאו" },
+      "future":  { "msg": "יוציא", "fsg": "תוציא", "mpl": "יוציאו", "fpl": "יוציאו" }
     }
   },
   {
@@ -422,6 +527,8 @@ const HEBREW_IDIOMS = (function () {
     "negated": false,
     "literal_sg": "{s} takes {o} out of {p} vessels",
     "literal_pl": "{s} take {o} out of {p} vessels",
+    "literal_past": "{s} took {o} out of {p} vessels",
+    "literal_future": "{s} will take {o} out of {p} vessels",
     "showMeaning": true,
     "suffix_forms": {
       "1sg": "מכליי", "2msg": "מכליך", "2fsg": "מכליך",
@@ -429,15 +536,19 @@ const HEBREW_IDIOMS = (function () {
       "2mpl": "מכליכם", "2fpl": "מכליכן", "3mpl": "מכליהם", "3fpl": "מכליהן"
     },
     "conjugations": {
-      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" }
+      "present": { "msg": "מוציא", "fsg": "מוציאה", "mpl": "מוציאים", "fpl": "מוציאות" },
+      "past":    { "msg": "הוציא", "fsg": "הוציאה", "mpl": "הוציאו", "fpl": "הוציאו" },
+      "future":  { "msg": "יוציא", "fsg": "תוציא", "mpl": "יוציאו", "fpl": "יוציאו" }
     }
   }
 ];
 
-  // Normalize: expose present_tense and english_meaning as aliases.
+  // Normalize: expose tense aliases and english_meaning.
   return raw.map(function (item) {
     return Object.assign({}, item, {
       present_tense: item.conjugations.present,
+      past_tense: item.conjugations.past || null,
+      future_tense: item.conjugations.future || null,
       english_meaning: item.english,
     });
   });
