@@ -272,7 +272,7 @@ const I18N = {
       conjugationNote: "Match English forms to Hebrew conjugations.",
       abbreviationName: "Abbreviation",
       abbreviationNote: "Guess English meanings from Hebrew abbreviations.",
-      advConjName: "Adv. Conjugation",
+      advConjName: "Advanced Conjugation",
       advConjNote: "Conjugate both subject and object of Hebrew verbal idioms.",
     },
     prompt: {
@@ -313,7 +313,7 @@ const I18N = {
       lessonTitle: "Translation Complete",
       matchTitle: "Conjugation Complete",
       abbreviationTitle: "Abbreviation Complete",
-      advConjTitle: "Adv. Conjugation Complete",
+      advConjTitle: "Advanced Conjugation Complete",
       score: "Score: {score}/{total}",
       lessonNote: "Second-chance rounds: {count}",
       lessonNoteNone: "No second-chance rounds this run.",
@@ -1645,9 +1645,9 @@ function renderSessionHeader() {
     el.vocabCount.classList.remove("hidden");
     el.vocabCount.textContent = t("session.timer", { seconds: state.advConj.elapsedSeconds });
     updateLessonProgress(ADV_CONJ_ROUNDS ? Math.round((state.advConj.currentRound / ADV_CONJ_ROUNDS) * 100) : 0);
-    el.nextBtn.disabled = !hasQuestion || !state.advConj.currentQuestion?.locked;
-    el.nextBtn.textContent = t("session.next");
-    el.nextBtn.classList.toggle("hidden", !hasQuestion || !state.advConj.currentQuestion?.locked);
+    el.nextBtn.disabled = questionNeedsSelection(state.advConj.currentQuestion);
+    el.nextBtn.textContent = hasQuestion && !state.advConj.currentQuestion?.locked ? t("session.submit") : t("session.next");
+    el.nextBtn.classList.toggle("hidden", !hasQuestion);
     persistSessionState();
     return;
   }
@@ -1960,9 +1960,11 @@ function endSessionAndNavigate(targetRoute = "home") {
   clearSecondChanceIntro();
   clearVerbMatchIntro();
   clearAbbreviationIntro();
+  clearAdvConjIntro();
   resetSessionCounters();
   resetVerbMatchState();
   resetAbbreviationState();
+  resetAdvConjState();
   state.lesson.active = false;
   state.lesson.inReview = false;
   state.currentQuestion = null;
@@ -1995,12 +1997,15 @@ function showSessionSummary(config = {}) {
   clearSecondChanceIntro();
   clearVerbMatchIntro();
   clearAbbreviationIntro();
+  clearAdvConjIntro();
   state.lesson.active = false;
   state.lesson.inReview = false;
   state.currentQuestion = null;
   state.match.active = false;
   state.abbreviation.active = false;
   state.abbreviation.currentQuestion = null;
+  state.advConj.active = false;
+  state.advConj.currentQuestion = null;
   state.mode = "summary";
   state.summary.active = true;
   state.summary.game = String(config.game || "");
@@ -2511,7 +2516,13 @@ function renderAbbreviationQuestion() {
   if (!question) return;
 
   el.promptLabel.textContent = question.promptLabel;
-  el.promptText.classList.add("hebrew");
+  if (question.promptIsHebrew) {
+    el.promptText.classList.add("hebrew");
+    el.promptText.classList.remove("english-prompt");
+  } else {
+    el.promptText.classList.remove("hebrew");
+    el.promptText.classList.add("english-prompt");
+  }
   el.promptText.textContent = question.prompt;
   renderAbbreviationChoices(question);
   renderNiqqudToggle();
@@ -2519,16 +2530,25 @@ function renderAbbreviationQuestion() {
 
 function renderAbbreviationChoices(question) {
   el.choiceContainer.innerHTML = "";
+  const choicesAreHebrew = question.direction === "en2he";
 
   question.options.forEach((option) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "choice-btn";
+    if (choicesAreHebrew) {
+      btn.classList.add("hebrew");
+      btn.dir = "rtl";
+      btn.setAttribute("lang", "he");
+    }
     btn.textContent = option.label;
     btn.addEventListener("click", () => {
       if (question.locked) return;
       question.selectedOptionId = option.id;
-      renderAbbreviationQuestion();
+      el.choiceContainer.querySelectorAll(".choice-btn").forEach((b, i) => {
+        b.classList.toggle("selected", question.options[i]?.id === option.id);
+      });
+      renderSessionHeader();
     });
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
     el.choiceContainer.append(btn);
@@ -2598,18 +2618,31 @@ function buildAbbreviationQuestion(pool) {
   if (!entry) return null;
 
   state.abbreviation.askedEntryIds.push(entry.id);
-  const options = buildAbbreviationOptions(pool, entry);
+  const direction = Math.random() < 0.5 ? "he2en" : "en2he";
+  const options = buildAbbreviationOptions(pool, entry, direction);
 
-  return {
-    promptLabel: t("prompt.abbreviation"),
-    prompt: entry.abbr,
-    promptIsHebrew: true,
-    entry,
-    options,
-  };
+  if (direction === "he2en") {
+    return {
+      promptLabel: t("prompt.abbreviation"),
+      prompt: entry.abbr,
+      promptIsHebrew: true,
+      direction,
+      entry,
+      options,
+    };
+  } else {
+    return {
+      promptLabel: t("prompt.abbreviation"),
+      prompt: entry.english,
+      promptIsHebrew: false,
+      direction,
+      entry,
+      options,
+    };
+  }
 }
 
-function buildAbbreviationOptions(pool, entry) {
+function buildAbbreviationOptions(pool, entry, direction) {
   const sameBucketCandidates = pool.filter((item) => item.id !== entry.id && item.bucket === entry.bucket);
   const distractors = shuffle(sameBucketCandidates).slice(0, 3);
 
@@ -2621,9 +2654,10 @@ function buildAbbreviationOptions(pool, entry) {
     distractors.push(...filler);
   }
 
+  const isHe2En = direction === "he2en";
   const options = [entry, ...distractors].slice(0, 4).map((item) => ({
     id: item.id,
-    label: item.english,
+    label: isHe2En ? item.english : item.abbr,
     entry: item,
   }));
 
@@ -2855,7 +2889,8 @@ function loadAdvConjQuestion() {
     return;
   }
   state.advConj.currentQuestion = state.advConj.questionQueue.shift();
-  renderAll();
+  clearFeedback();
+  renderAdvConjQuestion();
 }
 
 function renderAdvConjQuestion() {
@@ -2867,15 +2902,20 @@ function renderAdvConjQuestion() {
   el.choiceContainer.classList.remove("match-grid");
   renderSessionHeader();
   if (el.promptLabel) {
-    el.promptLabel.textContent = q.idiomEn;
-    el.promptLabel.classList.remove("hidden");
+    el.promptLabel.textContent = "";
+    el.promptLabel.classList.add("hidden");
   }
   if (el.promptText) {
-    el.promptText.textContent = `${q.subjectEn} \u2192 ${q.objectEn}`;
+    el.promptText.textContent = q.promptText;
     el.promptText.classList.remove("hidden");
-    el.promptText.classList.remove("hebrew");
+    if (q.promptIsHebrew) {
+      el.promptText.classList.add("hebrew");
+    } else {
+      el.promptText.classList.remove("hebrew");
+    }
   }
   renderAdvConjChoices(q);
+  renderNiqqudToggle();
 }
 
 function renderAdvConjChoices(question) {
@@ -2885,14 +2925,21 @@ function renderAdvConjChoices(question) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "choice-btn";
-    btn.dir = "rtl";
-    btn.setAttribute("lang", "he");
+    if (question.correctAnswerIsHebrew) {
+      btn.classList.add("hebrew");
+      btn.dir = "rtl";
+      btn.setAttribute("lang", "he");
+    }
     btn.textContent = opt.text;
     btn.addEventListener("click", () => {
       if (question.locked) return;
       question.selectedOptionId = opt.id;
-      applyAdvConjAnswer();
+      el.choiceContainer.querySelectorAll(".choice-btn").forEach((b, i) => {
+        b.classList.toggle("selected", question.options[i]?.id === opt.id);
+      });
+      renderSessionHeader();
     });
+    btn.classList.toggle("selected", question.selectedOptionId === opt.id && !question.locked);
     el.choiceContainer.appendChild(btn);
   }
   if (question.locked) {
@@ -2939,7 +2986,10 @@ function applyAdvConjAnswer() {
     isCorrect
   );
   updateAdvConjStats(isCorrect);
-  renderAll();
+  markAdvConjChoiceResults(state.advConj.currentQuestion);
+  renderSessionHeader();
+  renderDomainPerformance();
+  renderMostMissed();
 }
 
 function updateAdvConjStats(isCorrect) {
@@ -3163,7 +3213,10 @@ function renderChoices(question) {
     btn.addEventListener("click", () => {
       if (question.locked) return;
       question.selectedOptionId = option.id;
-      renderQuestion();
+      el.choiceContainer.querySelectorAll(".choice-btn").forEach((b, i) => {
+        b.classList.toggle("selected", question.options[i]?.id === option.id);
+      });
+      renderSessionHeader();
     });
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
 
@@ -3325,8 +3378,15 @@ function handleNextAction() {
   }
 
   if (state.mode === "advConj") {
-    if (state.advConj.currentQuestion && state.advConj.currentQuestion.locked) {
+    if (!state.advConj.active || !state.advConj.currentQuestion) {
+      return;
+    }
+    if (state.advConj.currentQuestion.locked) {
       loadAdvConjQuestion();
+      return;
+    }
+    if (state.advConj.currentQuestion.selectedOptionId) {
+      applyAdvConjAnswer();
     }
     return;
   }

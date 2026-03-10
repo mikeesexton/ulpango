@@ -24,6 +24,68 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-09 — Fix hover blink on choice buttons (all games)
+
+**Requested:** Fix blinking/flashing hover animation glitch on desktop when clicking choice buttons.
+**Files changed:**
+- `styles.css`: Added `.choice-btn:hover { transform: none; box-shadow: none; }` inside the `@media (hover: hover)` block to disable the `translateY(-1px)` lift animation on choice buttons — the lift effect caused visible blinking when hovering across choices on desktop. Bumped CSS version to `20260309a`.
+- `app.js`: Changed click handlers in `renderChoices()` (translation), `renderAbbreviationChoices()` (abbreviation), and `renderAdvConjChoices()` (advConj) to toggle `.selected` class on existing DOM buttons + call `renderSessionHeader()` instead of calling the full render function (which destroyed and recreated all button elements via `innerHTML = ""`). Bumped app.js version to `20260309a`.
+**Behavior changed:** Choice buttons no longer lift/shift on hover on desktop — they stay flat. Selection highlight updates smoothly via CSS class toggle without rebuilding the DOM. Applies to all three choice-based games (translation, abbreviation, advanced conjugation). Game tiles, nav buttons, and action buttons still have the lift-on-hover effect.
+**Tests run:** `npm test` — 25 pass, 1 fail (pre-existing), 1 cancelled (pre-existing). No regressions.
+**Risks / regressions to check:** Click handler now only toggles `.selected` class and updates header — does NOT re-render prompt text or niqqud toggle. This is fine for selection (no prompt change needed), but verify that niqqud toggle still works when toggled mid-question (the toggle has its own handler that calls the full render).
+
+---
+
+### 2026-03-09 — Fix advConj leave navigation, transparent icon backgrounds
+
+**Requested:** (1) Fix broken navigation when leaving Advanced Conjugation game (showed stale "Translation / Pick a mode" screen instead of returning home); (2) replace icon PNGs with transparent-background versions (white corners were visible on dark mode).
+**Files changed:**
+- `app.js`: Added `clearAdvConjIntro()` and `resetAdvConjState()` calls to `endSessionAndNavigate()` (was missing — advConj state/timer were never cleaned up when leaving); added `clearAdvConjIntro()`, `state.advConj.active = false`, `state.advConj.currentQuestion = null` to `showSessionSummary()` for consistency
+- `assets/icon-translation.png`, `assets/icon-conjugation.png`, `assets/icon-abbreviation.png`, `assets/icon-adv-conjugation.png`: Processed via Python PIL to flood-fill white corner pixels with transparency (converted RGB → RGBA, BFS from all 4 corners replacing near-white pixels with alpha=0)
+- `index.html`: Bumped icon cache-bust query params from `?v=20260309` to `?v=20260309b`
+**Behavior changed:** Leaving an Advanced Conjugation game (via Home → Lose Progress) now correctly returns to the home dashboard with game picker. AdvConj timer stops and state resets properly. Icons display without white borders/corners on dark mode.
+**Tests run:** `npm test` — 25 pass, 1 fail (pre-existing: `starter verb seed entries`), 1 cancelled (pre-existing: `app-progress.test.js` timeout). No regressions.
+**Risks / regressions to check:** PIL flood-fill with threshold 245 may have caught some near-white edge pixels at the rounded-rect boundary — verify icons look clean at large sizes; `resetAdvConjState()` clears the timer via `clearInterval` — verify no double-clear if `finishAdvConj` was already called
+
+---
+
+### 2026-03-09 — AdvConj standardization: select+submit, targeted renders, icon cache bust
+
+**Requested:** (1) Fix choice button hover animation glitch in advConj (buttons flashed on hover because clicking auto-submitted, causing instant lock/disable transition); (2) fix homepage icons not updating (browser caching old images); (3) standardize advConj gameplay to use select+submit pattern like abbreviation and translation; (4) audit and fix other game standardization differences.
+**Files changed:**
+- `app.js`: Changed `renderAdvConjChoices()` click handler from auto-submit (`applyAdvConjAnswer()`) to select-only (`renderAdvConjQuestion()`), added `.selected` class toggle on choice buttons; updated `renderSessionHeader()` advConj section to use `questionNeedsSelection()` and show Submit/Next like other games; updated `handleNextAction()` advConj section to add submit step (check `selectedOptionId` before calling `applyAdvConjAnswer()`); replaced `renderAll()` in `applyAdvConjAnswer()` with targeted `markAdvConjChoiceResults()` + `renderSessionHeader()` + `renderDomainPerformance()` + `renderMostMissed()`; replaced `renderAll()` in `loadAdvConjQuestion()` with `renderAdvConjQuestion()`; added `renderNiqqudToggle()` call to `renderAdvConjQuestion()`; normalized `selectedOptionId` check from `!= null` to truthy check for consistency
+- `index.html`: Added `?v=20260309` cache-busting query params to all 8 icon `<img>` src attributes
+**Behavior changed:** AdvConj now uses the same select+submit two-step interaction as abbreviation and translation games: click a choice to highlight it, then click Submit to confirm. Submit button shows disabled until a choice is selected. No more hover animation glitch (buttons no longer instantly lock/disable on click). Icons refresh past browser cache. Niqqud toggle renders during advConj questions.
+**Tests run:** `npm test` — 25 pass, 1 fail (pre-existing: `starter verb seed entries`), 1 cancelled (pre-existing: `app-progress.test.js` timeout). No regressions.
+**Risks / regressions to check:** Replacing `renderAll()` with targeted renders in advConj could miss some UI update that `renderAll()` was covering — verify persist/restore of session state still works; `markAdvConjChoiceResults()` is now called directly in `applyAdvConjAnswer()` instead of indirectly via `renderAll()` chain — verify correct/wrong highlighting still works
+
+---
+
+### 2026-03-09 — Adv. Conjugation: literal sentence prompts, bidirectional, feedback
+
+**Requested:** Overhaul the Advanced Conjugation game: (1) change prompts from "idiom label + he → me" format to full literal English sentences (e.g. "he eats our head"); (2) drop the Hebrew subject pronoun from answers so players must identify conjugation from verb form; (3) make the game bidirectional (EN→HE and HE→EN); (4) add feedback text after answers, showing idiomatic meaning for non-obvious idioms; (5) add possessive pronoun support for English templates.
+**Files changed:**
+- `hebrew-idioms.js`: Added `literal_sg`, `literal_pl`, `showMeaning` fields to all 21 idiom entries; renamed `prompt_sg`/`prompt_pl` to `literal_sg`/`literal_pl` on first entry
+- `app.js`: Added `poss` field to `ADV_CONJ_OBJECTS`; added `buildAdvConjEnglishSentence()` helper; rewrote `buildAdvConjDeck()` for bidirectional literal-sentence prompts with direction-aware distractor generation and ambiguous verb form filtering; updated `buildAdvConjHebrewAnswer()` to drop subject pronoun from all 3 object_type branches; updated `renderAdvConjQuestion()` to show `promptText` with conditional Hebrew CSS class instead of old label+arrow format; updated `renderAdvConjChoices()` to conditionally apply Hebrew/RTL styling based on answer direction; added `setFeedback` call in `applyAdvConjAnswer()` with `showMeaning` support; added `advConjCorrect`/`advConjWrong` i18n keys in EN and HE bundles
+**Behavior changed:** Advanced Conjugation now shows full sentences as prompts. EN→HE: "he eats our head" → pick Hebrew (without pronoun). HE→EN: "אוכל לנו את הראש" → pick English literal. Feedback text appears after each answer; for non-obvious idioms, the idiomatic meaning is appended (e.g. "to nag / drive someone crazy with talk"). Ambiguous verb forms (identical msg/fsg) are skipped in HE→EN direction.
+**Tests run:** `npm test` — 25 pass, 1 fail (pre-existing: `starter verb seed entries`), 1 cancelled (pre-existing: `app-progress.test.js` timeout). No regressions from changes.
+**Risks / regressions to check:** `literal_sg`/`literal_pl` templates must use `{s}` (subject), `{o}` (direct object), `{p}` (possessive) placeholders correctly; `poss` field on `ADV_CONJ_OBJECTS` must match English possessive pronouns; ambiguous verb form filter (`he2en` direction) may skip too many valid questions for idioms with shared msg/fsg forms; `showMeaning` flag accuracy on each idiom
+
+---
+
+### 2026-03-09 — Icons, abbreviation bidirectional, advConj feedback fix, rename to Advanced Conjugation
+
+**Requested:** (1) Rename uploaded icon files (3,4,5,6) to proper icon names; (2) make abbreviation game bidirectional (HE→EN and EN→HE); (3) fix advConj feedback text not clearing when advancing to next question; (4) rename "Adv. Conjugation" to "Advanced Conjugation" throughout.
+**Files changed:**
+- `assets/3.png` → `assets/icon-translation.png`, `assets/4.png` → `assets/icon-conjugation.png`, `assets/5.png` → `assets/icon-abbreviation.png`, `assets/6.png` → `assets/icon-adv-conjugation.png`: Renamed user-uploaded icon files to replace old icons
+- `app.js`: Made `buildAbbreviationQuestion()` randomly assign `direction` ("he2en" or "en2he") with prompt set to `entry.abbr` or `entry.english` accordingly; updated `buildAbbreviationOptions()` to accept `direction` param and set option labels to `english` or `abbr` depending on direction; updated `renderAbbreviationQuestion()` to conditionally apply/remove `hebrew` CSS class on prompt; updated `renderAbbreviationChoices()` to apply `hebrew` class, `dir="rtl"`, `lang="he"` on choice buttons for en2he direction; added `clearFeedback()` call in `loadAdvConjQuestion()` to clear stale feedback between questions; changed EN i18n `advConjName` from "Adv. Conjugation" to "Advanced Conjugation"; changed EN i18n `advConjTitle` from "Adv. Conjugation Complete" to "Advanced Conjugation Complete"
+- `index.html`: Changed both instances of "Adv. Conjugation" to "Advanced Conjugation" in home tile and game picker tile
+**Behavior changed:** Abbreviation game now alternates randomly between HE→EN (Hebrew abbreviation prompt, English choices) and EN→HE (English meaning prompt, Hebrew abbreviation choices). AdvConj feedback text clears properly when advancing to next question. Game title shows "Advanced Conjugation" everywhere instead of "Adv. Conjugation". All 4 game icons updated with new designs.
+**Tests run:** `npm test` — 25 pass, 1 fail (pre-existing: `starter verb seed entries`), 1 cancelled (pre-existing: `app-progress.test.js` timeout). No regressions from changes.
+**Risks / regressions to check:** Abbreviation en2he direction shows Hebrew abbreviation choices that may look similar — verify distractor quality; abbreviation feedback text still uses `entry.english` and `entry.expansionHe` regardless of direction (should be fine since it shows full info); verify new icon file sizes/quality match expectations
+
+---
+
 ### 2026-03-09 — Advanced Conjugation game mode
 
 **Requested:** Implement a new "Advanced Conjugation" game mode where players conjugate both the subject and object of Hebrew verbal idioms (present tense, multiple object types: direct, l-dative, possessive suffix).

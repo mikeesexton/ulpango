@@ -1915,6 +1915,11 @@ body[data-ui-lang="he"] .mastered-row input {
     box-shadow: var(--control-hover-shadow);
   }
 
+  .choice-btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
   .settings-link-btn:hover {
     transform: translateY(-1px);
     box-shadow: var(--control-hover-shadow);
