@@ -696,3 +696,16 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify past/future English templates read naturally for all idioms. Check that ambiguity filtering correctly skips he2en questions where mpl/fpl share the same past/future verb form. Verify לכבות conjugation forms are correct in the conjugation game. Confirm לבשל פחות מדי no longer appears in translation quiz.
 
 ---
+
+### 2026-03-10 — Fix advConj Play Again, distractor ambiguity, cache busting
+
+**Requested:** (1) Fix distractor where "your" was ambiguous between singular and plural objects. (2) Fix Play Again button not working in Advanced Conjugation — it was redirecting to the summary page instead of restarting. (3) Fix past/future tenses not appearing when user runs via localhost (cache issue).
+**Files changed:**
+- `app.js`: Changed `ADV_CONJ_OBJECTS` 2mpl `poss` from `"your"` to `"your (pl.)"` to disambiguate from singular `"your"`. Added `clearSummaryState()`, `state.mode = "advConj"`, `state.route = "home"`, and `state.lastPlayedMode = "advConj"` inside `startAdvConj()` so it works correctly when called from `continueFromResults()` (Play Again).
+- `index.html`: Bumped all cache-busting query params from various dates to `?v=20260310a` so browsers load the latest JS/CSS files.
+
+**Behavior changed:** Play Again button in Advanced Conjugation now correctly restarts the game instead of showing the summary again. English sentences with plural "you" objects now show "your (pl.)" to distinguish from singular "your". Users on localhost will get fresh files after hard-refreshing.
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Verify "your (pl.)" reads naturally in English sentences. Confirm Play Again works in all game modes (translation, conjugation, abbreviation, advConj). Check that GitHub Pages deployment picks up the new cache params.
+
+---
