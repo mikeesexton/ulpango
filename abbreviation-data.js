@@ -996,7 +996,7 @@ const ABBREVIATIONS = [
     "id": "abbr-111",
     "abbr": "ני״ע",
     "expansionHe": "ניירות ערך",
-    "english": "securities",
+    "english": "stocks / securities",
     "bucket": "Civics, Law & Work",
     "notes": "",
     "source": "abbreviations-xlsx"

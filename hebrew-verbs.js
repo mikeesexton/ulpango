@@ -125,7 +125,6 @@ const SAFE_GENERATION_OVERRIDES = new Map([
   ["לדלל", { root: ["ד", "ל", "ל"], binyan: "piel", personal_priority: 74 }],
   ["לסנן", { root: ["ס", "נ", "נ"], binyan: "piel", personal_priority: 78 }],
   ["לקרר", { root: ["ק", "ר", "ר"], binyan: "piel", personal_priority: 73 }],
-  ["לצנן", { root: ["צ", "נ", "נ"], binyan: "piel", personal_priority: 72 }],
   ["לרפד", { root: ["ר", "פ", "ד"], binyan: "piel", personal_priority: 71 }],
   ["להסמיך", { root: ["ס", "מ", "כ"], binyan: "hifil", personal_priority: 70 }],
   ["להרתיח", { root: ["ר", "ת", "ח"], binyan: "hifil", personal_priority: 79 }],
@@ -786,6 +785,25 @@ function buildStarterVerbEntries() {
       difficulty_level: 2,
       tags: ["piel", "seed"],
       personal_priority: 79,
+    }),
+    createVerbEntry({
+      id: "starter-verb-letzanen",
+      availability: getStarterVerbAvailability("starter-verb-letzanen"),
+      lemma: "לצנן",
+      root: ["צ", "נ", "נ"],
+      binyan: "piel",
+      regularity: "regular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to chill", null, true), makeSense("to cool down", null, true)],
+      forms: makeForms(
+        makePresent("מצנן", "מצננת", "מצננים", "מצננות"),
+        makePast("ציננתי", "ציננת", "ציננת", "צינן", "ציננה", "ציננו", "ציננתם", "ציננתן", "ציננו"),
+        makeFuture("אצנן", "תצנן", "תצנני", "יצנן", "תצנן", "נצנן", "תצננו", "יצננו")
+      ),
+      review_status: "approved",
+      difficulty_level: 2,
+      tags: ["piel", "seed"],
+      personal_priority: 72,
     }),
   ];
 }
