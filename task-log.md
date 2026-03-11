@@ -709,3 +709,19 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify "your (pl.)" reads naturally in English sentences. Confirm Play Again works in all game modes (translation, conjugation, abbreviation, advConj). Check that GitHub Pages deployment picks up the new cache params.
 
 ---
+
+### 2026-03-11 — Fix stocks translation, לצנן conjugation, showMeaning double-parens
+
+**Requested:** (1) ניירות ערך should translate as "stocks" — update abbreviation and add to vocab. (2) Past tense 1pl of לצנן generates "צינננו" (3 nuns) — should be "ציננו". (3) Check if ממ״ד exists in abbreviation game (it does — no action). (4) Fix doubled parentheses when showing figurative meaning for קורע in advConj feedback.
+**Files changed:**
+- `abbreviation-data.js`: Changed ני״ע english from "securities" to "stocks / securities".
+- `vocab-data.js`: Added `["stocks / securities", "ניירות ערך", "נְיָרוֹת עֵרֶךְ"]` to core_advanced.
+- `hebrew-verbs.js`: Removed לצנן from SAFE_GENERATION_OVERRIDES (auto-generated piel had geminate root bug producing "צינננו"). Added curated entry `starter-verb-letzanen` with manually correct forms including 1pl past "ציננו".
+- `hebrew-idioms.js`: Removed wrapping parentheses from `english` field on קורע ("to kill/send someone [funny]") and אסימון ("to make it click/make sense for someone") entries — the display code in app.js already wraps with parens via `showMeaning`.
+- `index.html`: Bumped cache-busting params to `?v=20260311a`.
+
+**Behavior changed:** ניירות ערך now appears in translation game. ני״ע abbreviation shows "stocks / securities". לצנן conjugation game shows correct "ציננו" for 1pl past. AdvConj feedback for קורע/אסימון shows single parentheses instead of doubled.
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Verify לצנן curated forms are all correct (present, past, future). Check other geminate piel verbs in SAFE_GENERATION_OVERRIDES (לדלל, לסנן, לקרר) may have the same 1pl past bug. Verify ממ״ד still appears correctly in abbreviation game.
+
+---
