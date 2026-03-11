@@ -725,3 +725,16 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify לצנן curated forms are all correct (present, past, future). Check other geminate piel verbs in SAFE_GENERATION_OVERRIDES (לדלל, לסנן, לקרר) may have the same 1pl past bug. Verify ממ״ד still appears correctly in abbreviation game.
 
 ---
+
+### 2026-03-11 — Move iPad nav to bottom bar (raise breakpoint to 1024px)
+
+**Requested:** On iPad, move the Home/Review/Settings sidebar nav to the bottom like mobile. The sidebar was cramping category text on review page and making the pre-game greeting look off-center.
+**Files changed:**
+- `styles.css`: Changed responsive breakpoint from 768px to 1024px — `@media (min-width: 768px)` → `(min-width: 1024px)`, `@media (max-width: 767px)` → `(max-width: 1023px)` (2 occurrences). Merged the two now-identical `@media (min-width: 1024px)` blocks into one.
+- `index.html`: Bumped cache-busting params to `?v=20260311b`.
+
+**Behavior changed:** iPad portrait (768-1023px) now shows bottom nav bar instead of sidebar. Full content width available for game tiles, review categories, and pre-game greetings. Desktop (1024px+) layout unchanged.
+**Tests run:** `npm test` — all 12 tests pass
+**Risks / regressions to check:** Verify layout at exactly 1024px still shows sidebar correctly. Check that no other CSS rules relied on the 768px breakpoint outside styles.css (e.g. inline styles or JS media queries in app.js).
+
+---
