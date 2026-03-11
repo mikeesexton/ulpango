@@ -708,7 +708,7 @@ const ADV_CONJ_OBJECTS = [
   { key: "3msg", dirObj: "אותו",  lObj: "לו",   en: "him",      poss: "his" },
   { key: "3fsg", dirObj: "אותה",  lObj: "לה",   en: "her",      poss: "her" },
   { key: "1pl",  dirObj: "אותנו", lObj: "לנו",  en: "us",       poss: "our" },
-  { key: "2mpl", dirObj: "אתכם",  lObj: "לכם",  en: "you (pl.)", poss: "your" },
+  { key: "2mpl", dirObj: "אתכם",  lObj: "לכם",  en: "you (pl.)", poss: "your (pl.)" },
   { key: "3mpl", dirObj: "אותם",  lObj: "להם",  en: "them",     poss: "their" },
 ];
 const VERB_MATCH_ROUNDS = 1;
@@ -2875,7 +2875,11 @@ function startAdvConj() {
   stopAbbreviationTimer();
   resetAbbreviationState();
   clearAbbreviationIntro();
+  clearSummaryState();
   resetAdvConjState();
+  state.mode = "advConj";
+  state.route = "home";
+  state.lastPlayedMode = "advConj";
   const deck = shuffle(buildAdvConjDeck());
   state.advConj.questionQueue = deck.slice(0, ADV_CONJ_ROUNDS);
   state.advConj.active = true;
