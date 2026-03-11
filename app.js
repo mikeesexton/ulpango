@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260307p";
+const APP_BUILD = "20260311c";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -294,6 +294,11 @@ const I18N = {
       reviewToEnglish: "Second Chance: Translate to English",
       reviewToHebrew: "Second Chance: Translate to Hebrew",
     },
+    audio: {
+      label: "Sound Effects",
+      on: "On",
+      off: "Off",
+    },
     feedback: {
       correct: "Correct: {answer}",
       wrong: "Not quite. Correct answer: {answer} ({english})",
@@ -333,7 +338,7 @@ const I18N = {
     },
     settings: {
       title: "Settings",
-      note: "Adjust language, theme, and inline nikud.",
+      note: "Adjust language, theme, sounds, and inline nikud.",
       language: "Language",
       feedbackSurvey: "Feedback survey",
       niqqud: "Inline Nikud",
@@ -543,6 +548,11 @@ const I18N = {
       reviewToEnglish: "הזדמנות שנייה: תרגם לאנגלית",
       reviewToHebrew: "הזדמנות שנייה: תרגם לעברית",
     },
+    audio: {
+      label: "אפקטים קוליים",
+      on: "פועל",
+      off: "כבוי",
+    },
     feedback: {
       correct: "נכון: {answer}",
       wrong: "לא מדויק. התשובה הנכונה: {answer} ({english})",
@@ -582,7 +592,7 @@ const I18N = {
     },
     settings: {
       title: "הגדרות",
-      note: "התאם שפה, ערכת נושא וניקוד מובנה.",
+      note: "התאם שפה, ערכת נושא, צלילים וניקוד מובנה.",
       language: "שפה",
       feedbackSurvey: "שאלון משוב",
       niqqud: "ניקוד מובנה",
@@ -671,15 +681,22 @@ const STORAGE_KEYS = {
   progress: "ivriquest-progress-v1",
   language: "ivriquest-language-v1",
   theme: "ivriquest-theme-v1",
+  sound: "ivriquest-sound-v1",
   ui: "ivriquest-ui-v1",
   session: "ivriquest-session-v1",
   welcomeSeen: "ivriquest-welcome-seen-v1",
   advConjStats: "advConjStats",
 };
 
+const AUDIO_CUES = Object.freeze({
+  answerCorrect: "./assets/sounds/answer-correct.ogg",
+  answerWrong: "./assets/sounds/answer-wrong.ogg",
+});
+
 const storage = getStorage();
 const restoredUi = loadJson(STORAGE_KEYS.ui, {});
 const restoredSession = loadJson(STORAGE_KEYS.session, null);
+const audioPlayers = new Map();
 
 const LEITNER_INTERVALS = [
   0,
@@ -842,9 +859,12 @@ const el = {
   homeThemeValue: document.querySelector("#homeThemeValue"),
   homeNiqqudToggle: document.querySelector("#homeNiqqudToggle"),
   homeNiqqudValue: document.querySelector("#homeNiqqudValue"),
+  homeSoundToggle: document.querySelector("#homeSoundToggle"),
+  homeSoundValue: document.querySelector("#homeSoundValue"),
   poolMeta: document.querySelector("#poolMeta"),
   langToggle: document.querySelector("#langToggle"),
   themeToggle: document.querySelector("#themeToggle"),
+  soundToggle: document.querySelector("#soundToggle"),
   feedbackSurveyLink: document.querySelector("#feedbackSurveyLink"),
   lessonStatus: document.querySelector("#lessonStatus"),
   lessonProgressFill: document.querySelector("#lessonProgressFill"),
@@ -901,6 +921,7 @@ const state = {
   progress: loadJson(STORAGE_KEYS.progress, {}),
   language: loadLanguagePreference(),
   theme: loadThemePreference(),
+  audio: loadSoundPreference(),
   route: restoredUi.route || "home",
   lastPlayedMode: restoredUi.lastPlayedMode || "lesson",
   mode: "home",
@@ -1060,8 +1081,10 @@ function bindUi() {
   el.homeLangToggle?.addEventListener("click", () => toggleLanguage());
   el.homeThemeToggle?.addEventListener("click", () => toggleTheme());
   el.homeNiqqudToggle?.addEventListener("click", () => toggleNiqqudPreference());
+  el.homeSoundToggle?.addEventListener("click", () => toggleSoundPreference());
   el.langToggle?.addEventListener("click", () => toggleLanguage());
   el.themeToggle?.addEventListener("click", () => toggleTheme());
+  el.soundToggle?.addEventListener("click", () => toggleSoundPreference());
   el.resultsContinueBtn?.addEventListener("click", () => continueFromResults());
   el.resultsReviewBtn?.addEventListener("click", () => leaveSummaryAndNavigate("review"));
   el.resultsHomeBtn?.addEventListener("click", () => leaveSummaryAndNavigate("home"));
@@ -1419,6 +1442,12 @@ function toggleNiqqudPreference() {
   renderAll();
 }
 
+function toggleSoundPreference() {
+  state.audio.enabled = !state.audio.enabled;
+  saveSoundPreference(state.audio.enabled);
+  renderAll();
+}
+
 function getLocaleBundle() {
   return I18N[state.language] || I18N.en;
 }
@@ -1449,6 +1478,14 @@ function t(key, vars = {}) {
 
 function renderNiqqudToggle() {
   el.niqqudToggle.textContent = state.showNiqqudInline ? t("prompt.hideNiqqud") : t("prompt.showNiqqud");
+}
+
+function renderSoundToggle() {
+  if (!el.soundToggle) return;
+  const soundLabel = `${t("audio.label")}: ${state.audio.enabled ? t("audio.on") : t("audio.off")}`;
+  el.soundToggle.textContent = soundLabel;
+  el.soundToggle.setAttribute("aria-label", soundLabel);
+  el.soundToggle.setAttribute("aria-pressed", String(state.audio.enabled));
 }
 
 function renderThemeToggle() {
@@ -2173,6 +2210,7 @@ function renderSettingsState() {
   applySurveyLinks();
   renderThemeToggle();
   renderNiqqudToggle();
+  renderSoundToggle();
 }
 
 function createCompactRow({ title, note }) {
@@ -2254,11 +2292,17 @@ function renderHomeOptions() {
   if (el.homeNiqqudValue) {
     el.homeNiqqudValue.textContent = state.showNiqqudInline ? t("dashboard.on") : t("dashboard.off");
   }
+  if (el.homeSoundValue) {
+    el.homeSoundValue.textContent = state.audio.enabled ? t("audio.on") : t("audio.off");
+  }
   if (el.homeThemeToggle) {
     el.homeThemeToggle.setAttribute("aria-pressed", String(state.theme === "dark"));
   }
   if (el.homeNiqqudToggle) {
     el.homeNiqqudToggle.setAttribute("aria-pressed", String(state.showNiqqudInline));
+  }
+  if (el.homeSoundToggle) {
+    el.homeSoundToggle.setAttribute("aria-pressed", String(state.audio.enabled));
   }
 }
 
@@ -2584,6 +2628,7 @@ function applyAbbreviationAnswer(isCorrect, selectedId = null) {
       : t("feedback.abbreviationWrong", { english: entry.english, expansion }),
     isCorrect
   );
+  playAnswerFeedbackSound(isCorrect);
 
   question.selectedOptionId = selectedId ?? null;
   markAbbreviationChoiceResults(question);
@@ -3008,6 +3053,7 @@ function applyAdvConjAnswer() {
       : t("feedback.advConjWrong", { answer: feedbackAnswer }),
     isCorrect
   );
+  playAnswerFeedbackSound(isCorrect);
   updateAdvConjStats(isCorrect);
   markAdvConjChoiceResults(state.advConj.currentQuestion);
   renderSessionHeader();
@@ -3316,6 +3362,7 @@ function applyAnswer(isCorrect, selectedId = null) {
       : t("feedback.wrong", { answer: answerDisplay, english: word.en }),
     isCorrect
   );
+  playAnswerFeedbackSound(isCorrect);
 
   state.currentQuestion.selectedOptionId = selectedId ?? null;
   markChoiceResults();
@@ -5090,6 +5137,19 @@ function saveThemePreference(value) {
   }
 }
 
+function loadSoundPreference() {
+  const raw = loadJson(STORAGE_KEYS.sound, null);
+  return {
+    enabled: raw?.enabled !== false,
+  };
+}
+
+function saveSoundPreference(enabled) {
+  saveJson(STORAGE_KEYS.sound, {
+    enabled: enabled !== false,
+  });
+}
+
 function hasSeenWelcomeModal() {
   if (!storage) return false;
 
@@ -5131,6 +5191,54 @@ function saveJson(key, value) {
   } catch {
     // Ignore write failures (private mode/storage restrictions).
   }
+}
+
+function getAudioPlayer(cueId) {
+  if (audioPlayers.has(cueId)) {
+    return audioPlayers.get(cueId);
+  }
+
+  const src = AUDIO_CUES[cueId];
+  if (!src || typeof global.Audio !== "function") {
+    audioPlayers.set(cueId, null);
+    return null;
+  }
+
+  try {
+    const player = new global.Audio(src);
+    player.preload = "auto";
+    audioPlayers.set(cueId, player);
+    return player;
+  } catch {
+    audioPlayers.set(cueId, null);
+    return null;
+  }
+}
+
+function playSoundCue(cueId) {
+  if (!state.audio.enabled) return;
+
+  const player = getAudioPlayer(cueId);
+  if (!player || typeof player.play !== "function") return;
+
+  try {
+    player.currentTime = 0;
+  } catch {
+    // Ignore currentTime reset failures.
+  }
+
+  try {
+    const playback = player.play();
+    if (playback && typeof playback.catch === "function") {
+      playback.catch(() => {});
+    }
+  } catch {
+    // Ignore autoplay and codec failures.
+  }
+}
+
+function playAnswerFeedbackSound(isCorrect) {
+  playSoundCue(isCorrect ? "answerCorrect" : "answerWrong");
 }
 
 function prepareAbbreviationDeck(entries) {

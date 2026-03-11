@@ -738,3 +738,23 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify layout at exactly 1024px still shows sidebar correctly. Check that no other CSS rules relied on the 768px breakpoint outside styles.css (e.g. inline styles or JS media queries in app.js).
 
 ---
+
+### 2026-03-11 09:33 — Add submit-time feedback sounds and sound toggle
+
+**Requested:** Reacquaint with the project, add submit-time answer sounds using the provided files (`powerUp2` for right answers, `lowThreeTone` for wrong answers), move/rename them as needed, and add a sound on/off control to both the Settings page and the home Options box in a way that can scale to more sounds later.
+
+**Files changed:**
+- `assets/sounds/answer-correct.ogg` — Moved/renamed from `sounds/powerUp2.ogg` for the correct-answer cue.
+- `assets/sounds/answer-wrong.ogg` — Moved/renamed from `sounds/lowThreeTone.ogg` for the wrong-answer cue.
+- `index.html` — Added `homeSoundToggle`/`homeSoundValue` to the home Options card, added `soundToggle` to the Settings page, and bumped the `app.js` cache-busting query param.
+- `app.js` — Added a shared audio cue registry, persistent `ivriquest-sound-v1` preference storage, `state.audio.enabled`, settings/home toggle wiring, localized sound labels, and submit-time playback hooks in translation, abbreviation, and advanced conjugation answer handlers.
+- `tests/app-progress.test.js` — Extended the fake DOM/audio harness to support click handlers and `Audio.play()` logging; added coverage for default-on sound prefs, persistence, submit-only playback, disabled-sound suppression, and abbreviation/advConj sound paths.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Translation, Abbreviation, and Advanced Conjugation now play a short sound only when the submitted answer is scored: `answer-correct.ogg` on correct submissions and `answer-wrong.ogg` on incorrect ones. Choice selection remains silent until Submit. Users can turn sound effects on or off from either the Settings page or the home Options card, and the preference persists across reloads.
+
+**Tests run:** `node --test tests/app-progress.test.js` — 18 tests executed and passed, but the runner did not exit cleanly afterward (pre-existing hang reproduced). `npm test` — app-progress tests executed and passed through the same 18 cases, then the suite again failed to exit cleanly before reaching the remaining files (pre-existing hang reproduced). `node --test tests/hebrew-verbs.test.js` — 11 pass, 1 fail (pre-existing: "starter verb seed entries carry per-mode availability metadata"). `node --test tests/vocab-data.test.js` — 2 pass, 0 fail.
+
+**Risks / regressions to check:** Verify the first sound playback is responsive in direct-file mode (`index.html`) as well as localhost. Check that the new Settings button text feels clear in both English and Hebrew. The Node test runner still hangs after `tests/app-progress.test.js`, so full-suite exit behavior remains unresolved outside this change.
+
+---

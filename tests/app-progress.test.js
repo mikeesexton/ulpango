@@ -51,11 +51,12 @@ class FakeElement {
     this.attributes = {};
     this.children = [];
     this.dataset = {};
-    this.textContent = "";
-    this.innerHTML = "";
+    this.listeners = {};
+    this._textContent = "";
+    this._innerHTML = "";
     this.disabled = false;
-    this.className = "";
     this.value = "";
+    this.className = "";
   }
 
   append(...nodes) {
@@ -67,16 +68,47 @@ class FakeElement {
     return node;
   }
 
-  addEventListener() {}
-
-  removeEventListener() {}
-
-  querySelector() {
-    return new FakeElement();
+  addEventListener(type, handler) {
+    if (!this.listeners[type]) {
+      this.listeners[type] = [];
+    }
+    this.listeners[type].push(handler);
   }
 
-  querySelectorAll() {
-    return [];
+  removeEventListener(type, handler) {
+    if (!this.listeners[type]) return;
+    this.listeners[type] = this.listeners[type].filter((candidate) => candidate !== handler);
+  }
+
+  click() {
+    const handlers = this.listeners.click || [];
+    const event = {
+      target: this,
+      currentTarget: this,
+      preventDefault() {},
+      stopPropagation() {},
+    };
+    handlers.forEach((handler) => handler(event));
+  }
+
+  querySelector(selector) {
+    return this.querySelectorAll(selector)[0] || new FakeElement();
+  }
+
+  querySelectorAll(selector) {
+    const matches = [];
+    const visit = (nodes) => {
+      nodes.forEach((node) => {
+        if (matchesSelector(node, selector)) {
+          matches.push(node);
+        }
+        if (Array.isArray(node.children) && node.children.length > 0) {
+          visit(node.children);
+        }
+      });
+    };
+    visit(this.children);
+    return matches;
   }
 
   setAttribute(name, value) {
@@ -96,6 +128,43 @@ class FakeElement {
   removeAttribute(name) {
     delete this.attributes[name];
   }
+
+  get className() {
+    return Array.from(this.classList.tokens).join(" ");
+  }
+
+  set className(value) {
+    this.classList = new FakeClassList();
+    String(value || "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .forEach((token) => this.classList.add(token));
+  }
+
+  get innerHTML() {
+    return this._innerHTML;
+  }
+
+  set innerHTML(value) {
+    this._innerHTML = String(value || "");
+    this.children = [];
+  }
+
+  get textContent() {
+    return this._textContent;
+  }
+
+  set textContent(value) {
+    this._textContent = String(value ?? "");
+  }
+}
+
+function matchesSelector(node, selector) {
+  if (!node || !selector) return false;
+  if (selector.startsWith(".")) {
+    return node.classList.contains(selector.slice(1));
+  }
+  return node.tagName === selector.toUpperCase();
 }
 
 function createLocalStorage(initialEntries = {}) {
@@ -124,6 +193,8 @@ function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options =
     `
 globalThis.__appTestExports = {
   applyAnswer,
+  applyAbbreviationAnswer,
+  applyAdvConjAnswer,
   beginAbbreviationFromIntro,
   beginLessonFromIntro,
   beginVerbMatchFromIntro,
@@ -140,12 +211,14 @@ globalThis.__appTestExports = {
   navigateTo,
   nextAbbreviationQuestion,
   nextQuestion,
+  renderChoices,
   requestLeaveSession,
   requestGoHome,
   resumeActiveTimers,
   restoreSessionState,
   startAbbreviation,
   startVerbMatch,
+  toggleSoundPreference,
   updateProgress,
   state,
 };
@@ -153,6 +226,7 @@ globalThis.__appTestExports = {
 `
   );
 
+  const audioPlayLog = [];
   const elements = new Map();
   const document = {
     body: new FakeElement("body"),
@@ -196,6 +270,18 @@ globalThis.__appTestExports = {
       introAutoAdvanceMs: 0,
     },
     document,
+    Audio: class FakeAudio {
+      constructor(src) {
+        this.src = src;
+        this.preload = "";
+        this.currentTime = 0;
+      }
+
+      play() {
+        audioPlayLog.push(this.src);
+        return Promise.resolve();
+      }
+    },
     localStorage: createLocalStorage(options.localStorageData || {
       "ivriquest-welcome-seen-v1": "1",
     }),
@@ -205,6 +291,7 @@ globalThis.__appTestExports = {
     addEventListener() {},
     removeEventListener() {},
     location: { search: "" },
+    HEBREW_IDIOMS: options.idioms || [],
     IvriQuestVocab: {
       EXPANSION_TRACKS: {},
       getBaseVocabulary() {
@@ -240,7 +327,10 @@ globalThis.__appTestExports = {
 
   vm.createContext(context);
   vm.runInContext(instrumented, context, { filename: sourcePath });
-  return context.__appTestExports;
+  return {
+    ...context.__appTestExports,
+    audioPlayLog,
+  };
 }
 
 function waitForTimers() {
@@ -361,6 +451,173 @@ test("show nikud preference persists when advancing translation and abbreviation
   nextAbbreviationQuestion();
   assert.equal(state.showNiqqudInline, true);
   assert.ok(state.abbreviation.currentQuestion);
+});
+
+test("sound preference defaults to enabled and toggle persists to localStorage", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { localStorage, state, toggleSoundPreference } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assert.equal(state.audio.enabled, true);
+  toggleSoundPreference();
+  assert.equal(state.audio.enabled, false);
+  assert.equal(localStorage.getItem("ivriquest-sound-v1"), JSON.stringify({ enabled: false }));
+});
+
+test("translation submit plays the correct answer sound", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary);
+
+  state.lesson.active = true;
+  state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "alpha",
+  };
+
+  applyAnswer(true, "alpha");
+
+  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-correct.ogg"]);
+});
+
+test("translation submit plays the wrong answer sound", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary);
+
+  state.lesson.active = true;
+  state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "beta",
+  };
+
+  applyAnswer(false, "beta");
+
+  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-wrong.ogg"]);
+});
+
+test("selecting a translation choice without submitting stays silent", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { audioPlayLog, document, renderChoices, state } = loadAppHarness(vocabulary);
+
+  state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+    optionsAreHebrew: false,
+  };
+
+  renderChoices(state.currentQuestion);
+  const buttons = document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+
+  assert.equal(state.currentQuestion.selectedOptionId, "alpha");
+  assert.deepEqual(audioPlayLog, []);
+});
+
+test("abbreviation and advanced conjugation submits play feedback sounds", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const abbreviations = [
+    { id: "abbr-1", abbr: "וכו׳", expansionHe: "וכולי", english: "etc.", bucket: "Daily Life & Home" },
+  ];
+  const { applyAbbreviationAnswer, applyAdvConjAnswer, audioPlayLog, state } = loadAppHarness(
+    vocabulary,
+    abbreviations,
+    [],
+    {
+      idioms: [
+        { id: "idiom-1", english: "to be honest", showMeaning: false },
+      ],
+    }
+  );
+
+  state.abbreviation.currentQuestion = {
+    locked: false,
+    entry: abbreviations[0],
+    options: [
+      { id: "abbr-1", entry: abbreviations[0] },
+    ],
+    selectedOptionId: "abbr-1",
+  };
+  applyAbbreviationAnswer(true, "abbr-1");
+
+  state.advConj.currentQuestion = {
+    locked: false,
+    idiomId: "idiom-1",
+    correctAnswer: "ניסוח נכון",
+    options: [
+      { id: "wrong", text: "ניסוח שגוי", isCorrect: false },
+      { id: "right", text: "ניסוח נכון", isCorrect: true },
+    ],
+    selectedOptionId: "wrong",
+  };
+  applyAdvConjAnswer();
+
+  assert.deepEqual(audioPlayLog, [
+    "./assets/sounds/answer-correct.ogg",
+    "./assets/sounds/answer-wrong.ogg",
+  ]);
+});
+
+test("disabled sounds suppress feedback playback", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: false }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assert.equal(state.audio.enabled, false);
+
+  state.lesson.active = true;
+  state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "alpha",
+  };
+
+  applyAnswer(true, "alpha");
+
+  assert.deepEqual(audioPlayLog, []);
 });
 
 test("abbreviation and conjugation start flows enter intro state and home clears them", () => {
