@@ -277,6 +277,13 @@ globalThis.__appTestExports = {
         this.currentTime = 0;
       }
 
+      canPlayType(type) {
+        if (options.audioSupport && Object.hasOwn(options.audioSupport, type)) {
+          return options.audioSupport[type];
+        }
+        return "probably";
+      }
+
       play() {
         audioPlayLog.push(this.src);
         return Promise.resolve();
@@ -453,7 +460,7 @@ test("show nikud preference persists when advancing translation and abbreviation
   assert.ok(state.abbreviation.currentQuestion);
 });
 
-test("sound preference defaults to enabled and toggle persists to localStorage", () => {
+test("sound preference defaults to disabled and toggle persists to localStorage", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
   ];
@@ -463,10 +470,10 @@ test("sound preference defaults to enabled and toggle persists to localStorage",
     },
   });
 
-  assert.equal(state.audio.enabled, true);
-  toggleSoundPreference();
   assert.equal(state.audio.enabled, false);
-  assert.equal(localStorage.getItem("ivriquest-sound-v1"), JSON.stringify({ enabled: false }));
+  toggleSoundPreference();
+  assert.equal(state.audio.enabled, true);
+  assert.equal(localStorage.getItem("ivriquest-sound-v1"), JSON.stringify({ enabled: true }));
 });
 
 test("translation submit plays the correct answer sound", () => {
@@ -474,7 +481,12 @@ test("translation submit plays the correct answer sound", () => {
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
     { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
   ];
-  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary);
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
 
   state.lesson.active = true;
   state.currentQuestion = {
@@ -498,7 +510,12 @@ test("translation submit plays the wrong answer sound", () => {
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
     { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
   ];
-  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary);
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
 
   state.lesson.active = true;
   state.currentQuestion = {
@@ -522,7 +539,12 @@ test("selecting a translation choice without submitting stays silent", () => {
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
     { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
   ];
-  const { audioPlayLog, document, renderChoices, state } = loadAppHarness(vocabulary);
+  const { audioPlayLog, document, renderChoices, state } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
 
   state.currentQuestion = {
     locked: false,
@@ -558,6 +580,10 @@ test("abbreviation and advanced conjugation submits play feedback sounds", () =>
       idioms: [
         { id: "idiom-1", english: "to be honest", showMeaning: false },
       ],
+      localStorageData: {
+        "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+        "ivriquest-welcome-seen-v1": "1",
+      },
     }
   );
 
@@ -587,6 +613,39 @@ test("abbreviation and advanced conjugation submits play feedback sounds", () =>
     "./assets/sounds/answer-correct.ogg",
     "./assets/sounds/answer-wrong.ogg",
   ]);
+});
+
+test("audio playback falls back to mp3 when ogg support is unavailable", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary, [], [], {
+    audioSupport: {
+      'audio/ogg; codecs="vorbis"': "",
+      "audio/mpeg": "probably",
+    },
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  state.lesson.active = true;
+  state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "alpha",
+  };
+
+  applyAnswer(true, "alpha");
+
+  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-correct.mp3"]);
 });
 
 test("disabled sounds suppress feedback playback", () => {

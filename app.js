@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260311c";
+const APP_BUILD = "20260313a";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -689,8 +689,14 @@ const STORAGE_KEYS = {
 };
 
 const AUDIO_CUES = Object.freeze({
-  answerCorrect: "./assets/sounds/answer-correct.ogg",
-  answerWrong: "./assets/sounds/answer-wrong.ogg",
+  answerCorrect: Object.freeze([
+    { src: "./assets/sounds/answer-correct.ogg", type: 'audio/ogg; codecs="vorbis"' },
+    { src: "./assets/sounds/answer-correct.mp3", type: "audio/mpeg" },
+  ]),
+  answerWrong: Object.freeze([
+    { src: "./assets/sounds/answer-wrong.ogg", type: 'audio/ogg; codecs="vorbis"' },
+    { src: "./assets/sounds/answer-wrong.mp3", type: "audio/mpeg" },
+  ]),
 });
 
 const storage = getStorage();
@@ -5140,13 +5146,13 @@ function saveThemePreference(value) {
 function loadSoundPreference() {
   const raw = loadJson(STORAGE_KEYS.sound, null);
   return {
-    enabled: raw?.enabled !== false,
+    enabled: raw?.enabled === true,
   };
 }
 
 function saveSoundPreference(enabled) {
   saveJson(STORAGE_KEYS.sound, {
-    enabled: enabled !== false,
+    enabled: enabled === true,
   });
 }
 
@@ -5198,7 +5204,7 @@ function getAudioPlayer(cueId) {
     return audioPlayers.get(cueId);
   }
 
-  const src = AUDIO_CUES[cueId];
+  const src = resolveAudioCueSource(AUDIO_CUES[cueId]);
   if (!src || typeof global.Audio !== "function") {
     audioPlayers.set(cueId, null);
     return null;
@@ -5213,6 +5219,41 @@ function getAudioPlayer(cueId) {
     audioPlayers.set(cueId, null);
     return null;
   }
+}
+
+function resolveAudioCueSource(sources) {
+  if (!Array.isArray(sources) || !sources.length || typeof global.Audio !== "function") {
+    return null;
+  }
+
+  let probe = null;
+  try {
+    probe = new global.Audio();
+  } catch {
+    probe = null;
+  }
+
+  for (const source of sources) {
+    const src = String(source?.src || "").trim();
+    if (!src) continue;
+
+    const type = String(source?.type || "").trim();
+    if (!type || !probe || typeof probe.canPlayType !== "function") {
+      return src;
+    }
+
+    try {
+      const support = probe.canPlayType(type);
+      if (support === "probably" || support === "maybe") {
+        return src;
+      }
+    } catch {
+      return src;
+    }
+  }
+
+  const fallback = sources.find((source) => String(source?.src || "").trim());
+  return fallback ? String(fallback.src).trim() : null;
 }
 
 function playSoundCue(cueId) {
