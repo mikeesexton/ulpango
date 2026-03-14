@@ -758,3 +758,24 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify the first sound playback is responsive in direct-file mode (`index.html`) as well as localhost. Check that the new Settings button text feels clear in both English and Hebrew. The Node test runner still hangs after `tests/app-progress.test.js`, so full-suite exit behavior remains unresolved outside this change.
 
 ---
+
+### 2026-03-14 11:13 — Stabilize feedback audio and disambiguate advConj prompts
+
+**Requested:** (1) Replace the answer sounds with newly provided WAV files, convert them to web-friendly formats, add a new streak sound every fourth correct answer, bring the same sounds into the conjugation game, and default sound to Off. (2) Investigate why GitHub Pages playback was inconsistent across iPad/mobile/desktop and make the live build reliably serve the latest cues. (3) Fix ambiguous Advanced Conjugation prompts where English "your" could refer to either singular or plural objects.
+
+**Files changed:**
+- `assets/sounds/answer-correct.ogg`, `assets/sounds/answer-correct.mp3` — Replaced the correct-answer cue with converted versions of the updated user WAV file.
+- `assets/sounds/answer-streak.ogg`, `assets/sounds/answer-streak.mp3` — Added converted versions of the new streak cue from the user WAV file.
+- `assets/sounds/answer-wrong.mp3` — Added MP3 fallback alongside the hosted wrong-answer cue set.
+- `app.js` — Added versioned OGG/MP3 cue source selection, cue priming/preload logic, default sound preference Off, every-4th-correct streak playback, conjugation-game sound hooks, and explicit `you (sg.)` / `your (sg.)` labeling in `ADV_CONJ_OBJECTS` so singular vs plural second-person prompts are not ambiguous.
+- `index.html` — Bumped cache-busting query params so browsers and GitHub Pages fetch the latest JS/audio assets.
+- `tests/app-progress.test.js` — Added coverage for default-off sound prefs, MP3 fallback, preload/priming, streak playback, conjugation-game audio, and advConj singular/plural English prompt disambiguation.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Sound effects now default to Off for new users. When enabled, the app serves versioned audio assets with OGG preferred and MP3 fallback, primes them earlier to reduce first-play misses, and plays feedback in translation, abbreviation, conjugation, and advanced conjugation. Every fourth consecutive correct answer plays the streak cue. Advanced Conjugation prompts now distinguish singular and plural second-person possession as `your (sg.)` and `your (pl.)`, preventing ambiguous answer banks.
+
+**Tests run:** `node --test tests/app-progress.test.js` — all targeted app-progress/audio tests passed, including streak and advConj disambiguation coverage; runner still hangs afterward due to the pre-existing open-handle issue. `node --test tests/vocab-data.test.js` — passed. `node --test tests/hebrew-verbs.test.js` — same unrelated pre-existing failure remains at line 343. Verified GitHub Pages deployment served `app.js?v=20260314a` and returned HTTP 200 for `assets/sounds/answer-streak.ogg?v=20260314a`.
+
+**Risks / regressions to check:** Verify cached browsers pick up the new assets after one hard refresh. Confirm streak counting feels right across all game modes after interrupted sessions or resumes. The full Node suite still has a pre-existing hang/open-handle issue after `tests/app-progress.test.js`, so whole-suite exit behavior is not yet clean.
+
+---
