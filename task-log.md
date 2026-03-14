@@ -1046,3 +1046,21 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Do one hard refresh on `http://localhost:8080/` once so the old cached `hebrew-idioms.js?v=20260311b` is gone. After that, Advanced Conjugation should open normally.
 
 ---
+
+### 2026-03-14 16:46 — Fix GitHub Pages artifact to publish modular app bundle
+
+**Requested:** Investigate why the live GitHub Pages build showed `IvriQuest foundation scripts failed to load` while localhost was fine, and fix the deployment.
+
+**Files changed:**
+- `.github/workflows/deploy-pages.yml` — Updated the static-site bundle step to copy the new `app/` directory into `dist` so the deployed HTML can actually load the modularized runtime files.
+- `index.html` — Bumped the `app/*.js` and `app.js` cache-busting query string from `20260314i` to `20260314j` so browsers stop reusing cached 404s for the newly published module paths.
+- `app.js` — Bumped `APP_BUILD` to `20260314j` to stay aligned with the refreshed browser asset version.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended in the app itself. The fix restores the live deployment by making GitHub Pages publish the modular bundle that localhost was already serving correctly.
+
+**Tests run:** `node --test` — passed, 45/45.
+
+**Risks / regressions to check:** After the next push, verify that `https://mikeesexton.github.io/ulpango/app/constants.js?v=20260314j` returns `200` and that the app loads without the boot error. One hard refresh may still help on devices that cached the old missing-module URLs.
+
+---

@@ -34,6 +34,7 @@ jobs:
           cp index.html dist/
           cp styles.css dist/
           cp app.js dist/
+          cp -r app dist/
           cp vocab-data.js dist/
           cp abbreviation-data.js dist/
           cp hebrew-verbs.js dist/
