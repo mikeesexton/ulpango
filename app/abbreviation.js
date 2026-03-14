@@ -24,6 +24,12 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+abbreviation.getExpansionText = abbreviation.getExpansionText || function getExpansionText(entry, withNiqqud = false) {
+  const plain = String(entry?.expansionHe || entry?.expansion_he || "").trim();
+  const marked = String(entry?.expansionHeNiqqud || entry?.expansion_he_niqqud || "").trim();
+  return withNiqqud && marked ? marked : plain;
+};
+
 abbreviation.getAbbreviationRoundTarget = abbreviation.getAbbreviationRoundTarget || function getAbbreviationRoundTarget() {
   const runtime = getRuntime();
   if (!runtime.abbreviationDeck?.length) return 0;
@@ -51,6 +57,7 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
   source.forEach((entry, index) => {
     const abbr = String(entry?.abbr || "").trim();
     const expansionHe = String(entry?.expansionHe || entry?.expansion_he || "").trim();
+    const expansionHeNiqqud = String(entry?.expansionHeNiqqud || entry?.expansion_he_niqqud || "").trim();
     const english = String(entry?.english || "").trim();
     if (!abbr || !expansionHe || !english) return;
 
@@ -71,14 +78,18 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
       id,
       abbr,
       expansionHe,
+      expansionHeNiqqud,
       english,
       bucket: String(entry?.bucket || "").trim(),
       notes: String(entry?.notes || "").trim(),
       source: String(entry?.source || "abbreviation"),
+      availability: {
+        abbreviationQuiz: entry?.availability?.abbreviationQuiz !== false,
+      },
     });
   });
 
-  return cleaned;
+  return cleaned.filter((entry) => entry.availability?.abbreviationQuiz !== false);
 };
 
 abbreviation.renderAbbreviationIdleState = abbreviation.renderAbbreviationIdleState || function renderAbbreviationIdleState() {
@@ -301,7 +312,8 @@ abbreviation.applyAbbreviationAnswer = abbreviation.applyAbbreviationAnswer || f
     }
   }
 
-  const expansion = `${entry.expansionHe} (${entry.abbr})`;
+  const expansionText = abbreviation.getExpansionText(entry, runtime.state.showNiqqudInline);
+  const expansion = `${expansionText} (${entry.abbr})`;
   h.setFeedback?.(
     isCorrect
       ? translate("feedback.abbreviationCorrect", { english: entry.english, expansion })

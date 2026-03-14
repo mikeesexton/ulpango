@@ -1064,3 +1064,24 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** After the next push, verify that `https://mikeesexton.github.io/ulpango/app/constants.js?v=20260314j` returns `200` and that the app loads without the boot error. One hard refresh may still help on devices that cached the old missing-module URLs.
 
 ---
+
+### 2026-03-14 17:05 — Normalize abbreviation punctuation, suppress exact collisions, add expansion-only niqqud batch
+
+**Requested:** Implement the abbreviation punctuation cleanup, overlap suppression, and first safe niqqud pass without adding niqqud to acronym tokens themselves.
+
+**Files changed:**
+- `abbreviation-data.js` — Converted the remaining dotted abbreviations to gereshayim (`ח״פ`, `ע״מ`, `ע״פ`), added `availability.abbreviationQuiz: false` to exact-collision entries that should stay out of gameplay, and added `expansionHeNiqqud` to the first 24 safe everyday expansions.
+- `app/abbreviation.js` — Added `getExpansionText()`, preserved acronym tokens unchanged, filtered the prepared deck by `availability.abbreviationQuiz`, and switched answer feedback to use `expansionHeNiqqud` only when inline niqqud is enabled.
+- `app/data.js` — Updated abbreviation mistake summaries to use the niqqud-aware expansion text as well.
+- `tests/app-progress.test.js` — Added a regression test proving the niqqud toggle affects only the full expansion text and not the acronym token.
+- `tests/abbreviation-data.test.js` — New real-data tests covering period cleanup, duplicate-playable-acronym suppression, business/legal collision handling, and presence of the phase-1 `expansionHeNiqqud` fields.
+- `index.html` / `app.js` — Bumped static asset cache versions to refresh the changed abbreviation data and module code.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Abbreviation mode now serves only geresh/gereshayim acronym forms, hides exact-collision abbreviations that would produce ambiguous answer banks, and shows niqqud only on the expanded Hebrew phrase when the global niqqud toggle is on.
+
+**Tests run:** `node --test tests/abbreviation-data.test.js` — passed, 3/3. `node --test tests/app-progress.test.js` — passed, 30/30. `node --test` — passed, 49/49.
+
+**Risks / regressions to check:** The collision cleanup intentionally removes a few exact-acronym entries from gameplay for now (`ע״מ`, `ע״פ`, `מ״מ` conflicting senses). If you later want context-sensitive reintroduction, that should be a separate pass with domain-aware prompts or labeling.
+
+---

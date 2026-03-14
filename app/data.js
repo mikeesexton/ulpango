@@ -54,7 +54,7 @@ data.buildAbbreviationMistakeSummary = data.buildAbbreviationMistakeSummary || f
     .filter(Boolean)
     .map((entry) => ({
       primary: entry.abbr,
-      secondary: `${entry.english} | ${entry.expansionHe}`,
+      secondary: `${entry.english} | ${app.abbreviation?.getExpansionText?.(entry, runtime.state.showNiqqudInline) || entry.expansionHe}`,
     }));
 };
 

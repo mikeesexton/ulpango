@@ -210,6 +210,7 @@ globalThis.__appTestExports = {
   applyAdvConjAnswer,
   applyVerbMatchMismatch,
   applyVerbMatchSuccess,
+  buildAbbreviationMistakeSummary,
   buildAdvConjDeck,
   buildAdvConjEnglishSentence,
   getAdvConjSubjectsForTense,
@@ -563,6 +564,59 @@ test("show nikud preference persists when advancing translation and abbreviation
   nextAbbreviationQuestion();
   assert.equal(state.showNiqqudInline, true);
   assert.ok(state.abbreviation.currentQuestion);
+});
+
+test("abbreviation expansions use niqqud only on the full expansion text", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const abbreviations = [
+    {
+      id: "abbr-1",
+      abbr: "לדוג׳",
+      expansionHe: "לדוגמה",
+      expansionHeNiqqud: "לְדוּגְמָה",
+      english: "for example",
+      bucket: "Daily Life & Home",
+    },
+  ];
+
+  const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOnHarness.state.showNiqqudInline = true;
+  niqqudOnHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
+  assert.match(
+    niqqudOnHarness.document.querySelector("#feedback").textContent,
+    /לְדוּגְמָה \(לדוג׳\)/
+  );
+  niqqudOnHarness.state.abbreviation.sessionMistakeIds = ["abbr-1"];
+  assert.equal(
+    niqqudOnHarness.buildAbbreviationMistakeSummary()[0].secondary,
+    "for example | לְדוּגְמָה"
+  );
+
+  const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOffHarness.state.showNiqqudInline = false;
+  niqqudOffHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
+  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
+  assert.match(plainFeedback, /לדוגמה \(לדוג׳\)/);
+  assert.doesNotMatch(plainFeedback, /לְדוּגְמָה/);
+  niqqudOffHarness.state.abbreviation.sessionMistakeIds = ["abbr-1"];
+  assert.equal(
+    niqqudOffHarness.buildAbbreviationMistakeSummary()[0].secondary,
+    "for example | לדוגמה"
+  );
 });
 
 test("sound preference defaults to disabled and toggle persists to localStorage", () => {
