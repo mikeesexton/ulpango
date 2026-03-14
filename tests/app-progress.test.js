@@ -192,11 +192,13 @@ function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options =
     /\}\)\(typeof window !== "undefined" \? window : globalThis\);\s*$/,
     `
 globalThis.__appTestExports = {
+  ADV_CONJ_OBJECTS,
   applyAnswer,
   applyAbbreviationAnswer,
   applyAdvConjAnswer,
   applyVerbMatchMismatch,
   applyVerbMatchSuccess,
+  buildAdvConjEnglishSentence,
   beginAbbreviationFromIntro,
   beginLessonFromIntro,
   beginVerbMatchFromIntro,
@@ -827,6 +829,38 @@ test("conjugation matches play correct, wrong, and streak sounds", async () => {
   assert.equal(streakHarness.state.sessionStreak, 4);
   assertAudioPlayLog(streakHarness.audioPlayLog, [/^\.\/assets\/sounds\/answer-streak\.ogg\?v=[0-9a-z]+$/]);
   streakHarness.goHome();
+});
+
+test("advanced conjugation English prompts disambiguate second-person singular vs plural possession", () => {
+  const idiom = {
+    id: "ptihat_einayim",
+    object_type: "l_dative",
+    fixed_object: "את העיניים",
+    literal_sg: "{s} opens {p} eyes",
+    literal_pl: "{s} open {p} eyes",
+    literal_past: "{s} opened {p} eyes",
+    literal_future: "{s} will open {p} eyes",
+    present_tense: { msg: "פותח", fsg: "פותחת", mpl: "פותחים", fpl: "פותחות" },
+    past_tense: { msg: "פתח", fsg: "פתחה", mpl: "פתחו", fpl: "פתחו" },
+    future_tense: { msg: "יפתח", fsg: "תפתח", mpl: "יפתחו", fpl: "יפתחו" },
+  };
+  const { ADV_CONJ_OBJECTS, buildAdvConjEnglishSentence } = loadAppHarness([], [], [], {
+    idioms: [idiom],
+  });
+  const subj = { form: "fpl", en: "they (f.)" };
+  const singularYou = ADV_CONJ_OBJECTS.find((obj) => obj.key === "2msg");
+  const pluralYou = ADV_CONJ_OBJECTS.find((obj) => obj.key === "2mpl");
+
+  assert.equal(singularYou?.poss, "your (sg.)");
+  assert.equal(pluralYou?.poss, "your (pl.)");
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, subj, singularYou, "past"),
+    "they (f.) opened your (sg.) eyes"
+  );
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, subj, pluralYou, "past"),
+    "they (f.) opened your (pl.) eyes"
+  );
 });
 
 test("abbreviation and conjugation start flows enter intro state and home clears them", () => {

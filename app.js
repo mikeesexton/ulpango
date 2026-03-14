@@ -731,7 +731,7 @@ const ADV_CONJ_SUBJECTS = [
 
 const ADV_CONJ_OBJECTS = [
   { key: "1sg",  dirObj: "אותי",  lObj: "לי",   en: "me",       poss: "my" },
-  { key: "2msg", dirObj: "אותך",  lObj: "לך",   en: "you (m.)", poss: "your" },
+  { key: "2msg", dirObj: "אותך",  lObj: "לך",   en: "you (sg.)", poss: "your (sg.)" },
   { key: "3msg", dirObj: "אותו",  lObj: "לו",   en: "him",      poss: "his" },
   { key: "3fsg", dirObj: "אותה",  lObj: "לה",   en: "her",      poss: "her" },
   { key: "1pl",  dirObj: "אותנו", lObj: "לנו",  en: "us",       poss: "our" },
