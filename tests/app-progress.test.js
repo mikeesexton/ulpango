@@ -913,6 +913,36 @@ test("advanced conjugation English prompts disambiguate second-person singular v
   );
 });
 
+test("advanced conjugation collapses duplicate singular-plural markers when object and possessive refer to the same you", () => {
+  const idiom = {
+    id: "yotzi_midaat",
+    object_type: "possessive_suffix",
+    literal_sg: "{s} takes {o} out of {p} mind",
+    literal_pl: "{s} take {o} out of {p} mind",
+    literal_past: "{s} took {o} out of {p} mind",
+    literal_future: "{s} will take {o} out of {p} mind",
+    suffix_forms: { "2msg": "מדעתך", "2mpl": "מדעתכם" },
+    present_tense: { msg: "מוציא", fsg: "מוציאה", mpl: "מוציאים", fpl: "מוציאות" },
+    past_tense: { msg: "הוציא", fsg: "הוציאה", mpl: "הוציאו", fpl: "הוציאו" },
+    future_tense: { msg: "יוציא", fsg: "תוציא", mpl: "יוציאו", fpl: "יוציאו" },
+  };
+  const { ADV_CONJ_OBJECTS, buildAdvConjEnglishSentence } = loadAppHarness([], [], [], {
+    idioms: [idiom],
+  });
+  const subj = { form: "msg", en: "he" };
+  const singularYou = ADV_CONJ_OBJECTS.find((obj) => obj.key === "2msg");
+  const pluralYou = ADV_CONJ_OBJECTS.find((obj) => obj.key === "2mpl");
+
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, subj, singularYou, "future"),
+    "he will take you out of your mind (sg.)"
+  );
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, subj, pluralYou, "future"),
+    "he will take you out of your mind (pl.)"
+  );
+});
+
 test("advanced conjugation subjects add present-tense you forms without extending past/future beyond available data", () => {
   const { ADV_CONJ_SUBJECTS, getAdvConjSubjectsForTense } = loadAppHarness([], [], []);
   const labels = (subjects) => Array.from(subjects, (subject) => subject.en);

@@ -831,3 +831,20 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** If product intent changes and `לכתוב` should appear in the translation quiz later, the source of truth is `TRANSLATION_HIDDEN_STARTER_VERB_IDS` in `hebrew-verbs.js`, not this test.
 
 ---
+
+### 2026-03-14 11:54 — Collapse duplicate advConj singular/plural markers
+
+**Requested:** Fix the awkward Advanced Conjugation English wording where `(sg.)` or `(pl.)` appeared redundantly in prompts like “he will take you (sg.) out of your (sg.) mind”.
+
+**Files changed:**
+- `app.js` — Updated `buildAdvConjEnglishSentence()` to detect when the same second-person qualifier appears on both the direct-object and possessive forms in a single sentence, collapse the duplicated labels, and append a single trailing qualifier instead.
+- `tests/app-progress.test.js` — Added a regression test covering the exact “take you out of your mind” pattern so the collapsed wording stays stable while preserving the earlier singular/plural disambiguation checks.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Advanced Conjugation still disambiguates singular vs plural second-person English prompts, but sentences that mention the same “you” twice now render a single marker, e.g. `he will take you out of your mind (sg.)` instead of repeating `(sg.)` twice.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 27/27. `node --test tests/hebrew-verbs.test.js` — passed, 12/12.
+
+**Risks / regressions to check:** The collapsed marker is intentionally appended at the end of the sentence only when both `{o}` and `{p}` refer to the same disambiguated second-person form. Spot-check a few Advanced Conjugation prompts live to confirm the wording feels natural in both choices and feedback text.
+
+---

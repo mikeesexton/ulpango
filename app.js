@@ -2812,11 +2812,39 @@ function buildAdvConjEnglishSentence(idiom, subj, obj, tense) {
     tpl = (subj.form === "mpl" || subj.form === "fpl") ? idiom.literal_pl : idiom.literal_sg;
   }
   if (!tpl) return "";
-  return tpl.replace(/\{s\}/g, subj.en).replace(/\{o\}/g, obj.en).replace(/\{p\}/g, obj.poss);
+
+  let objectText = obj.en;
+  let possessiveText = obj.poss;
+  let collapsedQualifier = "";
+  const usesObject = tpl.includes("{o}");
+  const usesPossessive = tpl.includes("{p}");
+  if (usesObject && usesPossessive) {
+    const objectQualifier = getAdvConjTrailingQualifier(obj.en);
+    const possessiveQualifier = getAdvConjTrailingQualifier(obj.poss);
+    if (objectQualifier && objectQualifier === possessiveQualifier) {
+      objectText = stripAdvConjTrailingQualifier(obj.en);
+      possessiveText = stripAdvConjTrailingQualifier(obj.poss);
+      collapsedQualifier = ` ${objectQualifier}`;
+    }
+  }
+
+  return tpl
+    .replace(/\{s\}/g, subj.en)
+    .replace(/\{o\}/g, objectText)
+    .replace(/\{p\}/g, possessiveText) + collapsedQualifier;
 }
 
 function getAdvConjSubjectsForTense(tense) {
   return ADV_CONJ_SUBJECTS.filter((subj) => !Array.isArray(subj.tenses) || subj.tenses.includes(tense));
+}
+
+function getAdvConjTrailingQualifier(text) {
+  const match = String(text || "").match(/\s(\([^()]+\))$/);
+  return match ? match[1] : "";
+}
+
+function stripAdvConjTrailingQualifier(text) {
+  return String(text || "").replace(/\s\([^()]+\)$/, "");
 }
 
 function buildAdvConjDeck() {
