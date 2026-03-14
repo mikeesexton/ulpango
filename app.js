@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260313a";
+const APP_BUILD = "20260314a";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -688,21 +688,24 @@ const STORAGE_KEYS = {
   advConjStats: "advConjStats",
 };
 
+function buildAudioCueSources(baseName) {
+  return Object.freeze([
+    { src: `./assets/sounds/${baseName}.ogg?v=${APP_BUILD}`, type: 'audio/ogg; codecs="vorbis"' },
+    { src: `./assets/sounds/${baseName}.mp3?v=${APP_BUILD}`, type: "audio/mpeg" },
+  ]);
+}
+
 const AUDIO_CUES = Object.freeze({
-  answerCorrect: Object.freeze([
-    { src: "./assets/sounds/answer-correct.ogg", type: 'audio/ogg; codecs="vorbis"' },
-    { src: "./assets/sounds/answer-correct.mp3", type: "audio/mpeg" },
-  ]),
-  answerWrong: Object.freeze([
-    { src: "./assets/sounds/answer-wrong.ogg", type: 'audio/ogg; codecs="vorbis"' },
-    { src: "./assets/sounds/answer-wrong.mp3", type: "audio/mpeg" },
-  ]),
+  answerCorrect: buildAudioCueSources("answer-correct"),
+  answerStreak: buildAudioCueSources("answer-streak"),
+  answerWrong: buildAudioCueSources("answer-wrong"),
 });
 
 const storage = getStorage();
 const restoredUi = loadJson(STORAGE_KEYS.ui, {});
 const restoredSession = loadJson(STORAGE_KEYS.session, null);
 const audioPlayers = new Map();
+let audioCuePreloadStarted = false;
 
 const LEITNER_INTERVALS = [
   0,
@@ -717,6 +720,7 @@ const LEITNER_INTERVALS = [
 const LESSON_ROUNDS = 10;
 const ABBREVIATION_ROUNDS = 10;
 const ADV_CONJ_ROUNDS = 10;
+const STREAK_SOUND_INTERVAL = 4;
 
 const ADV_CONJ_SUBJECTS = [
   { form: "msg", pronoun: "הוא", en: "he" },
@@ -1056,6 +1060,7 @@ applyLanguage();
 bindUi();
 resumeActiveTimers();
 renderAll();
+primeAudioCues();
 
 function bindUi() {
   el.routeButtons.forEach((button) => {
@@ -1451,6 +1456,7 @@ function toggleNiqqudPreference() {
 function toggleSoundPreference() {
   state.audio.enabled = !state.audio.enabled;
   saveSoundPreference(state.audio.enabled);
+  primeAudioCues();
   renderAll();
 }
 
@@ -3992,6 +3998,7 @@ function applyVerbMatchSuccess(leftCard, rightCard) {
   state.sessionStreak += 1;
   state.sessionScore += 1;
   state.match.sessionMatched += 1;
+  playAnswerFeedbackSound(true);
   updateConjugationProgress(currentWordId, true);
   renderDomainPerformance();
 
@@ -4039,6 +4046,7 @@ function applyVerbMatchMismatch(leftCard, rightCard) {
   state.match.mismatchedCardIds = [leftCard.id, rightCard.id];
   state.match.selectedLeftId = null;
   state.match.selectedRightId = null;
+  playAnswerFeedbackSound(false);
   updateConjugationProgress(currentWordId, false);
   renderDomainPerformance();
   renderVerbMatchRound();
@@ -5213,6 +5221,9 @@ function getAudioPlayer(cueId) {
   try {
     const player = new global.Audio(src);
     player.preload = "auto";
+    if (typeof player.load === "function") {
+      player.load();
+    }
     audioPlayers.set(cueId, player);
     return player;
   } catch {
@@ -5256,6 +5267,15 @@ function resolveAudioCueSource(sources) {
   return fallback ? String(fallback.src).trim() : null;
 }
 
+function primeAudioCues() {
+  if (audioCuePreloadStarted || !state.audio.enabled) return;
+  audioCuePreloadStarted = true;
+
+  Object.keys(AUDIO_CUES).forEach((cueId) => {
+    getAudioPlayer(cueId);
+  });
+}
+
 function playSoundCue(cueId) {
   if (!state.audio.enabled) return;
 
@@ -5279,7 +5299,18 @@ function playSoundCue(cueId) {
 }
 
 function playAnswerFeedbackSound(isCorrect) {
-  playSoundCue(isCorrect ? "answerCorrect" : "answerWrong");
+  if (!isCorrect) {
+    playSoundCue("answerWrong");
+    return;
+  }
+
+  const streakCount = Math.max(0, Number(state.sessionStreak || 0));
+  if (streakCount > 0 && streakCount % STREAK_SOUND_INTERVAL === 0) {
+    playSoundCue("answerStreak");
+    return;
+  }
+
+  playSoundCue("answerCorrect");
 }
 
 function prepareAbbreviationDeck(entries) {

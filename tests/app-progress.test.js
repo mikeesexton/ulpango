@@ -195,6 +195,8 @@ globalThis.__appTestExports = {
   applyAnswer,
   applyAbbreviationAnswer,
   applyAdvConjAnswer,
+  applyVerbMatchMismatch,
+  applyVerbMatchSuccess,
   beginAbbreviationFromIntro,
   beginLessonFromIntro,
   beginVerbMatchFromIntro,
@@ -227,6 +229,7 @@ globalThis.__appTestExports = {
   );
 
   const audioPlayLog = [];
+  const audioLoadLog = [];
   const elements = new Map();
   const document = {
     body: new FakeElement("body"),
@@ -288,6 +291,10 @@ globalThis.__appTestExports = {
         audioPlayLog.push(this.src);
         return Promise.resolve();
       }
+
+      load() {
+        audioLoadLog.push(this.src);
+      }
     },
     localStorage: createLocalStorage(options.localStorageData || {
       "ivriquest-welcome-seen-v1": "1",
@@ -336,12 +343,27 @@ globalThis.__appTestExports = {
   vm.runInContext(instrumented, context, { filename: sourcePath });
   return {
     ...context.__appTestExports,
+    audioLoadLog,
     audioPlayLog,
   };
 }
 
 function waitForTimers() {
   return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function assertAudioPlayLog(audioPlayLog, expectedPatterns) {
+  assert.equal(audioPlayLog.length, expectedPatterns.length);
+  expectedPatterns.forEach((pattern, index) => {
+    assert.match(audioPlayLog[index], pattern);
+  });
+}
+
+function assertAudioLoadLog(audioLoadLog, expectedPatterns) {
+  assert.equal(audioLoadLog.length, expectedPatterns.length);
+  expectedPatterns.forEach((pattern, index) => {
+    assert.match(audioLoadLog[index], pattern);
+  });
 }
 
 test("correct second-chance answers do not add misses or reshuffle most-missed rankings", () => {
@@ -502,7 +524,7 @@ test("translation submit plays the correct answer sound", () => {
 
   applyAnswer(true, "alpha");
 
-  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-correct.ogg"]);
+  assertAudioPlayLog(audioPlayLog, [/^\.\/assets\/sounds\/answer-correct\.ogg\?v=[0-9a-z]+$/]);
 });
 
 test("translation submit plays the wrong answer sound", () => {
@@ -531,7 +553,7 @@ test("translation submit plays the wrong answer sound", () => {
 
   applyAnswer(false, "beta");
 
-  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-wrong.ogg"]);
+  assertAudioPlayLog(audioPlayLog, [/^\.\/assets\/sounds\/answer-wrong\.ogg\?v=[0-9a-z]+$/]);
 });
 
 test("selecting a translation choice without submitting stays silent", () => {
@@ -609,9 +631,9 @@ test("abbreviation and advanced conjugation submits play feedback sounds", () =>
   };
   applyAdvConjAnswer();
 
-  assert.deepEqual(audioPlayLog, [
-    "./assets/sounds/answer-correct.ogg",
-    "./assets/sounds/answer-wrong.ogg",
+  assertAudioPlayLog(audioPlayLog, [
+    /^\.\/assets\/sounds\/answer-correct\.ogg\?v=[0-9a-z]+$/,
+    /^\.\/assets\/sounds\/answer-wrong\.ogg\?v=[0-9a-z]+$/,
   ]);
 });
 
@@ -645,7 +667,75 @@ test("audio playback falls back to mp3 when ogg support is unavailable", () => {
 
   applyAnswer(true, "alpha");
 
-  assert.deepEqual(audioPlayLog, ["./assets/sounds/answer-correct.mp3"]);
+  assertAudioPlayLog(audioPlayLog, [/^\.\/assets\/sounds\/answer-correct\.mp3\?v=[0-9a-z]+$/]);
+});
+
+test("enabling sounds primes all feedback cues", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { audioLoadLog, toggleSoundPreference } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assert.deepEqual(audioLoadLog, []);
+  toggleSoundPreference();
+  assertAudioLoadLog(audioLoadLog, [
+    /^\.\/assets\/sounds\/answer-correct\.ogg\?v=[0-9a-z]+$/,
+    /^\.\/assets\/sounds\/answer-streak\.ogg\?v=[0-9a-z]+$/,
+    /^\.\/assets\/sounds\/answer-wrong\.ogg\?v=[0-9a-z]+$/,
+  ]);
+});
+
+test("saved enabled sound preference primes all feedback cues at startup", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { audioLoadLog } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assertAudioLoadLog(audioLoadLog, [
+    /^\.\/assets\/sounds\/answer-correct\.ogg\?v=[0-9a-z]+$/,
+    /^\.\/assets\/sounds\/answer-streak\.ogg\?v=[0-9a-z]+$/,
+    /^\.\/assets\/sounds\/answer-wrong\.ogg\?v=[0-9a-z]+$/,
+  ]);
+});
+
+test("every fourth correct answer plays the streak sound", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const { applyAnswer, audioPlayLog, state } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  state.sessionStreak = 3;
+  state.lesson.active = true;
+  state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "alpha",
+  };
+
+  applyAnswer(true, "alpha");
+
+  assert.equal(state.sessionStreak, 4);
+  assertAudioPlayLog(audioPlayLog, [/^\.\/assets\/sounds\/answer-streak\.ogg\?v=[0-9a-z]+$/]);
 });
 
 test("disabled sounds suppress feedback playback", () => {
@@ -677,6 +767,66 @@ test("disabled sounds suppress feedback playback", () => {
   applyAnswer(true, "alpha");
 
   assert.deepEqual(audioPlayLog, []);
+});
+
+test("conjugation matches play correct, wrong, and streak sounds", async () => {
+  const vocabulary = [
+    { id: "verb-go", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      word: { id: "verb-go", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת" },
+      formSource: "validated",
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+        { id: "present_feminine_singular", englishText: "she goes", valuePlain: "הולכת", valueNiqqud: "הוֹלֶכֶת" },
+      ],
+    },
+  ];
+
+  const correctHarness = loadAppHarness(vocabulary, [], verbDeck, {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+  correctHarness.startVerbMatch();
+  await waitForTimers();
+  const correctLeft = correctHarness.state.match.leftCards[0];
+  const correctRight = correctHarness.state.match.rightCards.find((card) => card.pairId === correctLeft.pairId);
+  correctHarness.applyVerbMatchSuccess(correctLeft, correctRight);
+  assertAudioPlayLog(correctHarness.audioPlayLog, [/^\.\/assets\/sounds\/answer-correct\.ogg\?v=[0-9a-z]+$/]);
+  correctHarness.goHome();
+
+  const wrongHarness = loadAppHarness(vocabulary, [], verbDeck, {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+  wrongHarness.startVerbMatch();
+  await waitForTimers();
+  const wrongLeft = wrongHarness.state.match.leftCards[0];
+  const wrongRight = wrongHarness.state.match.rightCards.find((card) => card.pairId !== wrongLeft.pairId);
+  wrongHarness.applyVerbMatchMismatch(wrongLeft, wrongRight);
+  assertAudioPlayLog(wrongHarness.audioPlayLog, [/^\.\/assets\/sounds\/answer-wrong\.ogg\?v=[0-9a-z]+$/]);
+  wrongHarness.goHome();
+
+  const streakHarness = loadAppHarness(vocabulary, [], verbDeck, {
+    localStorageData: {
+      "ivriquest-sound-v1": JSON.stringify({ enabled: true }),
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+  streakHarness.startVerbMatch();
+  await waitForTimers();
+  streakHarness.state.sessionStreak = 3;
+  const streakLeft = streakHarness.state.match.leftCards[0];
+  const streakRight = streakHarness.state.match.rightCards.find((card) => card.pairId === streakLeft.pairId);
+  streakHarness.applyVerbMatchSuccess(streakLeft, streakRight);
+  assert.equal(streakHarness.state.sessionStreak, 4);
+  assertAudioPlayLog(streakHarness.audioPlayLog, [/^\.\/assets\/sounds\/answer-streak\.ogg\?v=[0-9a-z]+$/]);
+  streakHarness.goHome();
 });
 
 test("abbreviation and conjugation start flows enter intro state and home clears them", () => {
