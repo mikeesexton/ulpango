@@ -191,10 +191,15 @@ function createLocalStorage(initialEntries = {}) {
   };
 }
 
+function runScriptInContext(sourcePath, context, transform = null) {
+  const source = fs.readFileSync(sourcePath, "utf8");
+  const nextSource = typeof transform === "function" ? transform(source) : source;
+  vm.runInContext(nextSource, context, { filename: sourcePath });
+}
+
 function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options = {}) {
   const sourcePath = path.join(__dirname, "..", "app.js");
-  const source = fs.readFileSync(sourcePath, "utf8");
-  const instrumented = source.replace(
+  const instrumented = (source) => source.replace(
     /\}\)\(typeof window !== "undefined" \? window : globalThis\);\s*$/,
     `
 globalThis.__appTestExports = {
@@ -205,6 +210,7 @@ globalThis.__appTestExports = {
   applyAdvConjAnswer,
   applyVerbMatchMismatch,
   applyVerbMatchSuccess,
+  buildAdvConjDeck,
   buildAdvConjEnglishSentence,
   getAdvConjSubjectsForTense,
   beginAbbreviationFromIntro,
@@ -288,9 +294,14 @@ globalThis.__appTestExports = {
     nativeClearInterval(handle);
   }
 
+  const testMath = Object.create(Math);
+  if (typeof options.mathRandom === "function") {
+    testMath.random = options.mathRandom;
+  }
+
   const context = {
     console,
-    Math,
+    Math: testMath,
     Date,
     JSON,
     Array,
@@ -378,7 +389,27 @@ globalThis.__appTestExports = {
   document.defaultView = context;
 
   vm.createContext(context);
-  vm.runInContext(instrumented, context, { filename: sourcePath });
+  [
+    path.join(__dirname, "..", "app", "constants.js"),
+    path.join(__dirname, "..", "app", "storage.js"),
+    path.join(__dirname, "..", "app", "utils.js"),
+    path.join(__dirname, "..", "app", "hebrew.js"),
+    path.join(__dirname, "..", "app", "bootstrap-data.js"),
+    path.join(__dirname, "..", "app", "content-sources.js"),
+    path.join(__dirname, "..", "app", "bootstrap-runtime.js"),
+    path.join(__dirname, "..", "app", "audio.js"),
+    path.join(__dirname, "..", "app", "persistence.js"),
+    path.join(__dirname, "..", "app", "session.js"),
+    path.join(__dirname, "..", "app", "i18n.js"),
+    path.join(__dirname, "..", "app", "ui.js"),
+    path.join(__dirname, "..", "app", "data.js"),
+    path.join(__dirname, "..", "app", "lesson.js"),
+    path.join(__dirname, "..", "app", "abbreviation.js"),
+    path.join(__dirname, "..", "app", "adv-conj.js"),
+    path.join(__dirname, "..", "app", "verb-match.js"),
+    path.join(__dirname, "..", "app", "controller.js"),
+  ].forEach((scriptPath) => runScriptInContext(scriptPath, context));
+  runScriptInContext(sourcePath, context, instrumented);
   const harness = {
     ...context.__appTestExports,
     audioLoadLog,
@@ -962,6 +993,70 @@ test("advanced conjugation subjects add present-tense you forms without extendin
   assert.deepEqual(
     labels(getAdvConjSubjectsForTense("future")),
     ["he", "she", "they (m.)", "they (f.)"]
+  );
+});
+
+test("advanced conjugation present-tense English uses base verbs for second-person subjects", () => {
+  const idiom = {
+    id: "hotzaat_mitz",
+    object_type: "l_dative",
+    fixed_object: "את המיץ",
+    literal_sg: "{s} takes out {p} juice",
+    literal_pl: "{s} take out {p} juice",
+    literal_past: "{s} took out {p} juice",
+    literal_future: "{s} will take out {p} juice",
+    present_tense: { msg: "מוציא", fsg: "מוציאה", mpl: "מוציאים", fpl: "מוציאות" },
+    past_tense: { msg: "הוציא", fsg: "הוציאה", mpl: "הוציאו", fpl: "הוציאו" },
+    future_tense: { msg: "יוציא", fsg: "תוציא", mpl: "יוציאו", fpl: "יוציאו" },
+  };
+  const { ADV_CONJ_OBJECTS, buildAdvConjEnglishSentence } = loadAppHarness([], [], [], {
+    idioms: [idiom],
+  });
+  const myObject = ADV_CONJ_OBJECTS.find((obj) => obj.key === "1sg");
+
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, { form: "msg", en: "you (m.sg.)" }, myObject, "present"),
+    "you (m.sg.) take out my juice"
+  );
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, { form: "fsg", en: "you (f.sg.)" }, myObject, "present"),
+    "you (f.sg.) take out my juice"
+  );
+});
+
+test("advanced conjugation skips second-person subject plus second-person object combinations", () => {
+  const idiom = {
+    id: "mehagav",
+    english: "to get off someone's back",
+    english_meaning: "to get off someone's back",
+    object_type: "l_dative",
+    fixed_object: "מהגב",
+    literal_sg: "{s} gets off {p} back",
+    literal_pl: "{s} get off {p} back",
+    literal_past: "{s} got off {p} back",
+    literal_future: "{s} will get off {p} back",
+    present_tense: { msg: "יורד", fsg: "יורדת", mpl: "יורדים", fpl: "יורדות" },
+    past_tense: { msg: "ירד", fsg: "ירדה", mpl: "ירדו", fpl: "ירדו" },
+    future_tense: { msg: "יירד", fsg: "תירד", mpl: "יירדו", fpl: "יירדו" },
+  };
+  const { buildAdvConjDeck } = loadAppHarness([], [], [], {
+    idioms: [idiom],
+    mathRandom: () => 0,
+  });
+
+  const deck = buildAdvConjDeck();
+  assert.ok(deck.length > 0);
+  assert.equal(
+    deck.some((card) => card.promptText.includes("you (m.pl.) get off your (sg.) back")),
+    false
+  );
+  assert.equal(
+    deck.some((card) => {
+      if (!/^you\b/i.test(card.promptText)) return false;
+      const extraYouMarkers = card.promptText.match(/you\s*\(/gi) || [];
+      return extraYouMarkers.length > 1 || /your\s*\(/i.test(card.promptText);
+    }),
+    false
   );
 });
 

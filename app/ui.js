@@ -1,0 +1,971 @@
+(function initIvriQuestAppUi(global) {
+"use strict";
+
+const app = global.IvriQuestApp = global.IvriQuestApp || {};
+const ui = app.ui = app.ui || {};
+
+function getRuntime() {
+  return app.runtime || {};
+}
+
+function getHelpers() {
+  return getRuntime().helpers || {};
+}
+
+function getData() {
+  return app.data || {};
+}
+
+function getSession() {
+  return app.session || {};
+}
+
+function translate(key, vars = {}) {
+  return getHelpers().t ? getHelpers().t(key, vars) : key;
+}
+
+ui.isUiLocked = ui.isUiLocked || function isUiLocked() {
+  const runtime = getRuntime();
+  return Boolean(
+    runtime.state?.welcomeModalOpen ||
+      runtime.state?.lesson?.lessonStartIntroActive ||
+      runtime.state?.lesson?.secondChanceIntroActive ||
+      runtime.state?.abbreviation?.introActive ||
+      runtime.state?.match?.verbIntroActive ||
+      runtime.state?.leaveConfirmOpen ||
+      runtime.state?.masteredModalOpen
+  );
+};
+
+ui.updateUiLockState = ui.updateUiLockState || function updateUiLockState() {
+  const runtime = getRuntime();
+  const locked = ui.isUiLocked();
+  const learnSessionActive = app.session?.hasActiveLearnSession?.() || false;
+  runtime.global.document.body?.setAttribute("data-ui-locked", locked ? "true" : "false");
+  runtime.global.document.body?.setAttribute("data-learn-session", learnSessionActive ? "true" : "false");
+
+  (runtime.el?.routeButtons || []).forEach((button) => {
+    const shouldDisable = locked;
+    button.disabled = shouldDisable;
+    if (shouldDisable) {
+      button.setAttribute("aria-disabled", "true");
+      button.setAttribute("tabindex", "-1");
+    } else {
+      button.removeAttribute("aria-disabled");
+      button.removeAttribute("tabindex");
+    }
+  });
+
+  if (!runtime.el?.appShell) return;
+  if (locked) {
+    runtime.el.appShell.setAttribute("inert", "");
+  } else {
+    runtime.el.appShell.removeAttribute("inert");
+  }
+};
+
+ui.showBlockingOverlay = ui.showBlockingOverlay || function showBlockingOverlay(node) {
+  if (!node) {
+    ui.updateUiLockState();
+    return;
+  }
+  node.classList.remove("hidden");
+  node.classList.add("active");
+  node.setAttribute("aria-hidden", "false");
+  ui.updateUiLockState();
+};
+
+ui.hideBlockingOverlay = ui.hideBlockingOverlay || function hideBlockingOverlay(node) {
+  if (!node) {
+    ui.updateUiLockState();
+    return;
+  }
+  node.classList.remove("active");
+  node.classList.add("hidden");
+  node.setAttribute("aria-hidden", "true");
+  ui.updateUiLockState();
+};
+
+ui.renderHomeButton = ui.renderHomeButton || function renderHomeButton() {
+  const runtime = getRuntime();
+  if (!runtime.el?.homeBtn) return;
+  const label = translate("session.backHome");
+  runtime.el.homeBtn.textContent = "🏠";
+  runtime.el.homeBtn.setAttribute("aria-label", label);
+  runtime.el.homeBtn.setAttribute("title", label);
+};
+
+ui.renderNiqqudToggle = ui.renderNiqqudToggle || function renderNiqqudToggle() {
+  const runtime = getRuntime();
+  if (!runtime.el?.niqqudToggle) return;
+  runtime.el.niqqudToggle.textContent = runtime.state.showNiqqudInline
+    ? translate("prompt.hideNiqqud")
+    : translate("prompt.showNiqqud");
+};
+
+ui.renderSoundToggle = ui.renderSoundToggle || function renderSoundToggle() {
+  const runtime = getRuntime();
+  if (!runtime.el?.soundToggle) return;
+  const soundLabel = `${translate("audio.label")}: ${runtime.state.audio.enabled ? translate("audio.on") : translate("audio.off")}`;
+  runtime.el.soundToggle.textContent = soundLabel;
+  runtime.el.soundToggle.setAttribute("aria-label", soundLabel);
+  runtime.el.soundToggle.setAttribute("aria-pressed", String(runtime.state.audio.enabled));
+};
+
+ui.renderThemeToggle = ui.renderThemeToggle || function renderThemeToggle() {
+  const runtime = getRuntime();
+  if (!runtime.el?.themeToggle) return;
+  const nextThemeLabel = runtime.state.theme === "light" ? translate("controls.darkMode") : translate("controls.lightMode");
+  runtime.el.themeToggle.textContent = nextThemeLabel;
+  runtime.el.themeToggle.setAttribute("aria-label", nextThemeLabel);
+  runtime.el.themeToggle.setAttribute("aria-pressed", String(runtime.state.theme === "dark"));
+};
+
+ui.setGamePickerVisibility = ui.setGamePickerVisibility || function setGamePickerVisibility(visible) {
+  getRuntime().el?.gamePicker?.classList.toggle("hidden", !visible);
+};
+
+ui.setPromptCardVisibility = ui.setPromptCardVisibility || function setPromptCardVisibility(visible) {
+  getRuntime().el?.promptCard?.classList.toggle("hidden", !visible);
+};
+
+ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisibility() {
+  const runtime = getRuntime();
+  runtime.el?.homeView?.classList.toggle("active", runtime.state.route === "home");
+  runtime.el?.resultsView?.classList.toggle("active", runtime.state.route === "results" && runtime.state.summary.active);
+  runtime.el?.reviewView?.classList.toggle("active", runtime.state.route === "review");
+  runtime.el?.settingsView?.classList.toggle("active", runtime.state.route === "settings");
+};
+
+ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
+  const runtime = getRuntime();
+  const routeKey = `nav.${runtime.state.route}`;
+  if (runtime.el?.shellRouteChip) {
+    runtime.el.shellRouteChip.textContent = translate(routeKey);
+  }
+  if (runtime.el?.shellRouteSummary) {
+    if (runtime.state.summary.active && runtime.state.route === "results") {
+      runtime.el.shellRouteSummary.textContent = translate("summary.thumbsText");
+    } else if (runtime.state.route === "home") {
+      runtime.el.shellRouteSummary.textContent = app.session?.hasActiveLearnSession?.()
+        ? translate("dashboard.active")
+        : translate("dashboard.ready");
+    } else {
+      runtime.el.shellRouteSummary.textContent = translate(routeKey);
+    }
+  }
+
+  (runtime.el?.routeButtons || []).forEach((button) => {
+    const buttonRoute = button.dataset.route || "home";
+    button.classList.toggle("active", buttonRoute === runtime.state.route);
+  });
+};
+
+ui.updateLessonProgress = ui.updateLessonProgress || function updateLessonProgress(percent) {
+  const runtime = getRuntime();
+  if (!runtime.el?.lessonProgressFill) return;
+  runtime.el.lessonProgressFill.style.width = `${Math.max(0, Math.min(100, percent || 0))}%`;
+};
+
+ui.questionNeedsSelection = ui.questionNeedsSelection || function questionNeedsSelection(question) {
+  if (!question) return true;
+  if (question.locked) return false;
+  return !question.selectedOptionId;
+};
+
+ui.getHebrewText = ui.getHebrewText || function getHebrewText(word, withNiqqud) {
+  const plain = word?.he || "";
+  const marked = word?.heNiqqud || plain;
+  return withNiqqud ? marked : plain;
+};
+
+ui.buildAnswerDisplay = ui.buildAnswerDisplay || function buildAnswerDisplay(word, withNiqqud = false) {
+  const plain = ui.getHebrewText(word, false);
+  const marked = ui.getHebrewText(word, true);
+
+  if (!plain || marked === plain || !withNiqqud) return plain;
+  return `${plain} (${marked})`;
+};
+
+ui.setFeedback = ui.setFeedback || function setFeedback(text, success) {
+  const runtime = getRuntime();
+  runtime.el.feedback.textContent = text;
+  runtime.el.feedback.classList.toggle("good", Boolean(success));
+  runtime.el.feedback.classList.toggle("bad", success === false);
+};
+
+ui.clearFeedback = ui.clearFeedback || function clearFeedback() {
+  const runtime = getRuntime();
+  runtime.el.feedback.textContent = "";
+  runtime.el.feedback.classList.remove("good", "bad");
+};
+
+ui.resetSessionCounters = ui.resetSessionCounters || function resetSessionCounters() {
+  const runtime = getRuntime();
+  runtime.state.sessionScore = 0;
+  runtime.state.sessionStreak = 0;
+};
+
+ui.renderAll = ui.renderAll || function renderAll() {
+  const runtime = getRuntime();
+  app.i18n?.applyLanguage?.();
+  runtime.state.route = getSession().resolveInitialRoute?.(runtime.state.route) || runtime.state.route;
+  ui.renderShellChrome();
+  ui.renderPoolMeta();
+  ui.renderDomainPerformance();
+  ui.renderMostMissed();
+  ui.renderMasteredModal();
+  ui.renderHomeState();
+  ui.renderReviewState();
+  ui.renderSettingsState();
+  ui.renderWelcomeModal();
+  ui.renderSummaryState();
+  ui.renderLearnState();
+  ui.renderRouteVisibility();
+  ui.updateUiLockState();
+  app.persistence?.persistUiState?.();
+  app.persistence?.persistSessionState?.();
+};
+
+ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
+  const runtime = getRuntime();
+  if (runtime.state.summary.active) {
+    return;
+  }
+
+  if (runtime.state.mode === "verbMatch") {
+    if (runtime.state.match.active && runtime.state.match.currentVerb) {
+      app.verbMatch?.renderVerbMatchRound?.();
+    } else {
+      app.verbMatch?.renderVerbMatchIdleState?.();
+    }
+    return;
+  }
+
+  if (runtime.state.mode === "abbreviation") {
+    if (runtime.state.abbreviation.active && runtime.state.abbreviation.currentQuestion) {
+      app.abbreviation?.renderAbbreviationQuestion?.();
+    } else {
+      app.abbreviation?.renderAbbreviationIdleState?.();
+    }
+    return;
+  }
+
+  if (runtime.state.mode === "advConj") {
+    if (runtime.state.advConj.active && runtime.state.advConj.currentQuestion) {
+      app.advConj?.renderAdvConjQuestion?.();
+    } else if (runtime.state.advConj.active) {
+      ui.renderSessionHeader();
+    }
+    return;
+  }
+
+  if (runtime.state.lesson.active || runtime.state.mode === "lesson") {
+    if (runtime.state.lesson.active && runtime.state.currentQuestion) {
+      app.lessonMode?.renderQuestion?.();
+    } else {
+      ui.renderIdleLessonState();
+    }
+    return;
+  }
+
+  ui.renderIdleLessonState();
+};
+
+ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader() {
+  const runtime = getRuntime();
+  const data = getData();
+  if (runtime.el.sessionScore) {
+    runtime.el.sessionScore.textContent = translate("session.score", { score: runtime.state.sessionScore });
+  }
+  runtime.el.statusRow?.classList.toggle("hidden", false);
+  runtime.el.vocabCount.textContent = "";
+  runtime.el.vocabCount.classList.add("hidden");
+  runtime.el.masterVerbBtn?.classList.add("hidden");
+  ui.updateLessonProgress(0);
+
+  if (runtime.state.mode === "summary" && runtime.state.summary.active) {
+    runtime.el.modeTitle.textContent = translate(runtime.state.summary.titleKey || "summary.resultsHeader", runtime.state.summary.titleVars);
+    runtime.el.lessonStatus.textContent = "";
+    runtime.el.sessionScore.textContent = "";
+    runtime.el.nextBtn.classList.add("hidden");
+    app.persistence?.persistSessionState?.();
+    return;
+  }
+
+  if (runtime.state.mode === "verbMatch") {
+    const verbTitle = runtime.state.match.active ? translate("session.verbMatchTitle") : translate("session.verbMatchStart");
+    const hasMatch = runtime.state.match.active && runtime.state.match.currentVerb;
+    const pairProgress = hasMatch
+      ? translate("match.progress", { current: runtime.state.match.matchedCount, total: runtime.state.match.totalPairs })
+      : translate("match.progress", { current: 0, total: 0 });
+
+    runtime.el.modeTitle.textContent = verbTitle;
+    runtime.el.lessonStatus.textContent = pairProgress;
+    runtime.el.vocabCount.classList.remove("hidden");
+    runtime.el.vocabCount.textContent = translate("match.timer", { seconds: runtime.state.match.elapsedSeconds });
+    runtime.el.sessionScore.textContent = translate("match.combo", { count: runtime.state.match.bestCombo });
+    ui.updateLessonProgress(
+      runtime.state.match.totalPairs
+        ? Math.round((runtime.state.match.matchedCount / runtime.state.match.totalPairs) * 100)
+        : 0
+    );
+
+    const canAdvanceVerb =
+      runtime.state.match.active &&
+      runtime.state.match.totalPairs > 0 &&
+      runtime.state.match.matchedCount >= runtime.state.match.totalPairs;
+    const shouldShowSummary = canAdvanceVerb && runtime.state.match.verbQueue.length === 0;
+    runtime.el.nextBtn.disabled = !canAdvanceVerb;
+    runtime.el.nextBtn.textContent = shouldShowSummary ? translate("session.viewResults") : translate("session.nextVerb");
+    runtime.el.nextBtn.classList.toggle("hidden", !canAdvanceVerb);
+    const showMasterAction =
+      canAdvanceVerb &&
+      Boolean(runtime.state.match.eligibleMasterWordId) &&
+      data.isWordAvailableForMode?.(data.getWordById?.(runtime.state.match.eligibleMasterWordId), "translationQuiz") &&
+      !data.isWordMastered?.(runtime.state.match.eligibleMasterWordId);
+    if (runtime.el.masterVerbBtn) {
+      runtime.el.masterVerbBtn.disabled = !showMasterAction;
+      runtime.el.masterVerbBtn.textContent = translate("mastered.moveCurrent");
+      runtime.el.masterVerbBtn.classList.toggle("hidden", !showMasterAction);
+    }
+    app.persistence?.persistSessionState?.();
+    return;
+  }
+
+  if (runtime.state.mode === "abbreviation") {
+    const targetRounds = app.abbreviation?.getAbbreviationRoundTarget?.() || runtime.constants.ABBREVIATION_ROUNDS;
+    const hasQuestion = runtime.state.abbreviation.active && Boolean(runtime.state.abbreviation.currentQuestion);
+    runtime.el.modeTitle.textContent = runtime.state.abbreviation.active
+      ? translate("session.abbreviationTitle")
+      : translate("session.abbreviationStart");
+    runtime.el.lessonStatus.textContent = translate("session.round", {
+      current: runtime.state.abbreviation.currentRound,
+      total: targetRounds,
+    });
+    runtime.el.vocabCount.classList.remove("hidden");
+    runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.abbreviation.elapsedSeconds });
+    ui.updateLessonProgress(targetRounds ? Math.round((runtime.state.abbreviation.currentRound / targetRounds) * 100) : 0);
+    runtime.el.nextBtn.disabled = ui.questionNeedsSelection(runtime.state.abbreviation.currentQuestion);
+    runtime.el.nextBtn.textContent = hasQuestion && !runtime.state.abbreviation.currentQuestion?.locked
+      ? translate("session.submit")
+      : translate("session.next");
+    runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
+    app.persistence?.persistSessionState?.();
+    return;
+  }
+
+  if (runtime.state.mode === "advConj") {
+    const hasQuestion = runtime.state.advConj.active && Boolean(runtime.state.advConj.currentQuestion);
+    runtime.el.modeTitle.textContent = translate("game.advConjName");
+    runtime.el.lessonStatus.textContent = translate("session.round", {
+      current: runtime.state.advConj.currentRound,
+      total: runtime.constants.ADV_CONJ_ROUNDS,
+    });
+    runtime.el.vocabCount.classList.remove("hidden");
+    runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.advConj.elapsedSeconds });
+    ui.updateLessonProgress(
+      runtime.constants.ADV_CONJ_ROUNDS
+        ? Math.round((runtime.state.advConj.currentRound / runtime.constants.ADV_CONJ_ROUNDS) * 100)
+        : 0
+    );
+    runtime.el.nextBtn.disabled = ui.questionNeedsSelection(runtime.state.advConj.currentQuestion);
+    runtime.el.nextBtn.textContent = hasQuestion && !runtime.state.advConj.currentQuestion?.locked
+      ? translate("session.submit")
+      : translate("session.next");
+    runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
+    app.persistence?.persistSessionState?.();
+    return;
+  }
+
+  const inSecondChance = Boolean(runtime.state.lesson.inReview);
+  const hasQuestion = runtime.state.lesson.active && Boolean(runtime.state.currentQuestion);
+  runtime.el.modeTitle.textContent = inSecondChance
+    ? translate("session.secondChanceTitle")
+    : translate("session.mixedTitle", { rounds: runtime.constants.LESSON_ROUNDS });
+  runtime.el.lessonStatus.textContent = inSecondChance
+    ? translate("session.secondChanceProgress", {
+        current: runtime.state.lesson.secondChanceCurrent,
+        total: runtime.state.lesson.secondChanceTotal,
+      })
+    : translate("session.round", {
+        current: runtime.state.lesson.currentRound,
+        total: runtime.constants.LESSON_ROUNDS,
+      });
+  runtime.el.vocabCount.classList.remove("hidden");
+  runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.lesson.elapsedSeconds });
+  ui.updateLessonProgress(
+    inSecondChance
+      ? 100
+      : Math.round((runtime.state.lesson.currentRound / runtime.constants.LESSON_ROUNDS) * 100)
+  );
+  runtime.el.nextBtn.disabled = ui.questionNeedsSelection(runtime.state.currentQuestion);
+  runtime.el.nextBtn.textContent = hasQuestion && !runtime.state.currentQuestion?.locked
+    ? translate("session.submit")
+    : translate("session.next");
+  runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
+  app.persistence?.persistSessionState?.();
+};
+
+ui.renderPromptText = ui.renderPromptText || function renderPromptText(question = getRuntime().state.currentQuestion) {
+  const runtime = getRuntime();
+  if (runtime.state.mode === "verbMatch") {
+    app.verbMatch?.renderVerbMatchPrompt?.();
+    return;
+  }
+
+  if (!question) {
+    ui.renderNiqqudToggle();
+    return;
+  }
+
+  const promptUsesWordSurface = question.promptUsesWordSurface !== false;
+  const hasHebrewSurface = Boolean(question.promptIsHebrew || question.optionsAreHebrew);
+
+  if (question.promptIsHebrew) {
+    runtime.el.promptText.classList.add("hebrew");
+  } else {
+    runtime.el.promptText.classList.remove("hebrew");
+  }
+
+  if (question.promptIsHebrew && question.word && promptUsesWordSurface) {
+    runtime.el.promptText.textContent = ui.getHebrewText(question.word, runtime.state.showNiqqudInline);
+  } else {
+    runtime.el.promptText.textContent = runtime.state.showNiqqudInline && question.promptNiqqud
+      ? question.promptNiqqud
+      : question.prompt;
+  }
+
+  ui.renderNiqqudToggle();
+  if (!hasHebrewSurface) {
+    return;
+  }
+};
+
+ui.renderPoolMeta = ui.renderPoolMeta || function renderPoolMeta() {
+  const runtime = getRuntime();
+  const data = getData();
+  const pool = data.getSelectedPool?.() || [];
+  const all = data.getAllVocabulary?.() || [];
+  if (!runtime.el?.poolMeta) return;
+  runtime.el.poolMeta.textContent = translate("pool.summary", { pool: pool.length, total: all.length });
+
+  if (!runtime.storage) {
+    runtime.el.poolMeta.textContent += ` ${translate("pool.tempProgress")}`;
+  }
+
+  if (runtime.usingFallbackVocab) {
+    runtime.el.poolMeta.textContent += ` ${translate("pool.fallback")}`;
+  }
+};
+
+ui.renderDomainPerformance = ui.renderDomainPerformance || function renderDomainPerformance() {
+  const data = getData();
+  const runtime = getRuntime();
+  const stats = data.calculateDomainStats?.() || [];
+  ui.renderPerformanceCardsInto(runtime.el?.homeDomainPerformance, stats);
+  ui.renderPerformanceCardsInto(runtime.el?.reviewDomainPerformance, stats);
+  ui.renderGameModePerformance();
+};
+
+ui.renderGameModePerformance = ui.renderGameModePerformance || function renderGameModePerformance() {
+  const data = getData();
+  const runtime = getRuntime();
+  const stats = data.calculateGameModeStats?.() || {
+    conjugation: { attempts: 0, correct: 0, wrong: 0 },
+    abbreviation: { attempts: 0, correct: 0, wrong: 0 },
+  };
+  const cards = [
+    {
+      emoji: "🔗",
+      title: translate("game.conjugationName"),
+      attempts: stats.conjugation.attempts,
+      correct: stats.conjugation.correct,
+      wrong: stats.conjugation.wrong,
+    },
+    {
+      emoji: "⏩",
+      title: translate("game.abbreviationName"),
+      attempts: stats.abbreviation.attempts,
+      correct: stats.abbreviation.correct,
+      wrong: stats.abbreviation.wrong,
+    },
+  ];
+
+  ui.renderPerformanceCardsInto(runtime.el?.homeModePerformance, cards);
+  ui.renderPerformanceCardsInto(runtime.el?.reviewModePerformance, cards);
+};
+
+ui.renderPerformanceCardsInto = ui.renderPerformanceCardsInto || function renderPerformanceCardsInto(container, cards) {
+  if (!container) return;
+  container.innerHTML = "";
+  cards.forEach((card) => {
+    ui.appendPerformanceCard(container, {
+      emoji: card.emoji,
+      title: card.title || translate(`domain.${card.id}`),
+      attempts: card.attempts,
+      correct: card.correct,
+      wrong: card.wrong,
+    });
+  });
+};
+
+ui.appendPerformanceCard = ui.appendPerformanceCard || function appendPerformanceCard(container, stats) {
+  if (!container) return;
+
+  const card = global.document.createElement("article");
+  card.className = "domain-card";
+
+  const ring = global.document.createElement("div");
+  ring.className = "domain-ring";
+
+  const attempts = Math.max(0, Number(stats?.attempts || 0));
+  const correct = Math.max(0, Math.min(attempts, Number(stats?.correct || 0)));
+  const wrong = Math.max(0, Number(stats?.wrong || 0));
+  const correctPct = attempts ? Math.round((correct / attempts) * 100) : 0;
+  const wrongPct = attempts ? 100 - correctPct : 0;
+
+  ring.style.setProperty("--ring-good", `${correctPct}%`);
+  ring.style.setProperty("--ring-bad", `${wrongPct}%`);
+  ring.classList.toggle("empty", attempts === 0);
+
+  const emoji = global.document.createElement("span");
+  emoji.className = "domain-emoji";
+  emoji.textContent = String(stats?.emoji || "•");
+  ring.append(emoji);
+
+  const meta = global.document.createElement("div");
+  meta.className = "domain-meta";
+
+  const title = global.document.createElement("p");
+  title.className = "domain-title";
+  title.textContent = String(stats?.title || "");
+
+  const score = global.document.createElement("p");
+  score.className = "domain-score";
+  score.textContent = `✅ ${correct}  ❌ ${wrong}`;
+
+  meta.append(title, score);
+  card.append(ring, meta);
+  container.append(card);
+};
+
+ui.renderHomeState = ui.renderHomeState || function renderHomeState() {
+  const runtime = getRuntime();
+  const showLesson = app.session?.hasActiveLearnSession?.() || false;
+  runtime.el?.homeDashboard?.classList.toggle("hidden", showLesson);
+  runtime.el?.homeLessonStage?.classList.toggle("hidden", !showLesson);
+  ui.renderHomeLessonButtons();
+  ui.renderHomeOptions();
+};
+
+ui.renderSummaryState = ui.renderSummaryState || function renderSummaryState() {
+  const runtime = getRuntime();
+  if (!runtime.el?.resultsSummary || !runtime.el?.resultsTitle || !runtime.el?.resultsNote) return;
+  const titleText = runtime.state.summary.titleKey
+    ? translate(runtime.state.summary.titleKey, runtime.state.summary.titleVars)
+    : translate("summary.resultsHeader");
+  const scoreValue = ui.getSummaryScoreValue();
+  const scoreTotal = ui.getSummaryScoreTotal();
+  const accuracy = ui.getSummaryAccuracyPercent();
+  const praise = ui.isPerfectSummary()
+    ? translate("results.amazing")
+    : accuracy < 50
+      ? translate("results.roomToImprove")
+      : translate("results.niceJob");
+
+  runtime.el.resultsTitle.textContent = titleText;
+  runtime.el.resultsNote.textContent = praise;
+  runtime.el.resultsSummary.innerHTML = "";
+
+  const performance = ui.createResultsPerformanceGraphic(accuracy);
+
+  const metrics = global.document.createElement("div");
+  metrics.className = "results-metrics";
+  const metricItems = ui.buildSummaryMetrics({ scoreValue, scoreTotal, accuracy });
+  metrics.style.setProperty("--results-metric-count", String(metricItems.length));
+  metricItems.forEach((metric) => {
+    metrics.append(ui.createResultsMetric(metric.label, metric.value));
+  });
+
+  const mistakesWrap = global.document.createElement("div");
+  mistakesWrap.className = "results-mistakes";
+  const heading = global.document.createElement("h3");
+  heading.className = "results-section-title";
+  heading.textContent = translate("results.mistakes");
+  mistakesWrap.append(heading);
+
+  if (!runtime.state.summary.mistakes.length) {
+    const empty = global.document.createElement("p");
+    empty.className = "small-note";
+    empty.textContent = translate("results.noMistakes");
+    mistakesWrap.append(empty);
+  } else {
+    runtime.state.summary.mistakes.forEach((item) => {
+      mistakesWrap.append(
+        ui.createCompactRow({
+          title: item.primary || item.title || "",
+          note: item.secondary || item.note || "",
+        })
+      );
+    });
+  }
+
+  runtime.el.resultsSummary.append(performance, metrics, mistakesWrap);
+};
+
+ui.renderReviewState = ui.renderReviewState || function renderReviewState() {
+};
+
+ui.getSummaryScoreValue = ui.getSummaryScoreValue || function getSummaryScoreValue() {
+  const runtime = getRuntime();
+  const explicit = Number(runtime.state.summary.scoreVars?.score);
+  if (Number.isFinite(explicit) && explicit >= 0) {
+    return Math.round(explicit);
+  }
+  return Math.max(0, runtime.state.summary.correctCount);
+};
+
+ui.getSummaryScoreTotal = ui.getSummaryScoreTotal || function getSummaryScoreTotal() {
+  const runtime = getRuntime();
+  const explicit = Number(runtime.state.summary.scoreVars?.total);
+  if (Number.isFinite(explicit) && explicit >= 0) {
+    return Math.round(explicit);
+  }
+  const attempts = runtime.state.summary.correctCount + runtime.state.summary.incorrectCount;
+  return Math.max(0, attempts);
+};
+
+ui.getSummaryAccuracyPercent = ui.getSummaryAccuracyPercent || function getSummaryAccuracyPercent() {
+  const runtime = getRuntime();
+  const attempts = runtime.state.summary.correctCount + runtime.state.summary.incorrectCount;
+  if (attempts > 0) {
+    return Math.round((runtime.state.summary.correctCount / attempts) * 100);
+  }
+  const total = ui.getSummaryScoreTotal();
+  if (total > 0) {
+    return Math.round((ui.getSummaryScoreValue() / total) * 100);
+  }
+  return 100;
+};
+
+ui.isPerfectSummary = ui.isPerfectSummary || function isPerfectSummary() {
+  const runtime = getRuntime();
+  return runtime.state.summary.incorrectCount === 0
+    && ui.getSummaryScoreTotal() > 0
+    && ui.getSummaryScoreValue() >= ui.getSummaryScoreTotal();
+};
+
+ui.formatResultSeconds = ui.formatResultSeconds || function formatResultSeconds(seconds) {
+  const runtime = getRuntime();
+  const safeSeconds = Math.max(0, Number(seconds || 0));
+  return runtime.state.language === "he" ? `${safeSeconds}ש׳` : `${safeSeconds}s`;
+};
+
+ui.buildSummaryMetrics = ui.buildSummaryMetrics || function buildSummaryMetrics({ scoreValue, scoreTotal, accuracy }) {
+  const runtime = getRuntime();
+  const metrics = [
+    { label: translate("results.score"), value: `${scoreValue}/${scoreTotal}` },
+    { label: translate("results.accuracy"), value: `${accuracy}%` },
+    { label: translate("results.time"), value: ui.formatResultSeconds(runtime.state.summary.elapsedSeconds) },
+  ];
+
+  if (runtime.state.summary.game === "lesson") {
+    metrics.push({
+      label: translate("results.reviewRounds"),
+      value: String(Math.max(0, Number(runtime.state.summary.noteVars?.count || 0))),
+    });
+    return metrics;
+  }
+
+  if (runtime.state.summary.game === "abbreviation") {
+    metrics.push({
+      label: translate("results.rounds"),
+      value: String(Math.max(0, Number(runtime.state.summary.noteVars?.rounds || 0))),
+    });
+    return metrics;
+  }
+
+  if (runtime.state.summary.game === "verbMatch") {
+    metrics.push({
+      label: translate("results.bestCombo"),
+      value: `x${Math.max(0, Number(runtime.state.summary.noteVars?.combo || 0))}`,
+    });
+  }
+
+  return metrics;
+};
+
+ui.createResultsPerformanceGraphic = ui.createResultsPerformanceGraphic || function createResultsPerformanceGraphic(accuracy) {
+  const performance = global.document.createElement("section");
+  performance.className = "results-performance";
+  performance.style.setProperty("--results-score", `${Math.max(0, Math.min(100, accuracy))}%`);
+  performance.setAttribute("role", "img");
+  performance.setAttribute("aria-label", `${translate("results.accuracy")}: ${accuracy}%`);
+
+  const ring = global.document.createElement("div");
+  ring.className = "results-performance-ring";
+
+  const center = global.document.createElement("div");
+  center.className = "results-performance-center";
+
+  const percent = global.document.createElement("p");
+  percent.className = "results-performance-percent";
+  percent.textContent = `${accuracy}%`;
+
+  center.append(percent);
+  ring.append(center);
+  performance.append(ring);
+  return performance;
+};
+
+ui.renderSettingsState = ui.renderSettingsState || function renderSettingsState() {
+  app.persistence?.applySurveyLinks?.();
+  ui.renderThemeToggle();
+  ui.renderNiqqudToggle();
+  ui.renderSoundToggle();
+};
+
+ui.createCompactRow = ui.createCompactRow || function createCompactRow({ title, note }) {
+  const row = global.document.createElement("article");
+  row.className = "compact-row";
+
+  const titleNode = global.document.createElement("p");
+  titleNode.className = "compact-row-title";
+  titleNode.textContent = title;
+
+  const noteNode = global.document.createElement("p");
+  noteNode.className = "compact-row-note";
+  noteNode.textContent = note;
+
+  row.append(titleNode, noteNode);
+  return row;
+};
+
+ui.createResultsMetric = ui.createResultsMetric || function createResultsMetric(label, value) {
+  const card = global.document.createElement("article");
+  card.className = "results-metric";
+
+  const labelNode = global.document.createElement("p");
+  labelNode.className = "results-metric-label";
+  labelNode.textContent = label;
+
+  const valueNode = global.document.createElement("p");
+  valueNode.className = "results-metric-value";
+  valueNode.textContent = value;
+
+  card.append(labelNode, valueNode);
+  return card;
+};
+
+ui.renderIdleLessonState = ui.renderIdleLessonState || function renderIdleLessonState() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  runtime.state.mode = app.session?.hasActiveLearnSession?.() ? runtime.state.mode : "lesson";
+  ui.setGamePickerVisibility(false);
+  ui.setPromptCardVisibility(true);
+  runtime.el.choiceContainer.classList.remove("summary-grid");
+  h.renderSessionHeader?.();
+  runtime.el.promptLabel.textContent = translate("learn.idleLabel");
+  runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.textContent = translate("learn.idlePrompt");
+  runtime.el.choiceContainer.innerHTML = "";
+  runtime.el.choiceContainer.classList.remove("match-grid");
+  h.clearFeedback?.();
+  ui.renderNiqqudToggle();
+};
+
+ui.renderHomeLessonButtons = ui.renderHomeLessonButtons || function renderHomeLessonButtons() {
+  const runtime = getRuntime();
+  const highlightedMode = app.session?.hasActiveLearnSession?.()
+    ? runtime.state.mode
+    : runtime.state.lastPlayedMode || "lesson";
+  ui.setHomeLessonState(runtime.el?.homeLessonBtn, highlightedMode === "lesson");
+  ui.setHomeLessonState(runtime.el?.homeVerbMatchBtn, highlightedMode === "verbMatch");
+  ui.setHomeLessonState(runtime.el?.homeAbbreviationBtn, highlightedMode === "abbreviation");
+};
+
+ui.setHomeLessonState = ui.setHomeLessonState || function setHomeLessonState(button, isCurrent) {
+  if (!button) return;
+  button.classList.toggle("is-current", isCurrent);
+  button.setAttribute("aria-current", isCurrent ? "true" : "false");
+};
+
+ui.renderHomeOptions = ui.renderHomeOptions || function renderHomeOptions() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  if (runtime.el?.homeLangValue) {
+    runtime.el.homeLangValue.textContent = h.getLanguageToggleLabel?.() || "";
+    runtime.el.homeLangValue.setAttribute("dir", runtime.state.language === "en" ? "rtl" : "ltr");
+    runtime.el.homeLangValue.style.textAlign = "";
+    runtime.el.homeLangValue.style.direction = "";
+  }
+  if (runtime.el?.homeThemeValue) {
+    runtime.el.homeThemeValue.textContent = runtime.state.theme === "light"
+      ? translate("controls.lightMode")
+      : translate("controls.darkMode");
+  }
+  if (runtime.el?.homeNiqqudValue) {
+    runtime.el.homeNiqqudValue.textContent = runtime.state.showNiqqudInline
+      ? translate("dashboard.on")
+      : translate("dashboard.off");
+  }
+  if (runtime.el?.homeSoundValue) {
+    runtime.el.homeSoundValue.textContent = runtime.state.audio.enabled
+      ? translate("audio.on")
+      : translate("audio.off");
+  }
+  if (runtime.el?.homeThemeToggle) {
+    runtime.el.homeThemeToggle.setAttribute("aria-pressed", String(runtime.state.theme === "dark"));
+  }
+  if (runtime.el?.homeNiqqudToggle) {
+    runtime.el.homeNiqqudToggle.setAttribute("aria-pressed", String(runtime.state.showNiqqudInline));
+  }
+  if (runtime.el?.homeSoundToggle) {
+    runtime.el.homeSoundToggle.setAttribute("aria-pressed", String(runtime.state.audio.enabled));
+  }
+};
+
+ui.renderMostMissed = ui.renderMostMissed || function renderMostMissed() {
+  const runtime = getRuntime();
+  const data = getData();
+  const h = getHelpers();
+  if (!runtime.el?.mostMissedList || !runtime.el?.mostMissedEmpty) return;
+
+  const wordsById = new Map((data.getAllVocabulary?.() || []).map((word) => [word.id, word]));
+  const ranked = data.getMostMissedRanked?.() || [];
+
+  runtime.el.mostMissedList.innerHTML = "";
+  runtime.el.mostMissedEmpty.classList.toggle("hidden", ranked.length > 0);
+
+  runtime.el.mostMissedList.style.display = "flex";
+  runtime.el.mostMissedList.style.gap = "1.25rem";
+  runtime.el.mostMissedList.style.alignItems = "flex-start";
+
+  const isRTL = global.document.documentElement.dataset.uiLang === "he";
+  const half = Math.ceil(ranked.length / 2);
+  const cols = [ranked.slice(0, half), ranked.slice(half)];
+
+  cols.forEach((col, colIdx) => {
+    const ol = global.document.createElement("ol");
+    ol.className = "missed-col";
+    ol.start = colIdx * half + 1;
+    ol.style.flex = "1";
+    ol.style.margin = "0";
+    ol.style.paddingLeft = isRTL ? "0" : "1.25rem";
+    ol.style.paddingRight = isRTL ? "1.25rem" : "0";
+
+    col.forEach((entry) => {
+      const word = wordsById.get(entry.wordId);
+      if (!word) return;
+
+      const item = global.document.createElement("li");
+      const line = global.document.createElement("p");
+      line.className = "missed-word";
+      line.textContent = h.getHebrewText?.(word, true) || "";
+      line.title = word.en;
+      item.title = word.en;
+
+      const meta = global.document.createElement("p");
+      meta.className = "missed-meta";
+      meta.textContent = String(entry.missed);
+
+      item.append(line, meta);
+      ol.append(item);
+    });
+
+    runtime.el.mostMissedList.append(ol);
+  });
+};
+
+ui.closeMasteredModal = ui.closeMasteredModal || function closeMasteredModal() {
+  const runtime = getRuntime();
+  runtime.state.masteredModalOpen = false;
+  runtime.state.masteredSelection = new Set();
+  ui.renderMasteredModal();
+};
+
+ui.closeWelcomeModal = ui.closeWelcomeModal || function closeWelcomeModal() {
+  const runtime = getRuntime();
+  if (!runtime.state.welcomeModalOpen) return;
+  runtime.state.welcomeModalOpen = false;
+  ui.renderWelcomeModal();
+};
+
+ui.renderWelcomeModal = ui.renderWelcomeModal || function renderWelcomeModal() {
+  const runtime = getRuntime();
+  if (!runtime.el?.welcomeModal) return;
+  app.persistence?.applySurveyLinks?.();
+  const open = Boolean(runtime.state.welcomeModalOpen);
+  runtime.el.welcomeModal.classList.toggle("hidden", !open);
+  runtime.el.welcomeModal.setAttribute("aria-hidden", open ? "false" : "true");
+  ui.updateUiLockState();
+};
+
+ui.renderMasteredModal = ui.renderMasteredModal || function renderMasteredModal() {
+  const runtime = getRuntime();
+  const data = getData();
+  const h = getHelpers();
+  if (!runtime.el?.masteredModal || !runtime.el?.masteredList || !runtime.el?.masteredEmpty || !runtime.el?.masteredRestoreBtn) return;
+
+  const open = Boolean(runtime.state.masteredModalOpen);
+  runtime.el.masteredModal.classList.toggle("hidden", !open);
+  runtime.el.masteredModal.setAttribute("aria-hidden", open ? "false" : "true");
+  ui.updateUiLockState();
+  if (!open) return;
+
+  const masteredWords = (data.getMasteredWords?.() || []).sort((a, b) => a.en.localeCompare(b.en));
+  const validIds = new Set(masteredWords.map((word) => word.id));
+  runtime.state.masteredSelection = new Set([...runtime.state.masteredSelection].filter((id) => validIds.has(id)));
+
+  runtime.el.masteredList.innerHTML = "";
+  runtime.el.masteredEmpty.classList.toggle("hidden", masteredWords.length > 0);
+
+  masteredWords.forEach((word) => {
+    const row = global.document.createElement("label");
+    row.className = "mastered-row";
+    row.title = word.en;
+
+    const input = global.document.createElement("input");
+    input.type = "checkbox";
+    input.checked = runtime.state.masteredSelection.has(word.id);
+    input.addEventListener("change", () => {
+      if (input.checked) {
+        runtime.state.masteredSelection.add(word.id);
+      } else {
+        runtime.state.masteredSelection.delete(word.id);
+      }
+      runtime.el.masteredRestoreBtn.disabled = runtime.state.masteredSelection.size === 0;
+    });
+
+    const textWrap = global.document.createElement("div");
+    const he = global.document.createElement("p");
+    he.className = "mastered-row-he";
+    he.textContent = h.getHebrewText?.(word, runtime.state.showNiqqudInline) || "";
+
+    const en = global.document.createElement("p");
+    en.className = "mastered-row-en";
+    en.textContent = word.en;
+
+    textWrap.append(he, en);
+    row.append(input, textWrap);
+    runtime.el.masteredList.append(row);
+  });
+
+  runtime.el.masteredRestoreBtn.disabled = runtime.state.masteredSelection.size === 0;
+};
+
+ui.restoreSelectedMasteredWords = ui.restoreSelectedMasteredWords || function restoreSelectedMasteredWords() {
+  const runtime = getRuntime();
+  const data = getData();
+  const h = getHelpers();
+  const selectedIds = [...runtime.state.masteredSelection].filter((wordId) => data.isWordMastered?.(wordId));
+  if (!selectedIds.length) return;
+
+  selectedIds.forEach((wordId) => data.setWordMastered?.(wordId, false));
+  app.persistence?.saveProgress?.();
+  runtime.state.masteredSelection = new Set();
+  h.renderAll?.();
+  h.setFeedback?.(translate("mastered.restored", { count: selectedIds.length }), true);
+};
+})(typeof window !== "undefined" ? window : globalThis);

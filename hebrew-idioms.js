@@ -553,3 +553,7 @@ const HEBREW_IDIOMS = (function () {
     });
   });
 })();
+
+if (typeof globalThis !== "undefined") {
+  globalThis.HEBREW_IDIOMS = HEBREW_IDIOMS;
+}

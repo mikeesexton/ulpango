@@ -7,6 +7,66 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-14 14:28 — Tighten Advanced Conjugation English grammar and filter confusing second-person banks
+
+**Requested:** Fix Advanced Conjugation grammar issues so second-person English prompts are correct, and prevent confusing cards where a second-person subject is paired with a second-person object/possessive target such as `you (m.pl.) get off your (sg.) back`.
+
+**Files changed:**
+- `app/adv-conj.js` — Updated present-tense English template selection so second-person subjects use the base verb (`take/open/get`) instead of third-person singular forms (`takes/opens/gets`), and filtered out deck entries where a second-person subject is paired with any second-person object slot.
+- `tests/app-progress.test.js` — Extended the harness exports and added regression coverage for the second-person present-tense verb fix plus the new deck filter that blocks second-person-subject/second-person-object prompt combinations.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Advanced Conjugation now renders prompts like `you (m.sg.) take out my juice` instead of `you (m.sg.) takes out my juice`, and it no longer serves answer banks where a `you ...` subject also introduces another `you (...)` or `your (...)` target in the same prompt.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** The new filter is intentionally conservative: it removes all second-person-subject plus second-person-object combinations, even in cases where Hebrew could technically express them, because the learner-facing English prompts become misleading or awkward. A quick live spot-check of Advanced Conjugation on localhost would still be useful to confirm the updated prompts read naturally.
+
+---
+
+### 2026-03-14 14:05 — Continue reorganization with data selectors and first mode extractions
+
+**Requested:** Continue the `app.js` reorganization plan beyond the earlier service/session/UI passes, focusing next on shared data selectors and then the first mode-by-mode extractions while keeping behavior identical.
+
+**Files changed:**
+- `app/data.js` — New data-layer module for progress records, due-word selection, translation-pool filtering, mastery flags, most-missed rankings, domain/game-mode stats, and mistake-summary builders.
+- `app/abbreviation.js` — New abbreviation-mode module for round targeting, start/reset/intro flow, question generation, rendering, answer evaluation, and option/result handling.
+- `app/adv-conj.js` — New Advanced Conjugation module for Hebrew/English prompt building, subject filtering, deck generation, start/intro flow, rendering, answer evaluation, and adv-conj stats/mistake summaries.
+- `app.js` — Rewired the app to consume the new data and mode modules, exposed additional runtime metadata for the modules, removed the extracted inline implementations, and bumped `APP_BUILD` to `20260314i`.
+- `index.html` — Added ordered `defer` script tags for `data.js`, `abbreviation.js`, and `adv-conj.js`, and refreshed cache-busting versions across the app-module chain.
+- `tests/app-progress.test.js` — Updated the VM harness to load the new module files in the same order as the browser before instrumenting `app.js`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. `app.js` is now down to `3908` lines, with the shared data layer plus the first two mode files moved out into dedicated modules.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 27/27. `node --test` — passed, 41/41.
+
+**Risks / regressions to check:** The browser boot order now depends on a longer but still explicit `defer` script chain, so a quick live smoke test is still worthwhile. Verb Match and lesson/translation remain the largest mode-specific blocks left in `app.js`, so those should be the next extraction targets if we keep pushing this structure.
+
+---
+
+### 2026-03-14 12:55 — Continue app.js reorganization with services, session flow, and UI shell helpers
+
+**Requested:** Continue the `app.js` organization plan beyond the foundation pass, keeping behavior identical while moving shared concerns into `app/` modules and verifying the full suite after each extraction.
+
+**Files changed:**
+- `app/audio.js` — New audio service module for cue source resolution, player caching, preloading, and answer-feedback playback.
+- `app/persistence.js` — New persistence service module for preferences, survey links, progress saves, and the existing UI/session storage payloads.
+- `app/session.js` — New session/navigation module for active-session detection, route resolution, intro auto-advance, overlay/leave-confirm flow, timer start/stop logic, session teardown, and results-summary transitions.
+- `app/ui.js` — New shared UI-shell module for route visibility, shell chrome, app-shell locking, blocking overlays, prompt-card visibility, lesson-progress width, and the basic home/theme/sound/niqqud control rendering helpers.
+- `app.js` — Rewired the app to import the extracted services through `window.IvriQuestApp`, removed the in-file duplicate implementations, exposed the needed runtime helpers to the new modules, and bumped `APP_BUILD` to `20260314f`.
+- `index.html` — Added ordered `defer` script tags for the new session and UI modules and refreshed cache-busting versions across the `app/` script chain.
+- `tests/app-progress.test.js` — Updated the VM harness to load `audio.js`, `persistence.js`, `session.js`, and `ui.js` in the same order as the browser before instrumenting `app.js`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. `app.js` is now down to `4759` lines and no longer owns the shared audio, persistence, session lifecycle, overlay locking, or basic shell/prompt visibility helpers directly.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 27/27. `node --test` — passed, 41/41.
+
+**Risks / regressions to check:** The browser now depends on a longer ordered `defer` chain under `index.html`, so a quick live smoke test is still worthwhile. The larger mode-specific renderers and selectors still live in `app.js`, so future extractions should keep following the same test-backed, low-risk pattern.
+
+---
+
 ## Entry Format
 
 ```
@@ -846,5 +906,143 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Tests run:** `node --test tests/app-progress.test.js` — passed, 27/27. `node --test tests/hebrew-verbs.test.js` — passed, 12/12.
 
 **Risks / regressions to check:** The collapsed marker is intentionally appended at the end of the sentence only when both `{o}` and `{p}` refer to the same disambiguated second-person form. Spot-check a few Advanced Conjugation prompts live to confirm the wording feels natural in both choices and feedback text.
+
+---
+
+### 2026-03-14 12:12 — Foundation pass: extract pure helpers into app/ scripts
+
+**Requested:** After committing and pushing the latest prompt-label fix, begin the `app.js` reorganization with a low-risk foundation pass: create an `app/` folder, move pure helpers and constants out first, add the new files to `index.html` in ordered `defer` script tags, and keep behavior identical.
+
+**Files changed:**
+- `app/constants.js` — New namespace-backed constants module containing storage keys, round/count constants, advConj subject/object constants, Hebrew final-letter maps, vocabulary availability defaults, and the survey URL.
+- `app/storage.js` — New pure storage helper module for `getStorage()`, `loadJson()`, and `saveJson()`.
+- `app/utils.js` — New pure utility module for `normalizeVocabularyAvailability()`, `weightedRandomWord()`, and `shuffle()`.
+- `app/hebrew.js` — New Hebrew-text helper module for niqqud stripping/building, final-letter normalization, medial-form normalization, and `prepareVocabulary()`.
+- `app.js` — Replaced the extracted local helpers/constants with namespace imports from `window.IvriQuestApp`, added a foundation-load guard, removed the duplicated helper implementations, and bumped `APP_BUILD` to `20260314c`.
+- `index.html` — Added ordered `defer` script tags for the new `app/` modules and converted the existing data/app script tags to ordered `defer` loading so the namespace is initialized before `app.js`.
+- `tests/app-progress.test.js` — Updated the VM harness to load the new `app/` support scripts before instrumenting `app.js`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. The app still runs as a plain static site, but `app.js` now consumes shared pure helpers from `app/` modules instead of defining all of them inline.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 27/27. `node --test` — passed, 41/41.
+
+**Risks / regressions to check:** Because script loading now relies on ordered `defer`, spot-check the live page once to confirm no boot error appears before the app renders. This pass intentionally leaves stateful rendering, routing, and mode logic inside `app.js`; only pure helpers/constants were extracted.
+
+---
+
+### 2026-03-14 14:52 — Continue app.js reorg with Verb Match and Lesson extraction
+
+**Requested:** Continue the `app.js` reorganization/tidying plan and report what still remains after the next substantial pass.
+
+**Files changed:**
+- `app/verb-match.js` — New dedicated Verb Match module containing start/reset/intro flow, round loading, pair selection, column refill, rendering, left/right card selection, success handling, mismatch handling, and “move current verb to mastered” behavior.
+- `app/lesson.js` — New dedicated lesson/translation module containing lesson startup, intro handling, second-chance intro handling, question progression, review-phase entry, question rendering, answer application, choice marking, lesson question cloning, and option-building helpers.
+- `app.js` — Rewired the bootstrap to import `lessonMode` and `verbMatch` module functions from `window.IvriQuestApp`, exposed `buildAnswerDisplay` to shared helpers, removed the old inlined Verb Match and lesson/question-flow implementations, and kept the remaining shell/rendering/bootstrap logic in place.
+- `index.html` — Added ordered `defer` script tags for `app/lesson.js` and `app/verb-match.js`.
+- `tests/app-progress.test.js` — Updated the harness boot order to load `app/lesson.js` and `app/verb-match.js` before instrumenting `app.js`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. Verb Match and lesson/translation gameplay still behave the same, but their state transitions and rendering flow now live in dedicated modules instead of the main bootstrap file. This also preserves the earlier advConj grammar fix that filters confusing second-person-subject plus second-person-object combinations from Advanced Conjugation.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** Script ordering matters more now that `app.js` depends on additional `app/` modules. Spot-check one full lesson run and one Verb Match run in the browser after the next push to confirm no stale-cache issue serves an older `app.js` alongside the new module files.
+
+---
+
+### 2026-03-14 15:18 — Move dashboard/results/modal rendering into ui module, trim dead conjugation helpers
+
+**Requested:** Continue the reorganization plan by pushing more rendering logic out of `app.js`, and keep tidying where safe.
+
+**Files changed:**
+- `app/ui.js` — Expanded the UI module to own pool-meta rendering, domain/mode performance cards, home/dashboard rendering, results-summary rendering, settings rendering, idle lesson rendering, most-missed rendering, and the welcome/mastered modal open/close/restore flows.
+- `app.js` — Rewired imports to consume the expanded UI module, removed the old inline UI/dashboard/results/modal renderers, exposed `getLanguageToggleLabel` to shared helpers for the home dashboard, and deleted an unused legacy conjugation-generator block that was no longer referenced anywhere in the runtime.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. The visual/dashboard layer is now concentrated in `app/ui.js`, and `app.js` is slimmer without changing gameplay. The removed conjugation-helper block was dead code; the live app already uses `IvriQuestHebrewVerbs.buildVerbConjugationDeck()` from `hebrew-verbs.js` for conjugation data.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** The home/results/review/settings shells and the mastered/welcome overlays now depend more heavily on `app/ui.js`, so the next browser spot-check after a push should include opening the home dashboard, results screen, and mastered modal once each. The dead-code trim was kept intentionally narrow and only removed functions with no remaining references in the repo.
+
+---
+
+### 2026-03-14 15:29 — Move remaining mode-specific setup helpers out of app.js
+
+**Requested:** Continue the reorganization plan with another low-risk pass.
+
+**Files changed:**
+- `app/abbreviation.js` — Took ownership of `prepareAbbreviationDeck()` and `cloneAbbreviationQuestionSnapshot()`, so abbreviation setup and snapshotting now live with the rest of the abbreviation mode.
+- `app/verb-match.js` — Took ownership of `playVerbMatchIntro()` and `beginVerbMatchFromIntro()`, so Verb Match now owns its intro/start transition as well as its round flow.
+- `app.js` — Rewired imports to use those module exports and removed the old inline implementations.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. This is a containment pass only; abbreviation deck prep, restored abbreviation-question snapshots, and Verb Match intro/start behavior all remain the same.
+
+**Tests run:** `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** This pass touches restored-session and intro flow wiring, so the next browser spot-check after a push should still include resuming an active session and starting Verb Match from home once.
+
+---
+
+### 2026-03-14 15:47 — Extract i18n/presenter/controller layers from app.js
+
+**Requested:** Continue the reorganization plan and keep shrinking `app.js` by moving the remaining shared presenter, language/theme, and controller code into dedicated modules.
+
+**Files changed:**
+- `app/i18n.js` — New module for language/theme/sound/niqqud preferences, translation lookup, `t()`, and language/theme application.
+- `app/ui.js` — Expanded to own the shared render loop, session header rendering, prompt rendering, feedback helpers, answer display helpers, and selection-state helpers in addition to the earlier dashboard/results/modal rendering.
+- `app/controller.js` — New module for DOM event binding, route/button handling, home-mode launch helpers, result continuation, summary-exit routing, reset-progress wiring, and next-action orchestration across modes.
+- `app/session.js` — Took ownership of `restoreSessionState()` so session rehydration now lives with the rest of the session lifecycle logic.
+- `app.js` — Rewired bootstrap imports to the new modules, removed the old inline implementations, and now mostly contains config/constants, runtime/state assembly, and startup sequencing.
+- `index.html` — Added ordered `defer` loading for `app/i18n.js` and `app/controller.js`.
+- `tests/app-progress.test.js` — Updated the harness boot order to load the new modules before instrumenting `app.js`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. This is still a structural pass only; the app now reaches the same behavior through smaller modules. `app.js` dropped to roughly bootstrap-only, with just one remaining local helper (`buildDomainByCategoryMap()`).
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** Because `app.js` now depends on more ordered modules, the next browser spot-check after a push should include one fresh reload plus: switching language/theme, opening a lesson, opening Verb Match, and reloading mid-session to confirm restored state still resumes cleanly.
+
+---
+
+### 2026-03-14 16:18 — Finish bootstrap-data extraction and move startup fallbacks/state out of app.js
+
+**Requested:** Continue the `app.js` reorganization plan by pushing more startup-only config and wiring out of the main bootstrap file.
+
+**Files changed:**
+- `app/bootstrap-data.js` — New startup data module holding the locale bundle, performance domains, domain-category lookup, and fallback domain id.
+- `app/content-sources.js` — New startup module holding the fallback vocab/abbreviation/verb APIs plus the shared `resolveContentApis()` selector.
+- `app/bootstrap-runtime.js` — New startup module for the DOM element registry and initial state factory.
+- `app.js` — Removed the inlined locale bundle, performance-domain config, fallback content APIs, giant DOM query block, and initial-state object; now consumes those startup modules and mainly orchestrates runtime wiring.
+- `index.html` — Added ordered `defer` script tags for the new startup modules.
+- `tests/app-progress.test.js` — Updated the harness boot order to match the browser’s new startup sequence.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None intended. This is a structural pass only. Startup order, fallback behavior, DOM lookup, initial state hydration, and the live app’s mode behavior should all remain the same.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 43/43.
+
+**Risks / regressions to check:** Script ordering matters even more now that `app.js` is consuming several startup modules. After the next push, do one fresh browser reload and start at least one Translation and one Conjugation session to confirm there is no stale-cached boot sequence.
+
+---
+
+### 2026-03-14 16:34 — Fix Advanced Conjugation idiom export for real browser boot
+
+**Requested:** Figure out why Advanced Conjugation would not start from `http://localhost:8080/` and fix it.
+
+**Files changed:**
+- `hebrew-idioms.js` — Exported `HEBREW_IDIOMS` onto `globalThis` so browser consumers can read the idiom list at runtime.
+- `index.html` — Bumped the `hebrew-idioms.js` cache-busting query string so the browser fetches the fixed data file immediately.
+- `tests/hebrew-idioms.test.js` — New regression tests that load the real idiom file and verify both global exposure and non-empty Advanced Conjugation deck generation.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Advanced Conjugation now sees the real idiom data in the live browser instead of an empty list, so the mode can build a playable deck again. This restores the browser path that the mocked harness had been hiding.
+
+**Tests run:** `node --test tests/hebrew-idioms.test.js` — passed, 2/2. `node --test tests/app-progress.test.js` — passed, 29/29. `node --test` — passed, 45/45.
+
+**Risks / regressions to check:** Do one hard refresh on `http://localhost:8080/` once so the old cached `hebrew-idioms.js?v=20260311b` is gone. After that, Advanced Conjugation should open normally.
 
 ---

@@ -1,0 +1,469 @@
+(function initIvriQuestAppLesson(global) {
+"use strict";
+
+const app = global.IvriQuestApp = global.IvriQuestApp || {};
+const lessonMode = app.lessonMode = app.lessonMode || {};
+
+function getRuntime() {
+  return app.runtime || {};
+}
+
+function getHelpers() {
+  return getRuntime().helpers || {};
+}
+
+function getData() {
+  return app.data || {};
+}
+
+function getSession() {
+  return app.session || {};
+}
+
+function translate(key, vars = {}) {
+  return getHelpers().t ? getHelpers().t(key, vars) : key;
+}
+
+lessonMode.startLesson = lessonMode.startLesson || function startLesson() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  const session = getSession();
+
+  session.stopVerbMatchTimer?.();
+  session.stopLessonTimer?.();
+  session.stopAbbreviationTimer?.();
+  session.closeLeaveSessionConfirm?.();
+  h.closeMasteredModal?.();
+  h.resetVerbMatchState?.();
+  h.resetAbbreviationState?.();
+  runtime.state.mode = "lesson";
+  runtime.state.route = "home";
+  runtime.state.lastPlayedMode = "lesson";
+  session.clearSummaryState?.();
+  session.clearLessonStartIntro?.();
+  session.clearSecondChanceIntro?.();
+  session.clearVerbMatchIntro?.();
+  session.clearAbbreviationIntro?.();
+  h.resetSessionCounters?.();
+  runtime.state.lesson.active = true;
+  runtime.state.lesson.inReview = false;
+  runtime.state.lesson.reviewQueue = [];
+  runtime.state.lesson.missedWordIds = [];
+  runtime.state.lesson.optionHistory = {};
+  runtime.state.lesson.currentRound = 0;
+  runtime.state.lesson.secondChanceCurrent = 0;
+  runtime.state.lesson.secondChanceTotal = 0;
+  runtime.state.lesson.wrongAnswers = 0;
+  runtime.state.lesson.sessionMistakeIds = [];
+  runtime.state.lesson.startMs = 0;
+  runtime.state.lesson.elapsedSeconds = 0;
+  runtime.state.lesson.askedWordIds = [];
+  runtime.state.lesson.domainCounts = {};
+  runtime.state.currentQuestion = null;
+  runtime.el.choiceContainer.innerHTML = "";
+  runtime.el.choiceContainer.classList.remove("match-grid");
+  h.clearFeedback?.();
+  lessonMode.playLessonStartIntro();
+  h.renderAll?.();
+};
+
+lessonMode.playLessonStartIntro = lessonMode.playLessonStartIntro || function playLessonStartIntro() {
+  const runtime = getRuntime();
+  const session = getSession();
+  const h = getHelpers();
+  if (!runtime.el.lessonStartIntro) {
+    lessonMode.beginLessonFromIntro();
+    return;
+  }
+
+  session.clearLessonStartIntro?.();
+  runtime.state.lesson.lessonStartIntroActive = true;
+  h.showBlockingOverlay?.(runtime.el.lessonStartIntro);
+  session.scheduleIntroAutoAdvance?.(() => lessonMode.beginLessonFromIntro());
+};
+
+lessonMode.beginLessonFromIntro = lessonMode.beginLessonFromIntro || function beginLessonFromIntro() {
+  const runtime = getRuntime();
+  const session = getSession();
+  if (!runtime.state.lesson.active) return;
+  if (!runtime.state.lesson.lessonStartIntroActive && runtime.state.currentQuestion) return;
+  if (runtime.state.lesson.lessonStartIntroActive) {
+    session.clearLessonStartIntro?.();
+  }
+  if (!runtime.state.lesson.startMs) {
+    runtime.state.lesson.startMs = Date.now();
+    runtime.state.lesson.elapsedSeconds = 0;
+    session.startLessonTimer?.();
+  }
+  lessonMode.nextQuestion();
+};
+
+lessonMode.playSecondChanceIntro = lessonMode.playSecondChanceIntro || function playSecondChanceIntro() {
+  const runtime = getRuntime();
+  const session = getSession();
+  const h = getHelpers();
+  if (!runtime.el.secondChanceIntro) {
+    lessonMode.nextQuestion();
+    return;
+  }
+
+  session.clearSecondChanceIntro?.();
+  runtime.state.lesson.secondChanceIntroActive = true;
+  h.showBlockingOverlay?.(runtime.el.secondChanceIntro);
+  session.scheduleIntroAutoAdvance?.(() => lessonMode.beginSecondChanceFromIntro());
+};
+
+lessonMode.beginSecondChanceFromIntro = lessonMode.beginSecondChanceFromIntro || function beginSecondChanceFromIntro() {
+  const runtime = getRuntime();
+  const session = getSession();
+  if (!runtime.state.lesson.active || !runtime.state.lesson.secondChanceIntroActive) return;
+  session.clearSecondChanceIntro?.();
+  lessonMode.nextQuestion();
+};
+
+lessonMode.nextQuestion = lessonMode.nextQuestion || function nextQuestion() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  const data = getData();
+  const session = getSession();
+
+  if (runtime.state.mode !== "lesson") return;
+  if (!runtime.state.lesson.active) {
+    session.goHome?.();
+    return;
+  }
+  if (runtime.state.lesson.lessonStartIntroActive) return;
+  if (runtime.state.lesson.secondChanceIntroActive) return;
+
+  const pool = data.getSelectedPool?.() || [];
+  if (!pool.length) {
+    session.stopLessonTimer?.();
+    runtime.state.lesson.active = false;
+    runtime.state.currentQuestion = null;
+    const hasMastered = (data.getMasteredWords?.() || []).length > 0;
+    runtime.el.promptLabel.textContent = hasMastered ? translate("prompt.masteredOnlyTitle") : translate("prompt.noVocabTitle");
+    runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.textContent = hasMastered ? translate("prompt.masteredOnlyBody") : translate("prompt.noVocabBody");
+    runtime.el.choiceContainer.innerHTML = "";
+    h.renderNiqqudToggle?.();
+    return;
+  }
+
+  if (!runtime.state.lesson.inReview && runtime.state.lesson.currentRound >= runtime.constants.LESSON_ROUNDS) {
+    if (!lessonMode.tryStartReviewPhase(pool)) {
+      session.finishLesson?.();
+      return;
+    }
+    runtime.state.currentQuestion = null;
+    h.renderSessionHeader?.();
+    lessonMode.playSecondChanceIntro();
+    return;
+  }
+
+  if (runtime.state.lesson.inReview && runtime.state.lesson.secondChanceCurrent >= runtime.state.lesson.secondChanceTotal) {
+    session.finishLesson?.();
+    return;
+  }
+
+  const question = runtime.state.lesson.inReview
+    ? lessonMode.buildReviewQuestion(pool)
+    : lessonMode.buildQuestion(pool);
+  if (!question) {
+    runtime.state.lesson.active = false;
+    session.finishLesson?.();
+    return;
+  }
+
+  lessonMode.rememberOptionHistory(question);
+  if (runtime.state.lesson.inReview) {
+    runtime.state.lesson.secondChanceCurrent += 1;
+  } else {
+    runtime.state.lesson.currentRound += 1;
+  }
+  runtime.state.currentQuestion = { ...question, locked: false, selectedOptionId: null };
+  h.clearFeedback?.();
+  lessonMode.renderQuestion();
+};
+
+lessonMode.renderQuestion = lessonMode.renderQuestion || function renderQuestion() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  const question = runtime.state.currentQuestion;
+
+  h.setGamePickerVisibility?.(false);
+  h.setPromptCardVisibility?.(true);
+  runtime.el.choiceContainer.classList.remove("summary-grid");
+  h.renderSessionHeader?.();
+  runtime.el.choiceContainer.classList.remove("match-grid");
+
+  if (!question) return;
+
+  runtime.el.promptLabel.textContent = question.promptLabel;
+  h.renderPromptText?.(question);
+  lessonMode.renderChoices(question);
+};
+
+lessonMode.renderChoices = lessonMode.renderChoices || function renderChoices(question) {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  runtime.el.choiceContainer.innerHTML = "";
+
+  question.options.forEach((option) => {
+    const btn = global.document.createElement("button");
+    btn.type = "button";
+    btn.className = `choice-btn ${question.optionsAreHebrew ? "hebrew" : ""}`;
+    btn.textContent = question.optionsAreHebrew
+      ? h.getHebrewText?.(option.word, runtime.state.showNiqqudInline) || ""
+      : option.word.en;
+
+    btn.addEventListener("click", () => {
+      if (question.locked) return;
+      question.selectedOptionId = option.id;
+      runtime.el.choiceContainer.querySelectorAll(".choice-btn").forEach((button, index) => {
+        button.classList.toggle("selected", question.options[index]?.id === option.id);
+      });
+      h.renderSessionHeader?.();
+    });
+    btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
+
+    runtime.el.choiceContainer.append(btn);
+  });
+
+  if (question.locked) {
+    lessonMode.markChoiceResults(question);
+  }
+};
+
+lessonMode.applyAnswer = lessonMode.applyAnswer || function applyAnswer(isCorrect, selectedId = null) {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  const data = getData();
+  if (!runtime.state.currentQuestion || runtime.state.currentQuestion.locked) return;
+
+  runtime.state.currentQuestion.locked = true;
+  const word = runtime.state.currentQuestion.word;
+
+  data.updateProgress?.(word.id, isCorrect);
+  runtime.state.sessionStreak = isCorrect ? runtime.state.sessionStreak + 1 : 0;
+
+  if (isCorrect) {
+    if (!runtime.state.currentQuestion.isReview) {
+      runtime.state.sessionScore += 1;
+    }
+  } else {
+    runtime.state.lesson.wrongAnswers += 1;
+    if (!runtime.state.lesson.sessionMistakeIds.includes(word.id)) {
+      runtime.state.lesson.sessionMistakeIds.push(word.id);
+    }
+  }
+
+  if (!isCorrect && !runtime.state.currentQuestion.isReview) {
+    lessonMode.addMissedWord(runtime.state.currentQuestion.word.id);
+  }
+
+  const answerDisplay = h.buildAnswerDisplay?.(word, runtime.state.showNiqqudInline) || "";
+  h.setFeedback?.(
+    isCorrect
+      ? translate("feedback.correct", { answer: answerDisplay })
+      : translate("feedback.wrong", { answer: answerDisplay, english: word.en }),
+    isCorrect
+  );
+  h.playAnswerFeedbackSound?.(isCorrect);
+
+  runtime.state.currentQuestion.selectedOptionId = selectedId ?? null;
+  lessonMode.markChoiceResults();
+
+  app.persistence?.saveProgress?.();
+  h.renderSessionHeader?.();
+  h.renderDomainPerformance?.();
+  h.renderMostMissed?.();
+};
+
+lessonMode.markChoiceResults = lessonMode.markChoiceResults || function markChoiceResults(question = getRuntime().state.currentQuestion) {
+  const runtime = getRuntime();
+  if (!question) return;
+  const buttons = Array.from(runtime.el.choiceContainer.querySelectorAll("button"));
+  const correctId = question.word.id;
+  const selectedId = question.selectedOptionId ?? null;
+
+  buttons.forEach((button, index) => {
+    const option = question.options[index];
+
+    if (option.id === correctId) {
+      button.classList.add("correct");
+    } else if (option.id === selectedId) {
+      button.classList.add("wrong");
+    }
+
+    button.disabled = true;
+  });
+};
+
+lessonMode.cloneLessonQuestionSnapshot = lessonMode.cloneLessonQuestionSnapshot || function cloneLessonQuestionSnapshot(question) {
+  return {
+    ...question,
+    word: question.word ? { ...question.word } : null,
+    options: question.options.map((option) => ({
+      ...option,
+      word: option.word ? { ...option.word } : null,
+    })),
+    locked: question.locked !== undefined ? Boolean(question.locked) : true,
+    selectedOptionId: question.selectedOptionId ?? null,
+  };
+};
+
+lessonMode.addMissedWord = lessonMode.addMissedWord || function addMissedWord(wordId) {
+  const runtime = getRuntime();
+  if (!wordId) return;
+  if (!runtime.state.lesson.missedWordIds.includes(wordId)) {
+    runtime.state.lesson.missedWordIds.push(wordId);
+  }
+};
+
+lessonMode.buildQuestion = lessonMode.buildQuestion || function buildQuestion(pool) {
+  const runtime = getRuntime();
+  const data = getData();
+  const mode = lessonMode.pickQuestionMode();
+  const freshPool =
+    runtime.state.lesson.askedWordIds.length < pool.length
+      ? pool.filter((word) => !runtime.state.lesson.askedWordIds.includes(word.id))
+      : pool;
+  const targetDomainId = data.pickLeastSeenLessonDomainId?.(freshPool);
+  const domainPool = targetDomainId
+    ? freshPool.filter((word) => data.getDomainIdForWord?.(word) === targetDomainId)
+    : freshPool;
+  const word = data.pickBestWord?.(domainPool.length ? domainPool : freshPool);
+  if (!word) return null;
+
+  runtime.state.lesson.askedWordIds.push(word.id);
+  const chosenDomainId = data.getDomainIdForWord?.(word);
+  runtime.state.lesson.domainCounts[chosenDomainId] = (runtime.state.lesson.domainCounts[chosenDomainId] || 0) + 1;
+  const options = lessonMode.buildOptions(pool, word);
+
+  if (mode === "reverse") {
+    return {
+      mode: "reverse",
+      promptLabel: translate("prompt.toEnglish"),
+      prompt: word.he,
+      promptIsHebrew: true,
+      options,
+      optionsAreHebrew: false,
+      word,
+      isReview: false,
+    };
+  }
+
+  return {
+    mode: "forward",
+    promptLabel: translate("prompt.toHebrew"),
+    prompt: word.en,
+    promptIsHebrew: false,
+    options,
+    optionsAreHebrew: true,
+    word,
+    isReview: false,
+  };
+};
+
+lessonMode.buildReviewQuestion = lessonMode.buildReviewQuestion || function buildReviewQuestion(pool) {
+  const runtime = getRuntime();
+  while (runtime.state.lesson.reviewQueue.length) {
+    const wordId = runtime.state.lesson.reviewQueue.shift();
+    const word = pool.find((item) => item.id === wordId);
+    if (!word) continue;
+
+    const mode = lessonMode.pickQuestionMode();
+    const forbiddenOptionIds = new Set((runtime.state.lesson.optionHistory[word.id] || []).filter((id) => id !== word.id));
+    const options = lessonMode.buildOptions(pool, word, { forbiddenOptionIds });
+
+    if (mode === "reverse") {
+      return {
+        mode: "reverse",
+        promptLabel: translate("prompt.reviewToEnglish"),
+        prompt: word.he,
+        promptIsHebrew: true,
+        options,
+        optionsAreHebrew: false,
+        word,
+        isReview: true,
+      };
+    }
+
+    return {
+      mode: "forward",
+      promptLabel: translate("prompt.reviewToHebrew"),
+      prompt: word.en,
+      promptIsHebrew: false,
+      options,
+      optionsAreHebrew: true,
+      word,
+      isReview: true,
+    };
+  }
+
+  return null;
+};
+
+lessonMode.buildOptions = lessonMode.buildOptions || function buildOptions(pool, word, config = {}) {
+  const shuffle = app.utils?.shuffle;
+  const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
+  const forbiddenOptionIds = config.forbiddenOptionIds || new Set();
+  const sameCategoryCandidates = pool.filter(
+    (item) => item.id !== word.id && item.category === word.category && !forbiddenOptionIds.has(item.id)
+  );
+  const distractors = doShuffle(sameCategoryCandidates).slice(0, 3);
+
+  if (distractors.length < 3) {
+    const filler = doShuffle(
+      pool.filter(
+        (item) => item.id !== word.id && !distractors.includes(item) && !forbiddenOptionIds.has(item.id)
+      )
+    ).slice(0, 3 - distractors.length);
+    distractors.push(...filler);
+  }
+
+  if (distractors.length < 3) {
+    const fallback = doShuffle(
+      pool.filter((item) => item.id !== word.id && !distractors.includes(item))
+    ).slice(0, 3 - distractors.length);
+    distractors.push(...fallback);
+  }
+
+  const options = [word, ...distractors].slice(0, 4).map((item) => ({
+    id: item.id,
+    word: item,
+  }));
+
+  return doShuffle(options);
+};
+
+lessonMode.pickQuestionMode = lessonMode.pickQuestionMode || function pickQuestionMode() {
+  return Math.random() < 0.5 ? "forward" : "reverse";
+};
+
+lessonMode.rememberOptionHistory = lessonMode.rememberOptionHistory || function rememberOptionHistory(question) {
+  const runtime = getRuntime();
+  if (!question?.word?.id || !Array.isArray(question.options) || runtime.state.lesson.optionHistory[question.word.id]) {
+    return;
+  }
+
+  runtime.state.lesson.optionHistory[question.word.id] = question.options.map((option) => option.id);
+};
+
+lessonMode.tryStartReviewPhase = lessonMode.tryStartReviewPhase || function tryStartReviewPhase(pool) {
+  const runtime = getRuntime();
+  const shuffle = app.utils?.shuffle;
+  const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
+  if (runtime.state.lesson.inReview || !runtime.state.lesson.missedWordIds.length) return false;
+
+  const wordIdsInPool = new Set(pool.map((word) => word.id));
+  const reviewIds = runtime.state.lesson.missedWordIds.filter((id) => wordIdsInPool.has(id));
+  if (!reviewIds.length) return false;
+
+  runtime.state.lesson.inReview = true;
+  runtime.state.lesson.reviewQueue = doShuffle(reviewIds);
+  runtime.state.lesson.secondChanceTotal = runtime.state.lesson.reviewQueue.length;
+  runtime.state.lesson.secondChanceCurrent = 0;
+  return true;
+};
+})(typeof window !== "undefined" ? window : globalThis);
