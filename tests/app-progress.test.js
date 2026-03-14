@@ -4,6 +4,12 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+const nativeSetTimeout = global.setTimeout;
+const nativeClearTimeout = global.clearTimeout;
+const nativeSetInterval = global.setInterval;
+const nativeClearInterval = global.clearInterval;
+const activeHarnesses = new Set();
+
 class FakeClassList {
   constructor() {
     this.tokens = new Set();
@@ -192,6 +198,7 @@ function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options =
     /\}\)\(typeof window !== "undefined" \? window : globalThis\);\s*$/,
     `
 globalThis.__appTestExports = {
+  ADV_CONJ_SUBJECTS,
   ADV_CONJ_OBJECTS,
   applyAnswer,
   applyAbbreviationAnswer,
@@ -199,6 +206,7 @@ globalThis.__appTestExports = {
   applyVerbMatchMismatch,
   applyVerbMatchSuccess,
   buildAdvConjEnglishSentence,
+  getAdvConjSubjectsForTense,
   beginAbbreviationFromIntro,
   beginLessonFromIntro,
   beginVerbMatchFromIntro,
@@ -221,6 +229,7 @@ globalThis.__appTestExports = {
   resumeActiveTimers,
   restoreSessionState,
   startAbbreviation,
+  startAdvConj,
   startVerbMatch,
   toggleSoundPreference,
   updateProgress,
@@ -232,6 +241,8 @@ globalThis.__appTestExports = {
 
   const audioPlayLog = [];
   const audioLoadLog = [];
+  const timeoutHandles = new Set();
+  const intervalHandles = new Set();
   const elements = new Map();
   const document = {
     body: new FakeElement("body"),
@@ -252,6 +263,31 @@ globalThis.__appTestExports = {
   };
   document.documentElement.style = {};
 
+  function trackedSetTimeout(handler, delay, ...args) {
+    const handle = nativeSetTimeout(() => {
+      timeoutHandles.delete(handle);
+      handler(...args);
+    }, delay);
+    timeoutHandles.add(handle);
+    return handle;
+  }
+
+  function trackedClearTimeout(handle) {
+    timeoutHandles.delete(handle);
+    nativeClearTimeout(handle);
+  }
+
+  function trackedSetInterval(handler, delay, ...args) {
+    const handle = nativeSetInterval(handler, delay, ...args);
+    intervalHandles.add(handle);
+    return handle;
+  }
+
+  function trackedClearInterval(handle) {
+    intervalHandles.delete(handle);
+    nativeClearInterval(handle);
+  }
+
   const context = {
     console,
     Math,
@@ -267,10 +303,10 @@ globalThis.__appTestExports = {
     Set,
     Promise,
     URLSearchParams,
-    setTimeout,
-    clearTimeout,
-    setInterval,
-    clearInterval,
+    setTimeout: trackedSetTimeout,
+    clearTimeout: trackedClearTimeout,
+    setInterval: trackedSetInterval,
+    clearInterval: trackedClearInterval,
     __IVRIQUEST_TEST_CONFIG__: {
       introAutoAdvanceMs: 0,
     },
@@ -343,15 +379,24 @@ globalThis.__appTestExports = {
 
   vm.createContext(context);
   vm.runInContext(instrumented, context, { filename: sourcePath });
-  return {
+  const harness = {
     ...context.__appTestExports,
     audioLoadLog,
     audioPlayLog,
+    cleanup() {
+      timeoutHandles.forEach((handle) => nativeClearTimeout(handle));
+      timeoutHandles.clear();
+      intervalHandles.forEach((handle) => nativeClearInterval(handle));
+      intervalHandles.clear();
+      activeHarnesses.delete(harness);
+    },
   };
+  activeHarnesses.add(harness);
+  return harness;
 }
 
 function waitForTimers() {
-  return new Promise((resolve) => setTimeout(resolve, 0));
+  return new Promise((resolve) => nativeSetTimeout(resolve, 0));
 }
 
 function assertAudioPlayLog(audioPlayLog, expectedPatterns) {
@@ -367,6 +412,11 @@ function assertAudioLoadLog(audioLoadLog, expectedPatterns) {
     assert.match(audioLoadLog[index], pattern);
   });
 }
+
+test.afterEach(() => {
+  activeHarnesses.forEach((harness) => harness.cleanup());
+  activeHarnesses.clear();
+});
 
 test("correct second-chance answers do not add misses or reshuffle most-missed rankings", () => {
   const vocabulary = [
@@ -861,6 +911,59 @@ test("advanced conjugation English prompts disambiguate second-person singular v
     buildAdvConjEnglishSentence(idiom, subj, pluralYou, "past"),
     "they (f.) opened your (pl.) eyes"
   );
+});
+
+test("advanced conjugation subjects add present-tense you forms without extending past/future beyond available data", () => {
+  const { ADV_CONJ_SUBJECTS, getAdvConjSubjectsForTense } = loadAppHarness([], [], []);
+  const labels = (subjects) => Array.from(subjects, (subject) => subject.en);
+
+  assert.deepEqual(
+    labels(ADV_CONJ_SUBJECTS),
+    ["he", "you (m.sg.)", "she", "you (f.sg.)", "they (m.)", "you (m.pl.)", "they (f.)", "you (f.pl.)"]
+  );
+  assert.deepEqual(
+    labels(getAdvConjSubjectsForTense("present")),
+    ["he", "you (m.sg.)", "she", "you (f.sg.)", "they (m.)", "you (m.pl.)", "they (f.)", "you (f.pl.)"]
+  );
+  assert.deepEqual(
+    labels(getAdvConjSubjectsForTense("past")),
+    ["he", "she", "they (m.)", "they (f.)"]
+  );
+  assert.deepEqual(
+    labels(getAdvConjSubjectsForTense("future")),
+    ["he", "she", "they (m.)", "they (f.)"]
+  );
+});
+
+test("advanced conjugation intro auto-advance is canceled when leaving home", async () => {
+  const idiom = {
+    id: "ptihat_einayim",
+    english: "to open someone's eyes",
+    english_meaning: "to open someone's eyes",
+    object_type: "l_dative",
+    fixed_object: "את העיניים",
+    literal_sg: "{s} opens {p} eyes",
+    literal_pl: "{s} open {p} eyes",
+    literal_past: "{s} opened {p} eyes",
+    literal_future: "{s} will open {p} eyes",
+    showMeaning: false,
+    present_tense: { msg: "פותח", fsg: "פותחת", mpl: "פותחים", fpl: "פותחות" },
+    past_tense: { msg: "פתח", fsg: "פתחה", mpl: "פתחו", fpl: "פתחו" },
+    future_tense: { msg: "יפתח", fsg: "תפתח", mpl: "יפתחו", fpl: "יפתחו" },
+  };
+  const { goHome, startAdvConj, state } = loadAppHarness([], [], [], {
+    idioms: [idiom],
+  });
+
+  startAdvConj();
+  assert.equal(state.advConj.introActive, true);
+
+  goHome();
+  await waitForTimers();
+
+  assert.equal(state.advConj.active, false);
+  assert.equal(state.advConj.introActive, false);
+  assert.equal(state.advConj.currentQuestion, null);
 });
 
 test("abbreviation and conjugation start flows enter intro state and home clears them", () => {

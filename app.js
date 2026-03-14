@@ -724,9 +724,13 @@ const STREAK_SOUND_INTERVAL = 4;
 
 const ADV_CONJ_SUBJECTS = [
   { form: "msg", pronoun: "הוא", en: "he" },
+  { form: "msg", pronoun: "אתה", en: "you (m.sg.)", tenses: ["present"] },
   { form: "fsg", pronoun: "היא", en: "she" },
+  { form: "fsg", pronoun: "את", en: "you (f.sg.)", tenses: ["present"] },
   { form: "mpl", pronoun: "הם", en: "they (m.)" },
+  { form: "mpl", pronoun: "אתם", en: "you (m.pl.)", tenses: ["present"] },
   { form: "fpl", pronoun: "הן", en: "they (f.)" },
+  { form: "fpl", pronoun: "אתן", en: "you (f.pl.)", tenses: ["present"] },
 ];
 
 const ADV_CONJ_OBJECTS = [
@@ -2811,6 +2815,10 @@ function buildAdvConjEnglishSentence(idiom, subj, obj, tense) {
   return tpl.replace(/\{s\}/g, subj.en).replace(/\{o\}/g, obj.en).replace(/\{p\}/g, obj.poss);
 }
 
+function getAdvConjSubjectsForTense(tense) {
+  return ADV_CONJ_SUBJECTS.filter((subj) => !Array.isArray(subj.tenses) || subj.tenses.includes(tense));
+}
+
 function buildAdvConjDeck() {
   const deck = [];
   const tenses = ["present", "past", "future"];
@@ -2821,7 +2829,8 @@ function buildAdvConjDeck() {
                       : tense === "future" ? idiom.future_tense
                       : idiom.present_tense;
       if (!tenseData) continue;
-      for (const subj of ADV_CONJ_SUBJECTS) {
+      const subjects = getAdvConjSubjectsForTense(tense);
+      for (const subj of subjects) {
         if (!tenseData[subj.form]) continue;
         for (const obj of ADV_CONJ_OBJECTS) {
           if (idiom.object_type === "possessive_suffix" && !idiom.suffix_forms[obj.key]) continue;
@@ -2834,14 +2843,14 @@ function buildAdvConjDeck() {
           // For he2en: skip if verb form is ambiguous (same for msg/fsg or mpl/fpl)
           if (direction === "he2en") {
             const verbForm = tenseData[subj.form];
-            const ambiguous = ADV_CONJ_SUBJECTS.some(s =>
-              s.form !== subj.form && tenseData[s.form] === verbForm
+            const ambiguous = subjects.some(s =>
+              s.en !== subj.en && tenseData[s.form] === verbForm
             );
             if (ambiguous) continue;
           }
 
           const otherObjs = ADV_CONJ_OBJECTS.filter(o => o.key !== obj.key);
-          const otherSubjs = ADV_CONJ_SUBJECTS.filter(s => s.form !== subj.form);
+          const otherSubjs = subjects.filter(s => s.en !== subj.en);
           const correctText = direction === "en2he" ? hebrewAnswer : englishSentence;
 
           // Build distractors in the answer language (same tense)
@@ -2919,6 +2928,7 @@ function resetAdvConjState() {
 }
 
 function clearAdvConjIntro() {
+  clearIntroAutoAdvance();
   if (el.advConjIntro) {
     el.advConjIntro.classList.add("hidden");
     el.advConjIntro.setAttribute("aria-hidden", "true");
@@ -2954,10 +2964,11 @@ function playAdvConjIntro() {
     el.advConjIntro.classList.remove("hidden");
     el.advConjIntro.setAttribute("aria-hidden", "false");
   }
-  setTimeout(beginAdvConjFromIntro, 1800);
+  scheduleIntroAutoAdvance(() => beginAdvConjFromIntro());
 }
 
 function beginAdvConjFromIntro() {
+  if (!state.advConj.active) return;
   clearAdvConjIntro();
   loadAdvConjQuestion();
 }
@@ -3105,7 +3116,7 @@ function buildAdvConjMistakeSummary() {
   return state.advConj.sessionMistakeIds.map(id => {
     const idiom = HEBREW_IDIOMS.find(i => i.id === id);
     if (!idiom) return null;
-    const subj = ADV_CONJ_SUBJECTS.find(s => idiom.present_tense[s.form]);
+    const subj = getAdvConjSubjectsForTense("present").find(s => idiom.present_tense[s.form]);
     const obj = ADV_CONJ_OBJECTS[0];
     const ans = subj ? buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key, "present") : "";
     return {

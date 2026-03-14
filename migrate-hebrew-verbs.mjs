@@ -8,9 +8,10 @@ const verbApi = require("./hebrew-verbs.js");
 
 const cwd = process.cwd();
 const vocabPath = path.join(cwd, "vocab-data.js");
-const outputReportPath = path.join(cwd, "hebrew-verb-review-report.json");
-const outputEntriesPath = path.join(cwd, "hebrew-verb-migrated.json");
-const outputReviewMarkdownPath = path.join(cwd, "hebrew-verb-review-report.md");
+const outputDir = path.join(cwd, "generated", "verbs");
+const outputReportPath = path.join(outputDir, "hebrew-verb-review-report.json");
+const outputEntriesPath = path.join(outputDir, "hebrew-verb-migrated.json");
+const outputReviewMarkdownPath = path.join(outputDir, "hebrew-verb-review-report.md");
 
 const sandbox = {
   window: {},
@@ -31,6 +32,8 @@ const vocabulary = sandbox.IvriQuestVocab.getBaseVocabulary();
 const migrated = verbApi.migrateVocabulary(vocabulary);
 const seedEntries = verbApi.getSeedVerbEntries();
 const combinedEntries = [...seedEntries, ...migrated.entries];
+
+fs.mkdirSync(outputDir, { recursive: true });
 
 const groupedByMode = {
   generated: [],

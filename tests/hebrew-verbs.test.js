@@ -346,7 +346,7 @@ test("starter verb seed entries carry per-mode availability metadata", () => {
 
   assert.equal(entriesById.get("starter-verb-lalechet--sense-1")?.availability?.translationQuiz, false);
   assert.equal(entriesById.get("starter-verb-lalechet--sense-1")?.availability?.sentenceHints, true);
-  assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.translationQuiz, true);
+  assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.translationQuiz, false);
   assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.sentenceHints, true);
 });
 

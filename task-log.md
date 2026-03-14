@@ -779,3 +779,55 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** Verify cached browsers pick up the new assets after one hard refresh. Confirm streak counting feels right across all game modes after interrupted sessions or resumes. The full Node suite still has a pre-existing hang/open-handle issue after `tests/app-progress.test.js`, so whole-suite exit behavior is not yet clean.
 
 ---
+
+### 2026-03-14 11:20 — Trim unused logo assets, move verb migration outputs
+
+**Requested:** Do the lightest-lift cleanup items from a repo review so the remaining bigger structural/content work can be handed off later.
+
+**Files changed:**
+- `migrate-hebrew-verbs.mjs` — Changed migration outputs to write into `generated/verbs/` and ensured the directory is created automatically before writing.
+- `README.md` — Updated the migration-output paths in the docs to match `generated/verbs/`.
+- `generated/verbs/hebrew-verb-review-report.json`, `generated/verbs/hebrew-verb-review-report.md`, `generated/verbs/hebrew-verb-migrated.json` — Moved the generated verb-report artifacts out of the repo root into a dedicated folder.
+- `assets/logo-dark.svg`, `assets/logo-light.svg` — Deleted the old heavyweight SVG logo files that are no longer referenced by the live CSS.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None in the live app. The repository is lighter, and the verb-migration script now writes its generated artifacts into a dedicated folder instead of the project root.
+
+**Tests run:** `node migrate-hebrew-verbs.mjs` — passed and regenerated outputs successfully into `generated/verbs/` with summary counts `{ generated_safe_verbs: 8, curated_verbs_needing_forms: 0, ambiguous_verbs_needing_sense_splitting: 3, phrase_only_items: 31, blocked_items: 57 }`. Also verified no live repo references remain to `logo-dark.svg` or `logo-light.svg` outside historical task-log notes.
+
+**Risks / regressions to check:** If any outside scripts or personal notes expect the old root-level migration filenames, they will need to be pointed at `generated/verbs/` instead. The SVG deletions are safe for the current app because CSS uses PNG logos now, but reintroducing SVG logos later would require re-adding optimized assets.
+
+---
+
+### 2026-03-14 11:31 — Expand advConj subject coverage, fix test-runner hang
+
+**Requested:** Expand the Advanced Conjugation subject coverage in `app.js` beyond just he/she/they, and investigate why the full Node test suite was hanging instead of exiting cleanly.
+
+**Files changed:**
+- `app.js` — Expanded `ADV_CONJ_SUBJECTS` to include present-tense second-person variants (`you (m.sg.)`, `you (f.sg.)`, `you (m.pl.)`, `you (f.pl.)`) where the underlying idiom data safely shares those present-tense forms; added `getAdvConjSubjectsForTense()` so past/future stay limited to the fully supported buckets; updated advConj deck generation to use tense-appropriate subject sets; switched advConj intro auto-advance to the shared tracked intro scheduler and added a guard so leaving home cancels the pending intro transition cleanly.
+- `tests/app-progress.test.js` — Exported the new advConj helpers for test harness access; added regression coverage for present-vs-past/future subject availability and canceled advConj intro auto-advance; wrapped the VM `setTimeout`/`setInterval` APIs in tracked test-local timer helpers and cleaned them up after each test so the file no longer leaves open handles behind.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Advanced Conjugation now includes additional second-person subjects in present tense prompts and answer banks, while still avoiding fake past/future coverage that the idiom dataset does not currently support. Leaving Advanced Conjugation during its intro no longer risks a delayed auto-start firing after the session has already been closed. The Node test suite now exits normally instead of hanging after `tests/app-progress.test.js`.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 26/26. `node --test` — exited cleanly (hang resolved) and reported 39 pass / 1 fail; the remaining failure is `tests/hebrew-verbs.test.js` at line 343 (`starter verb seed entries carry per-mode availability metadata`), unchanged by this work.
+
+**Risks / regressions to check:** This expands advConj only as far as the current idiom data can support safely. `I`, `we`, and non-present second-person forms still require richer tense data in `hebrew-idioms.js`; adding them in `app.js` alone would generate incorrect Hebrew. Because more present-tense second-person prompts now exist, spot-check distractor quality in Advanced Conjugation to make sure the larger subject pool still feels clean.
+
+---
+
+### 2026-03-14 11:38 — Align verb availability test with conjugation-only starter verbs
+
+**Requested:** Keep `לכתוב` available in the conjugation game but not in the translation game, and resolve the stale verb-data suite failure around that availability metadata.
+
+**Files changed:**
+- `tests/hebrew-verbs.test.js` — Updated the `starter-verb-lichtov--sense-1` expectation so `availability.translationQuiz === false` and `availability.sentenceHints === true`, matching the current seed-verb metadata and intended product behavior.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** None in the live app. `לכתוב` remains available to conjugation flows and remains excluded from the translation quiz pool; the test suite now reflects that rule correctly.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 12/12. `node --test` — passed, 40/40.
+
+**Risks / regressions to check:** If product intent changes and `לכתוב` should appear in the translation quiz later, the source of truth is `TRANSLATION_HIDDEN_STARTER_VERB_IDS` in `hebrew-verbs.js`, not this test.
+
+---

@@ -6,7 +6,7 @@
         "to fold"
       ],
       "source_word_ids": [
-        "cooking_verbs-010-to-fold"
+        "cooking_verbs-009-to-fold"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -18,7 +18,7 @@
         "to season"
       ],
       "source_word_ids": [
-        "cooking_verbs-018-to-season"
+        "cooking_verbs-017-to-season"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -30,7 +30,7 @@
         "to boil"
       ],
       "source_word_ids": [
-        "cooking_verbs-021-to-boil"
+        "cooking_verbs-020-to-boil"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -42,7 +42,7 @@
         "to thicken"
       ],
       "source_word_ids": [
-        "cooking_verbs-037-to-thicken"
+        "cooking_verbs-036-to-thicken"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -54,7 +54,7 @@
         "to dilute"
       ],
       "source_word_ids": [
-        "cooking_verbs-038-to-dilute"
+        "cooking_verbs-037-to-dilute"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -66,7 +66,7 @@
         "to strain"
       ],
       "source_word_ids": [
-        "cooking_verbs-039-to-strain"
+        "cooking_verbs-038-to-strain"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -78,19 +78,7 @@
         "to refrigerate"
       ],
       "source_word_ids": [
-        "cooking_verbs-045-to-refrigerate"
-      ],
-      "reason": "Explicit safe-for-generation override with a supported pattern.",
-      "conjugation_mode": "generated",
-      "regularity": "regular"
-    },
-    {
-      "lemma": "לצנן",
-      "glosses": [
-        "to chill"
-      ],
-      "source_word_ids": [
-        "cooking_verbs-046-to-chill"
+        "cooking_verbs-044-to-refrigerate"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -102,7 +90,7 @@
         "to garnish"
       ],
       "source_word_ids": [
-        "cooking_verbs-047-to-garnish"
+        "cooking_verbs-046-to-garnish"
       ],
       "reason": "Explicit safe-for-generation override with a supported pattern.",
       "conjugation_mode": "generated",
@@ -112,56 +100,14 @@
   "curated_verbs_needing_forms": [],
   "ambiguous_verbs_needing_sense_splitting": [
     {
-      "lemma": "לגרד",
-      "glosses": [
-        "to grate",
-        "to scrape"
-      ],
-      "source_word_ids": [
-        "cooking_verbs-006-to-grate",
-        "cooking_verbs-064-to-scrape"
-      ],
-      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
-      "conjugation_mode": "phrase_only",
-      "regularity": "ambiguous"
-    },
-    {
-      "lemma": "לערבב",
-      "glosses": [
-        "to stir",
-        "to mix"
-      ],
-      "source_word_ids": [
-        "cooking_verbs-008-to-stir",
-        "cooking_verbs-009-to-mix"
-      ],
-      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
-      "conjugation_mode": "phrase_only",
-      "regularity": "ambiguous"
-    },
-    {
-      "lemma": "להקציף",
-      "glosses": [
-        "to beat",
-        "to whip"
-      ],
-      "source_word_ids": [
-        "cooking_verbs-011-to-beat",
-        "cooking_verbs-059-to-whip"
-      ],
-      "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
-      "conjugation_mode": "phrase_only",
-      "regularity": "ambiguous"
-    },
-    {
       "lemma": "לחלוט",
       "glosses": [
         "to poach",
-        "to blanch"
+        "to blanch / parboil (also: לחלוט, same word as poach)"
       ],
       "source_word_ids": [
-        "cooking_verbs-023-to-poach",
-        "cooking_verbs-034-to-blanch"
+        "cooking_verbs-022-to-poach",
+        "cooking_verbs-033-to-blanch-parboil-also-same-word-as-poach"
       ],
       "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
       "conjugation_mode": "phrase_only",
@@ -171,11 +117,11 @@
       "lemma": "להקפיץ",
       "glosses": [
         "to saute",
-        "to toss"
+        "to toss / pan-toss (להקפיץ)"
       ],
       "source_word_ids": [
-        "cooking_verbs-027-to-saute",
-        "cooking_verbs-072-to-toss"
+        "cooking_verbs-026-to-saute",
+        "cooking_verbs-068-to-toss-pan-toss"
       ],
       "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
       "conjugation_mode": "phrase_only",
@@ -187,7 +133,7 @@
         "to coat"
       ],
       "source_word_ids": [
-        "cooking_verbs-073-to-coat"
+        "cooking_verbs-069-to-coat"
       ],
       "reason": "Lemma is known ambiguous or has multiple unsplit English glosses.",
       "conjugation_mode": "phrase_only",
@@ -225,7 +171,7 @@
         "to marinate"
       ],
       "source_word_ids": [
-        "cooking_verbs-019-to-marinate"
+        "cooking_verbs-018-to-marinate"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -237,7 +183,7 @@
         "to simmer"
       ],
       "source_word_ids": [
-        "cooking_verbs-022-to-simmer"
+        "cooking_verbs-021-to-simmer"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -249,7 +195,7 @@
         "to deep-fry"
       ],
       "source_word_ids": [
-        "cooking_verbs-026-to-deep-fry"
+        "cooking_verbs-025-to-deep-fry"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -261,7 +207,7 @@
         "to grill"
       ],
       "source_word_ids": [
-        "cooking_verbs-029-to-grill"
+        "cooking_verbs-028-to-grill"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -273,7 +219,7 @@
         "to broil"
       ],
       "source_word_ids": [
-        "cooking_verbs-032-to-broil"
+        "cooking_verbs-031-to-broil"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -285,7 +231,7 @@
         "to preheat"
       ],
       "source_word_ids": [
-        "cooking_verbs-042-to-preheat"
+        "cooking_verbs-041-to-preheat"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -297,7 +243,7 @@
         "to plate"
       ],
       "source_word_ids": [
-        "cooking_verbs-049-to-plate"
+        "cooking_verbs-048-to-plate"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -309,7 +255,7 @@
         "to adjust seasoning"
       ],
       "source_word_ids": [
-        "cooking_verbs-051-to-adjust-seasoning"
+        "cooking_verbs-050-to-adjust-seasoning"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -321,19 +267,7 @@
         "to overcook"
       ],
       "source_word_ids": [
-        "cooking_verbs-052-to-overcook"
-      ],
-      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
-      "conjugation_mode": "phrase_only",
-      "regularity": "phrase"
-    },
-    {
-      "lemma": "לבשל פחות מדי",
-      "glosses": [
-        "to undercook"
-      ],
-      "source_word_ids": [
-        "cooking_verbs-053-to-undercook"
+        "cooking_verbs-051-to-overcook"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -345,7 +279,7 @@
         "to puree"
       ],
       "source_word_ids": [
-        "cooking_verbs-061-to-puree"
+        "cooking_verbs-058-to-puree"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -357,7 +291,7 @@
         "to core"
       ],
       "source_word_ids": [
-        "cooking_verbs-066-to-core"
+        "cooking_verbs-062-to-core"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -369,7 +303,7 @@
         "to zest"
       ],
       "source_word_ids": [
-        "cooking_verbs-068-to-zest"
+        "cooking_verbs-064-to-zest"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -381,7 +315,7 @@
         "to line a pan"
       ],
       "source_word_ids": [
-        "cooking_verbs-070-to-line-a-pan"
+        "cooking_verbs-066-to-line-a-pan"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -393,7 +327,7 @@
         "to breadcrumb"
       ],
       "source_word_ids": [
-        "cooking_verbs-074-to-breadcrumb"
+        "cooking_verbs-070-to-breadcrumb"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -405,7 +339,7 @@
         "to braise"
       ],
       "source_word_ids": [
-        "cooking_verbs-075-to-braise"
+        "cooking_verbs-071-to-braise"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -417,7 +351,7 @@
         "to stew"
       ],
       "source_word_ids": [
-        "cooking_verbs-076-to-stew"
+        "cooking_verbs-072-to-stew"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -430,6 +364,54 @@
       ],
       "source_word_ids": [
         "home_everyday_life-092-to-declutter"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לעשות קנאקים באצבעות",
+      "glosses": [
+        "to crack your knuckles"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-101-to-crack-your-knuckles"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לעשות קנאקים",
+      "glosses": [
+        "to crack one's joints"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-104-to-crack-one-s-joints"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להיתקע על",
+      "glosses": [
+        "to dwell on"
+      ],
+      "source_word_ids": [
+        "emotional_nuance-022-to-dwell-on"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להיכנס לסחרור",
+      "glosses": [
+        "to spiral"
+      ],
+      "source_word_ids": [
+        "emotional_nuance-023-to-spiral"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -466,6 +448,66 @@
       ],
       "source_word_ids": [
         "dating_relationships-015-to-open-up-emotionally"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להוליך שולל",
+      "glosses": [
+        "to lead someone on"
+      ],
+      "source_word_ids": [
+        "dating_relationships-018-to-lead-someone-on"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לפתח רגשות",
+      "glosses": [
+        "to catch feelings"
+      ],
+      "source_word_ids": [
+        "dating_relationships-019-to-catch-feelings"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להיות תקוע על מישהו",
+      "glosses": [
+        "to be hung up on someone"
+      ],
+      "source_word_ids": [
+        "dating_relationships-020-to-be-hung-up-on-someone"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "לאבד עניין",
+      "glosses": [
+        "to lose interest"
+      ],
+      "source_word_ids": [
+        "dating_relationships-021-to-lose-interest"
+      ],
+      "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
+      "conjugation_mode": "phrase_only",
+      "regularity": "phrase"
+    },
+    {
+      "lemma": "להפוך את זה לרשמי",
+      "glosses": [
+        "to make it official"
+      ],
+      "source_word_ids": [
+        "dating_relationships-024-to-make-it-official"
       ],
       "reason": "Multi-word Hebrew lemma defaults to phrase_only.",
       "conjugation_mode": "phrase_only",
@@ -522,6 +564,18 @@
       "regularity": "regular"
     },
     {
+      "lemma": "לגרד",
+      "glosses": [
+        "to grate / scrape"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-006-to-grate-scrape"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
       "lemma": "לטרוף",
       "glosses": [
         "to whisk"
@@ -534,12 +588,36 @@
       "regularity": "regular"
     },
     {
+      "lemma": "לערבב",
+      "glosses": [
+        "to stir / mix"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-008-to-stir-mix"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להקציף",
+      "glosses": [
+        "to beat / whip"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-010-to-beat-whip"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
       "lemma": "ללוש",
       "glosses": [
         "to knead"
       ],
       "source_word_ids": [
-        "cooking_verbs-012-to-knead"
+        "cooking_verbs-011-to-knead"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -551,7 +629,7 @@
         "to roll out"
       ],
       "source_word_ids": [
-        "cooking_verbs-013-to-roll-out"
+        "cooking_verbs-012-to-roll-out"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -563,7 +641,7 @@
         "to sift"
       ],
       "source_word_ids": [
-        "cooking_verbs-014-to-sift"
+        "cooking_verbs-013-to-sift"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -575,7 +653,7 @@
         "to measure"
       ],
       "source_word_ids": [
-        "cooking_verbs-015-to-measure"
+        "cooking_verbs-014-to-measure"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -587,7 +665,7 @@
         "to pour"
       ],
       "source_word_ids": [
-        "cooking_verbs-016-to-pour"
+        "cooking_verbs-015-to-pour"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -599,7 +677,7 @@
         "to drizzle"
       ],
       "source_word_ids": [
-        "cooking_verbs-017-to-drizzle"
+        "cooking_verbs-016-to-drizzle"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -611,7 +689,7 @@
         "to soak"
       ],
       "source_word_ids": [
-        "cooking_verbs-020-to-soak"
+        "cooking_verbs-019-to-soak"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -623,7 +701,7 @@
         "to steam"
       ],
       "source_word_ids": [
-        "cooking_verbs-024-to-steam"
+        "cooking_verbs-023-to-steam"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -635,7 +713,7 @@
         "to fry"
       ],
       "source_word_ids": [
-        "cooking_verbs-025-to-fry"
+        "cooking_verbs-024-to-fry"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -647,7 +725,7 @@
         "to sear"
       ],
       "source_word_ids": [
-        "cooking_verbs-028-to-sear"
+        "cooking_verbs-027-to-sear"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -659,7 +737,7 @@
         "to roast"
       ],
       "source_word_ids": [
-        "cooking_verbs-030-to-roast"
+        "cooking_verbs-029-to-roast"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -671,7 +749,7 @@
         "to bake"
       ],
       "source_word_ids": [
-        "cooking_verbs-031-to-bake"
+        "cooking_verbs-030-to-bake"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -683,7 +761,7 @@
         "to toast"
       ],
       "source_word_ids": [
-        "cooking_verbs-033-to-toast"
+        "cooking_verbs-032-to-toast"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -695,7 +773,7 @@
         "to caramelize"
       ],
       "source_word_ids": [
-        "cooking_verbs-035-to-caramelize"
+        "cooking_verbs-034-to-caramelize"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -707,7 +785,7 @@
         "to reduce"
       ],
       "source_word_ids": [
-        "cooking_verbs-036-to-reduce"
+        "cooking_verbs-035-to-reduce"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -719,7 +797,7 @@
         "to drain"
       ],
       "source_word_ids": [
-        "cooking_verbs-040-to-drain"
+        "cooking_verbs-039-to-drain"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -731,7 +809,7 @@
         "to rinse"
       ],
       "source_word_ids": [
-        "cooking_verbs-041-to-rinse"
+        "cooking_verbs-040-to-rinse"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -743,7 +821,7 @@
         "to defrost"
       ],
       "source_word_ids": [
-        "cooking_verbs-043-to-defrost"
+        "cooking_verbs-042-to-defrost"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -755,7 +833,19 @@
         "to freeze"
       ],
       "source_word_ids": [
-        "cooking_verbs-044-to-freeze"
+        "cooking_verbs-043-to-freeze"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לצנן",
+      "glosses": [
+        "to chill"
+      ],
+      "source_word_ids": [
+        "cooking_verbs-045-to-chill"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -767,7 +857,7 @@
         "to serve"
       ],
       "source_word_ids": [
-        "cooking_verbs-048-to-serve"
+        "cooking_verbs-047-to-serve"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -779,7 +869,7 @@
         "to taste"
       ],
       "source_word_ids": [
-        "cooking_verbs-050-to-taste"
+        "cooking_verbs-049-to-taste"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -791,7 +881,7 @@
         "to burn"
       ],
       "source_word_ids": [
-        "cooking_verbs-054-to-burn"
+        "cooking_verbs-052-to-burn"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -803,7 +893,7 @@
         "to ignite"
       ],
       "source_word_ids": [
-        "cooking_verbs-055-to-ignite"
+        "cooking_verbs-053-to-ignite"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -815,7 +905,7 @@
         "to smoke"
       ],
       "source_word_ids": [
-        "cooking_verbs-056-to-smoke"
+        "cooking_verbs-054-to-smoke"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -827,7 +917,7 @@
         "to ferment"
       ],
       "source_word_ids": [
-        "cooking_verbs-057-to-ferment"
+        "cooking_verbs-055-to-ferment"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -839,7 +929,7 @@
         "to pickle"
       ],
       "source_word_ids": [
-        "cooking_verbs-058-to-pickle"
+        "cooking_verbs-056-to-pickle"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -851,7 +941,7 @@
         "to blend"
       ],
       "source_word_ids": [
-        "cooking_verbs-060-to-blend"
+        "cooking_verbs-057-to-blend"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -860,22 +950,22 @@
     {
       "lemma": "לרסק",
       "glosses": [
-        "to crush"
+        "to smash"
       ],
       "source_word_ids": [
-        "cooking_verbs-062-to-crush"
+        "cooking_verbs-059-to-smash"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
       "regularity": "regular"
     },
     {
-      "lemma": "למעוך",
+      "lemma": "למחוץ",
       "glosses": [
-        "to mash"
+        "to crush"
       ],
       "source_word_ids": [
-        "cooking_verbs-063-to-mash"
+        "cooking_verbs-060-to-crush"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -887,7 +977,7 @@
         "to skewer"
       ],
       "source_word_ids": [
-        "cooking_verbs-065-to-skewer"
+        "cooking_verbs-061-to-skewer"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -899,7 +989,7 @@
         "to pit"
       ],
       "source_word_ids": [
-        "cooking_verbs-067-to-pit"
+        "cooking_verbs-063-to-pit"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -911,7 +1001,7 @@
         "to grease"
       ],
       "source_word_ids": [
-        "cooking_verbs-069-to-grease"
+        "cooking_verbs-065-to-grease"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -923,7 +1013,7 @@
         "to flip"
       ],
       "source_word_ids": [
-        "cooking_verbs-071-to-flip"
+        "cooking_verbs-067-to-flip"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -935,7 +1025,7 @@
         "to fire (dismiss)"
       ],
       "source_word_ids": [
-        "work_business-066-to-fire-dismiss"
+        "work_business-063-to-fire-dismiss"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",
@@ -978,6 +1068,42 @@
       "regularity": "regular"
     },
     {
+      "lemma": "לכבות",
+      "glosses": [
+        "to turn off / extinguish"
+      ],
+      "source_word_ids": [
+        "home_everyday_life-105-to-turn-off-extinguish"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לשחרר",
+      "glosses": [
+        "to let go"
+      ],
+      "source_word_ids": [
+        "emotional_nuance-020-to-let-go"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לכוונן",
+      "glosses": [
+        "to fine-tune"
+      ],
+      "source_word_ids": [
+        "technology_ai-016-to-fine-tune"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
       "lemma": "להיעלם",
       "glosses": [
         "to ghost"
@@ -990,12 +1116,84 @@
       "regularity": "regular"
     },
     {
+      "lemma": "להיקשר",
+      "glosses": [
+        "to get attached"
+      ],
+      "source_word_ids": [
+        "dating_relationships-022-to-get-attached"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להתרחק",
+      "glosses": [
+        "to pull away"
+      ],
+      "source_word_ids": [
+        "dating_relationships-023-to-pull-away"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
       "lemma": "להדיח",
       "glosses": [
         "to oust"
       ],
       "source_word_ids": [
         "politics_society_expanded-017-to-oust"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "לגלול",
+      "glosses": [
+        "to scroll"
+      ],
+      "source_word_ids": [
+        "media_digital_life_expanded-018-to-scroll"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להחליק",
+      "glosses": [
+        "to swipe"
+      ],
+      "source_word_ids": [
+        "media_digital_life_expanded-019-to-swipe"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "להקיש",
+      "glosses": [
+        "to tap"
+      ],
+      "source_word_ids": [
+        "media_digital_life_expanded-020-to-tap"
+      ],
+      "reason": "Unsupported for learner-facing conjugation until curated.",
+      "conjugation_mode": "blocked",
+      "regularity": "regular"
+    },
+    {
+      "lemma": "ללחוץ",
+      "glosses": [
+        "to click"
+      ],
+      "source_word_ids": [
+        "media_digital_life_expanded-021-to-click"
       ],
       "reason": "Unsupported for learner-facing conjugation until curated.",
       "conjugation_mode": "blocked",

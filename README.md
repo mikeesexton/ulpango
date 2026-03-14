@@ -76,9 +76,9 @@ npm run migrate:verbs
 
 That writes:
 
-- `hebrew-verb-review-report.json`
-- `hebrew-verb-review-report.md`
-- `hebrew-verb-migrated.json`
+- `generated/verbs/hebrew-verb-review-report.json`
+- `generated/verbs/hebrew-verb-review-report.md`
+- `generated/verbs/hebrew-verb-migrated.json`
 
 ## Publish To GitHub Pages
 
