@@ -22,6 +22,74 @@ function loadAbbreviationContext() {
   return context;
 }
 
+const PHASE_ONE_IDS = [
+  "abbr-004",
+  "abbr-005",
+  "abbr-006",
+  "abbr-010",
+  "abbr-013",
+  "abbr-014",
+  "abbr-015",
+  "abbr-016",
+  "abbr-017",
+  "abbr-018",
+  "abbr-021",
+  "abbr-024",
+  "abbr-025",
+  "abbr-026",
+  "abbr-027",
+  "abbr-083",
+  "abbr-084",
+  "abbr-085",
+  "abbr-086",
+  "abbr-087",
+  "abbr-088",
+  "abbr-093",
+  "abbr-094",
+  "abbr-096",
+];
+
+const PHASE_TWO_IDS = [
+  "abbr-001",
+  "abbr-002",
+  "abbr-003",
+  "abbr-079",
+  "abbr-080",
+  "abbr-089",
+  "abbr-090",
+  "abbr-091",
+  "abbr-092",
+  "abbr-097",
+  "abbr-099",
+  "abbr-100",
+  "abbr-101",
+  "abbr-102",
+  "abbr-103",
+  "abbr-104",
+  "abbr-105",
+  "abbr-173",
+  "abbr-174",
+  "abbr-176",
+  "abbr-184",
+  "abbr-185",
+  "abbr-186",
+  "abbr-207",
+];
+
+const PHASE_THREE_IDS = [
+  "abbr-109",
+  "abbr-112",
+  "abbr-117",
+  "abbr-118",
+  "abbr-120",
+  "abbr-126",
+  "abbr-127",
+  "abbr-129",
+  "abbr-130",
+  "abbr-131",
+  "abbr-132",
+];
+
 test("playable abbreviations use geresh or gereshayim and do not overlap exactly", () => {
   const context = loadAbbreviationContext();
   const rows = context.IvriQuestAbbreviations.getAbbreviations();
@@ -62,37 +130,57 @@ test("phase 1 abbreviation expansions include safe niqqud on the full expansion 
   const context = loadAbbreviationContext();
   const rows = context.IvriQuestAbbreviations.getAbbreviations();
   const byId = new Map(rows.map((entry) => [entry.id, entry]));
-  const phaseOneIds = [
-    "abbr-004",
-    "abbr-005",
-    "abbr-006",
-    "abbr-010",
-    "abbr-013",
-    "abbr-014",
-    "abbr-015",
-    "abbr-016",
-    "abbr-017",
-    "abbr-018",
-    "abbr-021",
-    "abbr-024",
-    "abbr-025",
-    "abbr-026",
-    "abbr-027",
-    "abbr-083",
-    "abbr-084",
-    "abbr-085",
-    "abbr-086",
-    "abbr-087",
-    "abbr-088",
-    "abbr-093",
-    "abbr-094",
-    "abbr-096",
-  ];
 
-  phaseOneIds.forEach((entryId) => {
+  PHASE_ONE_IDS.forEach((entryId) => {
     const entry = byId.get(entryId);
     assert.ok(entry, `${entryId} should exist`);
     assert.ok(String(entry.expansionHeNiqqud || "").trim(), `${entryId} should have expansionHeNiqqud`);
+    assert.equal(/[\u0591-\u05C7]/.test(String(entry.abbr || "")), false, `${entryId} abbreviation should not carry niqqud`);
+  });
+});
+
+test("phase 2 abbreviation expansions include official-first niqqud on the full expansion only", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+
+  PHASE_TWO_IDS.forEach((entryId) => {
+    const entry = byId.get(entryId);
+    assert.ok(entry, `${entryId} should exist`);
+    assert.ok(String(entry.expansionHeNiqqud || "").trim(), `${entryId} should have expansionHeNiqqud`);
+    assert.equal(/[\u0591-\u05C7]/.test(String(entry.abbr || "")), false, `${entryId} abbreviation should not carry niqqud`);
+  });
+});
+
+test("all niqqud-bearing abbreviation expansions include provenance URLs", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const niqqudEntries = rows.filter((entry) => String(entry.expansionHeNiqqud || "").trim());
+
+  assert.ok(niqqudEntries.length > 0);
+  niqqudEntries.forEach((entry) => {
+    assert.match(
+      String(entry.expansionHeNiqqudSource || "").trim(),
+      /^https?:\/\//,
+      `${entry.id} should have an expansionHeNiqqudSource URL`
+    );
+  });
+});
+
+test("phase 3 abbreviation expansions stay inside the Academy-backed institutional batch", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+
+  PHASE_THREE_IDS.forEach((entryId) => {
+    const entry = byId.get(entryId);
+    assert.ok(entry, `${entryId} should exist`);
+    assert.ok(String(entry.expansionHeNiqqud || "").trim(), `${entryId} should have expansionHeNiqqud`);
+    assert.match(
+      String(entry.expansionHeNiqqudSource || ""),
+      /^https:\/\/terms\.hebrew-academy\.org\.il\//,
+      `${entryId} should use an Academy terms source`
+    );
     assert.equal(/[\u0591-\u05C7]/.test(String(entry.abbr || "")), false, `${entryId} abbreviation should not carry niqqud`);
   });
 });

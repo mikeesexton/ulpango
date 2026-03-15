@@ -1085,3 +1085,83 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** The collision cleanup intentionally removes a few exact-acronym entries from gameplay for now (`ע״מ`, `ע״פ`, `מ״מ` conflicting senses). If you later want context-sensitive reintroduction, that should be a separate pass with domain-aware prompts or labeling.
 
 ---
+
+### 2026-03-14 17:42 — Add official-first abbreviation niqqud phase 2 and provenance URLs
+
+**Requested:** Implement a second abbreviation-expansion niqqud tranche using an official-first source hierarchy, add provenance URLs for niqqud-bearing entries, and keep acronym tokens themselves unvowelized.
+
+**Files changed:**
+- `abbreviation-data.js` — Added shared official source URL constants, backfilled `expansionHeNiqqudSource` for the existing phase-1 entries, and added `expansionHeNiqqud` plus `expansionHeNiqqudSource` for the 24-entry phase-2 batch (`וכו׳`, `וכד׳`, `וגו׳`, `אחה״צ`, `לפנה״צ`, titles, measurement terms, `בי״ח`, `קופ״ח`, `ל״ד`, `ממ״ד`, `ממ״ק`, `ממ״מ`, `ר״ת`).
+- `app/abbreviation.js` — Preserved the new provenance field when normalizing abbreviation entries into the playable deck, without changing visible runtime behavior.
+- `tests/abbreviation-data.test.js` — Added explicit phase-2 coverage and a provenance invariant requiring every niqqud-bearing abbreviation expansion to carry a URL source.
+- `tests/app-progress.test.js` — Added a phase-2 runtime regression proving the niqqud toggle still changes only the expanded Hebrew phrase and leaves the acronym token plain.
+- `index.html` / `app.js` — Bumped cache-busting versions so browsers refresh the updated abbreviation data and runtime bundle.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Abbreviation mode now has a second safe niqqud tranche available on the Hebrew expansion side, and all niqqud-bearing abbreviation expansions now record the official source URL used for that batch. Acronym tokens remain unchanged with no niqqud added to the abbreviations themselves.
+
+**Tests run:** `node --test tests/abbreviation-data.test.js` — passed, 5/5. `node --test tests/app-progress.test.js` — passed, 31/31. `node --test` — passed, 52/52.
+
+**Risks / regressions to check:** The provenance field is currently stored only for niqqud-bearing abbreviation expansions, not for the entire abbreviation dataset. More politically or religiously loaded abbreviations were intentionally deferred so this pass stays anchored to stronger everyday/institutional source material.
+
+---
+
+### 2026-03-14 18:08 — Add Academy-backed institutional/legal abbreviation niqqud tranche
+
+**Requested:** Find and implement another reliable abbreviation-expansion niqqud batch, keeping the source bar high and avoiding the more ambiguous political/religious leftovers.
+
+**Files changed:**
+- `abbreviation-data.js` — Added an 11-entry Academy-backed institutional/legal tranche with `expansionHeNiqqud` and exact `expansionHeNiqqudSource` URLs for `מע״מ`, `ת״ז`, `בע״מ`, `מנכ״ל`, `יו״ר`, `ביהמ״ש`, `בימ״ש`, `פס״ד`, `חו״ד`, `עו״ד`, and `רו״ח`.
+- `tests/abbreviation-data.test.js` — Added an explicit phase-3 tranche test that requires this new batch to carry Academy `terms.hebrew-academy.org.il` provenance URLs.
+- `tests/app-progress.test.js` — Added a runtime regression proving a phase-3 legal/institutional entry still keeps the acronym token plain while toggling niqqud only on the expanded Hebrew phrase.
+- `index.html` / `app.js` — Bumped cache-busting versions so the refreshed abbreviation data loads consistently in the browser.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Abbreviation mode now includes a third, Academy-backed niqqud tranche for common institutional/legal abbreviations, while still leaving the acronym tokens themselves unvowelized.
+
+**Tests run:** `node --test tests/abbreviation-data.test.js` — passed, 6/6. `node --test tests/app-progress.test.js` — passed, 32/32. `node --test` — passed, 54/54.
+
+**Risks / regressions to check:** This batch intentionally stops short of entries like `ח״כ`, `רה״מ`, `עוסק מורשה`, `עוסק פטור`, and the more politically loaded or religious abbreviations, because those would require either mixed source families or a looser source standard than this pass used.
+
+---
+
+### 2026-03-15 10:14 — Strip Hebrew leakage from English-facing game text
+
+**Requested:** Investigate why Hebrew was appearing inside English answer choices in the translation game, explain the cause, and make sure it cannot happen in any game.
+
+**Files changed:**
+- `app/utils.js` — Added `sanitizeEnglishDisplayText()` to remove Hebrew substrings and clean up the surrounding English punctuation/parentheticals instead of letting mixed-language source strings pass through raw.
+- `app/hebrew.js` — Sanitized `word.en` during `prepareVocabulary()`, so translation, verb match, review, mastered lists, and most-missed views all consume cleaned English text from the normalized vocabulary layer.
+- `app/abbreviation.js` — Sanitized abbreviation `english` values during deck preparation so English-side abbreviation prompts, options, and feedback cannot leak Hebrew notes from source data.
+- `app/adv-conj.js` — Sanitized generated English sentences and idiom meaning strings so Advanced Conjugation English prompts/choices/feedback stay English-only even if an idiom source string contains Hebrew parentheticals.
+- `tests/app-progress.test.js` — Added a cross-game regression proving Hebrew is stripped from English-facing text in translation, abbreviation, and advanced conjugation.
+- `index.html` / `app.js` — Bumped cache-busting versions to refresh the updated JS modules in browsers.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Mixed-language English glosses in the source data are now sanitized before they reach gameplay UI. Legitimate Hebrew answers and prompts still display where they are supposed to; only English-facing strings are cleaned.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 33/33. `node --test tests/abbreviation-data.test.js` — passed, 6/6. `node --test` — passed, 55/55.
+
+**Risks / regressions to check:** The sanitizer intentionally preserves English clarifiers while stripping Hebrew tokens, so spot-check a few data-heavy cards with parentheses/slashes to make sure the cleaned English still reads naturally.
+
+---
+
+### 2026-03-15 10:31 — Deduplicate visible answer-bank labels across games
+
+**Requested:** After fixing Hebrew leakage in English answers, prevent any game from serving two identical visible answers in the same answer bank.
+
+**Files changed:**
+- `app/lesson.js` — Changed translation option building to dedupe by the label the learner actually sees: sanitized English in EN-choice rounds and plain Hebrew in HE-choice rounds. The bank now prefers same-category distractors first, but skips any candidate whose visible label duplicates an existing option.
+- `app/abbreviation.js` — Changed abbreviation option building to dedupe by visible label too, so English-side abbreviation rounds cannot show two identical cleaned English choices.
+- `app/verb-match.js` — Tightened pair selection to skip duplicate English-side card labels as well as duplicate Hebrew forms, preventing confusing repeated left-column cards.
+- `tests/app-progress.test.js` — Added regressions for translation answer-bank dedupe in both directions, abbreviation English-choice dedupe, and verb-match English-card dedupe.
+- `index.html` / `app.js` — Bumped cache-busting versions to refresh the updated client code.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Translation, abbreviation, and verb-match rounds now dedupe by the final label shown to the learner rather than only by entry ID. If duplicates collapse the candidate pool, the app prefers a smaller unique bank over repeated visible answers.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 36/36. `node --test` — passed, 58/58.
+
+**Risks / regressions to check:** In rare small-category pools, a translation or abbreviation question may now render fewer than four options instead of showing duplicates. That is intentional, but it is worth spot-checking a few tiny categories live to make sure the reduced option count still feels okay.
+
+---

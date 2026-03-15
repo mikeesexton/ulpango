@@ -20,6 +20,15 @@ function getSession() {
   return app.session || {};
 }
 
+function getLessonOptionDisplayKey(word, optionLanguage) {
+  if (optionLanguage === "english") {
+    return app.utils?.sanitizeEnglishDisplayText
+      ? app.utils.sanitizeEnglishDisplayText(word?.en)
+      : String(word?.en || "").trim();
+  }
+  return String(word?.he || "").trim();
+}
+
 function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
@@ -338,7 +347,9 @@ lessonMode.buildQuestion = lessonMode.buildQuestion || function buildQuestion(po
   runtime.state.lesson.askedWordIds.push(word.id);
   const chosenDomainId = data.getDomainIdForWord?.(word);
   runtime.state.lesson.domainCounts[chosenDomainId] = (runtime.state.lesson.domainCounts[chosenDomainId] || 0) + 1;
-  const options = lessonMode.buildOptions(pool, word);
+  const options = lessonMode.buildOptions(pool, word, {
+    optionLanguage: mode === "reverse" ? "english" : "hebrew",
+  });
 
   if (mode === "reverse") {
     return {
@@ -374,7 +385,10 @@ lessonMode.buildReviewQuestion = lessonMode.buildReviewQuestion || function buil
 
     const mode = lessonMode.pickQuestionMode();
     const forbiddenOptionIds = new Set((runtime.state.lesson.optionHistory[word.id] || []).filter((id) => id !== word.id));
-    const options = lessonMode.buildOptions(pool, word, { forbiddenOptionIds });
+    const options = lessonMode.buildOptions(pool, word, {
+      forbiddenOptionIds,
+      optionLanguage: mode === "reverse" ? "english" : "hebrew",
+    });
 
     if (mode === "reverse") {
       return {
@@ -408,33 +422,53 @@ lessonMode.buildOptions = lessonMode.buildOptions || function buildOptions(pool,
   const shuffle = app.utils?.shuffle;
   const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
   const forbiddenOptionIds = config.forbiddenOptionIds || new Set();
+  const optionLanguage = config.optionLanguage === "english" ? "english" : "hebrew";
   const sameCategoryCandidates = pool.filter(
     (item) => item.id !== word.id && item.category === word.category && !forbiddenOptionIds.has(item.id)
   );
-  const distractors = doShuffle(sameCategoryCandidates).slice(0, 3);
+  const seenLabels = new Set();
+  const options = [];
 
-  if (distractors.length < 3) {
-    const filler = doShuffle(
+  function tryAddOption(item) {
+    if (!item || forbiddenOptionIds.has(item.id)) return false;
+    const labelKey = getLessonOptionDisplayKey(item, optionLanguage);
+    if (!labelKey || seenLabels.has(labelKey)) return false;
+    seenLabels.add(labelKey);
+    options.push(item);
+    return true;
+  }
+
+  tryAddOption(word);
+
+  doShuffle(sameCategoryCandidates).forEach((item) => {
+    if (options.length >= 4) return;
+    tryAddOption(item);
+  });
+
+  if (options.length < 4) {
+    doShuffle(
       pool.filter(
-        (item) => item.id !== word.id && !distractors.includes(item) && !forbiddenOptionIds.has(item.id)
+        (item) => item.id !== word.id && !options.includes(item) && !forbiddenOptionIds.has(item.id)
       )
-    ).slice(0, 3 - distractors.length);
-    distractors.push(...filler);
+    ).forEach((item) => {
+      if (options.length >= 4) return;
+      tryAddOption(item);
+    });
   }
 
-  if (distractors.length < 3) {
-    const fallback = doShuffle(
-      pool.filter((item) => item.id !== word.id && !distractors.includes(item))
-    ).slice(0, 3 - distractors.length);
-    distractors.push(...fallback);
+  if (options.length < 4) {
+    doShuffle(
+      pool.filter((item) => item.id !== word.id && !options.includes(item))
+    ).forEach((item) => {
+      if (options.length >= 4) return;
+      tryAddOption(item);
+    });
   }
 
-  const options = [word, ...distractors].slice(0, 4).map((item) => ({
+  return doShuffle(options).map((item) => ({
     id: item.id,
     word: item,
   }));
-
-  return doShuffle(options);
 };
 
 lessonMode.pickQuestionMode = lessonMode.pickQuestionMode || function pickQuestionMode() {

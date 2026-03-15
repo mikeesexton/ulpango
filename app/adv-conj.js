@@ -20,6 +20,12 @@ function getIdioms() {
   return Array.isArray(global.HEBREW_IDIOMS) ? global.HEBREW_IDIOMS : [];
 }
 
+function sanitizeEnglishText(text) {
+  return app.utils?.sanitizeEnglishDisplayText
+    ? app.utils.sanitizeEnglishDisplayText(text)
+    : String(text || "").trim();
+}
+
 function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
@@ -87,10 +93,12 @@ advConj.buildAdvConjEnglishSentence = advConj.buildAdvConjEnglishSentence || fun
     }
   }
 
-  return tpl
+  return sanitizeEnglishText(
+    tpl
     .replace(/\{s\}/g, subj.en)
     .replace(/\{o\}/g, objectText)
-    .replace(/\{p\}/g, possessiveText) + collapsedQualifier;
+    .replace(/\{p\}/g, possessiveText) + collapsedQualifier
+  );
 };
 
 advConj.getAdvConjSubjectsForTense = advConj.getAdvConjSubjectsForTense || function getAdvConjSubjectsForTense(tense) {
@@ -350,7 +358,7 @@ advConj.applyAdvConjAnswer = advConj.applyAdvConjAnswer || function applyAdvConj
   const idiom = getIdioms().find((entry) => entry.id === question.idiomId);
   let feedbackAnswer = question.correctAnswer;
   if (idiom?.showMeaning) {
-    feedbackAnswer += ` (${idiom.english})`;
+    feedbackAnswer += ` (${sanitizeEnglishText(idiom.english)})`;
   }
   h.setFeedback?.(
     isCorrect
@@ -385,7 +393,7 @@ advConj.buildAdvConjMistakeSummary = advConj.buildAdvConjMistakeSummary || funct
       const answer = subj ? advConj.buildAdvConjHebrewAnswer(idiom, subj.form, subj.pronoun, obj.key, "present") : "";
       return {
         primary: answer,
-        secondary: idiom.english_meaning,
+        secondary: sanitizeEnglishText(idiom.english_meaning),
       };
     })
     .filter(Boolean);

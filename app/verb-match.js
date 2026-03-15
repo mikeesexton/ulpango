@@ -24,6 +24,12 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+function sanitizeEnglishText(text) {
+  return app.utils?.sanitizeEnglishDisplayText
+    ? app.utils.sanitizeEnglishDisplayText(text)
+    : String(text || "").trim();
+}
+
 verbMatch.moveEligibleVerbToMastered = verbMatch.moveEligibleVerbToMastered || function moveEligibleVerbToMastered() {
   const runtime = getRuntime();
   const h = getHelpers();
@@ -239,13 +245,17 @@ verbMatch.selectVerbRoundPairs = verbMatch.selectVerbRoundPairs || function sele
   const ordered = forms.filter((item) => runtime.matchFormOrder.includes(item.id));
   const byId = new Map(ordered.map((item) => [item.id, item]));
   const deduped = [];
-  const seen = new Set();
+  const seenHebrew = new Set();
+  const seenEnglish = new Set();
 
   runtime.matchFormOrder.forEach((id) => {
     const item = byId.get(id);
     if (!item) return;
-    if (!item.valuePlain || seen.has(item.valuePlain)) return;
-    seen.add(item.valuePlain);
+    const hebrewKey = String(item.valuePlain || "").trim();
+    const englishKey = sanitizeEnglishText(item.englishText);
+    if (!hebrewKey || !englishKey || seenHebrew.has(hebrewKey) || seenEnglish.has(englishKey)) return;
+    seenHebrew.add(hebrewKey);
+    seenEnglish.add(englishKey);
     deduped.push(item);
   });
 

@@ -20,6 +20,18 @@ function getSession() {
   return app.session || {};
 }
 
+function sanitizeEnglishText(text) {
+  return app.utils?.sanitizeEnglishDisplayText
+    ? app.utils.sanitizeEnglishDisplayText(text)
+    : String(text || "").trim();
+}
+
+function getAbbreviationOptionLabelKey(entry, direction) {
+  return direction === "he2en"
+    ? sanitizeEnglishText(entry?.english)
+    : String(entry?.abbr || "").trim();
+}
+
 function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
@@ -58,7 +70,8 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
     const abbr = String(entry?.abbr || "").trim();
     const expansionHe = String(entry?.expansionHe || entry?.expansion_he || "").trim();
     const expansionHeNiqqud = String(entry?.expansionHeNiqqud || entry?.expansion_he_niqqud || "").trim();
-    const english = String(entry?.english || "").trim();
+    const expansionHeNiqqudSource = String(entry?.expansionHeNiqqudSource || entry?.expansion_he_niqqud_source || "").trim();
+    const english = sanitizeEnglishText(entry?.english);
     if (!abbr || !expansionHe || !english) return;
 
     let idBase = String(entry?.id || `abbr-${index + 1}`).trim();
@@ -79,6 +92,7 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
       abbr,
       expansionHe,
       expansionHeNiqqud,
+      expansionHeNiqqudSource,
       english,
       bucket: String(entry?.bucket || "").trim(),
       notes: String(entry?.notes || "").trim(),
@@ -373,22 +387,39 @@ abbreviation.buildAbbreviationQuestion = abbreviation.buildAbbreviationQuestion 
 abbreviation.buildAbbreviationOptions = abbreviation.buildAbbreviationOptions || function buildAbbreviationOptions(pool, entry, direction) {
   const shuffle = app.utils?.shuffle;
   const sameBucketCandidates = pool.filter((item) => item.id !== entry.id && item.bucket === entry.bucket);
-  const distractors = typeof shuffle === "function" ? shuffle(sameBucketCandidates).slice(0, 3) : sameBucketCandidates.slice(0, 3);
+  const isHe2En = direction === "he2en";
+  const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
+  const seenLabels = new Set();
+  const options = [];
 
-  if (distractors.length < 3) {
-    const fillerPool = pool.filter((item) => item.id !== entry.id && !distractors.includes(item));
-    const filler = typeof shuffle === "function" ? shuffle(fillerPool).slice(0, 3 - distractors.length) : fillerPool.slice(0, 3 - distractors.length);
-    distractors.push(...filler);
+  function tryAddOption(item) {
+    if (!item) return false;
+    const labelKey = getAbbreviationOptionLabelKey(item, direction);
+    if (!labelKey || seenLabels.has(labelKey)) return false;
+    seenLabels.add(labelKey);
+    options.push(item);
+    return true;
   }
 
-  const isHe2En = direction === "he2en";
-  const options = [entry, ...distractors].slice(0, 4).map((item) => ({
+  tryAddOption(entry);
+
+  doShuffle(sameBucketCandidates).forEach((item) => {
+    if (options.length >= 4) return;
+    tryAddOption(item);
+  });
+
+  if (options.length < 4) {
+    doShuffle(pool.filter((item) => item.id !== entry.id && !options.includes(item))).forEach((item) => {
+      if (options.length >= 4) return;
+      tryAddOption(item);
+    });
+  }
+
+  return doShuffle(options).map((item) => ({
     id: item.id,
     label: isHe2En ? item.english : item.abbr,
     entry: item,
   }));
-
-  return typeof shuffle === "function" ? shuffle(options) : options;
 };
 
 abbreviation.pickBestAbbreviationEntry = abbreviation.pickBestAbbreviationEntry || function pickBestAbbreviationEntry(pool, usedEntryIds = []) {

@@ -619,6 +619,240 @@ test("abbreviation expansions use niqqud only on the full expansion text", () =>
   );
 });
 
+test("phase 2 abbreviation entries keep acronym tokens plain while toggling the expansion text", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const abbreviations = [
+    {
+      id: "abbr-1",
+      abbr: "ק״מ",
+      expansionHe: "קילומטר",
+      expansionHeNiqqud: "קִילוֹמֶטֶר",
+      expansionHeNiqqudSource: "https://hebrew-academy.org.il/%D7%9E%D7%99%D7%9C%D7%95%D7%9F-%D7%94%D7%90%D7%A7%D7%93%D7%9E%D7%99%D7%94/",
+      english: "kilometer",
+      bucket: "Ideas, Science & Tech",
+    },
+  ];
+
+  const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOnHarness.state.showNiqqudInline = true;
+  niqqudOnHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
+  assert.match(
+    niqqudOnHarness.document.querySelector("#feedback").textContent,
+    /קִילוֹמֶטֶר \(ק״מ\)/
+  );
+
+  const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOffHarness.state.showNiqqudInline = false;
+  niqqudOffHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
+  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
+  assert.match(plainFeedback, /קילומטר \(ק״מ\)/);
+  assert.doesNotMatch(plainFeedback, /קִילוֹמֶטֶר/);
+});
+
+test("phase 3 abbreviation entries keep institution/legal acronyms plain while toggling the expansion text", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const abbreviations = [
+    {
+      id: "abbr-1",
+      abbr: "עו״ד",
+      expansionHe: "עורך דין",
+      expansionHeNiqqud: "עוֹרֵךְ דִּין",
+      expansionHeNiqqudSource: "https://terms.hebrew-academy.org.il/munnah/115993_1/%D7%A2%D7%95%D6%B9%D7%A8%D6%B5%D7%9A%D6%B0%20%D7%93%D6%BC%D6%B4%D7%99%D7%9F",
+      english: "attorney",
+      bucket: "Civics, Law & Work",
+    },
+  ];
+
+  const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOnHarness.state.showNiqqudInline = true;
+  niqqudOnHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
+  assert.match(
+    niqqudOnHarness.document.querySelector("#feedback").textContent,
+    /עוֹרֵךְ דִּין \(עו״ד\)/
+  );
+
+  const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
+  niqqudOffHarness.state.showNiqqudInline = false;
+  niqqudOffHarness.state.abbreviation.currentQuestion = {
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
+  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
+  assert.match(plainFeedback, /עורך דין \(עו״ד\)/);
+  assert.doesNotMatch(plainFeedback, /עוֹרֵךְ דִּין/);
+});
+
+test("Hebrew is stripped from English-facing text across translation, abbreviation, and advanced conjugation", () => {
+  const vocabulary = [
+    { id: "alpha", category: "cooking_verbs", en: "to toss / pan-toss (חלוט)", he: "להקפיץ", heNiqqud: "לְהַקְפִּיץ", utility: 90, source: "test" },
+    { id: "beta", category: "cooking_verbs", en: "to saute", he: "להקפיץ-2", heNiqqud: "לְהַקְפִּיץ-2", utility: 80, source: "test" },
+    { id: "gamma", category: "cooking_verbs", en: "to ferment", he: "לתסוס", heNiqqud: "לְתַסֵּס", utility: 70, source: "test" },
+    { id: "delta", category: "cooking_verbs", en: "to line a pan", he: "לרפד תבנית", heNiqqud: "לְרַפֵּד תַּבְנִית", utility: 60, source: "test" },
+  ];
+  const abbreviations = [
+    { id: "abbr-1", abbr: "וכו׳", expansionHe: "וכולי", english: "etc. / and so on (חלוט)", bucket: "Daily Life & Home" },
+    { id: "abbr-2", abbr: "לדוג׳", expansionHe: "לדוגמה", english: "for example (לחלוט)", bucket: "Daily Life & Home" },
+    { id: "abbr-3", abbr: "ז״א", expansionHe: "זאת אומרת", english: "that is (להקפיץ)", bucket: "Daily Life & Home" },
+    { id: "abbr-4", abbr: "אח״כ", expansionHe: "אחר כך", english: "afterwards (לחלוט)", bucket: "Daily Life & Home" },
+  ];
+  const { ADV_CONJ_OBJECTS, applyAnswer, buildAdvConjEnglishSentence, document, getSelectedPool, nextAbbreviationQuestion, renderChoices, state } = loadAppHarness(vocabulary, abbreviations);
+
+  const sanitizedWords = getSelectedPool();
+  const contaminatedWord = sanitizedWords.find((word) => word.id === "alpha");
+  assert.ok(contaminatedWord);
+  assert.equal(/[\u0590-\u05FF]/.test(contaminatedWord.en), false);
+  assert.equal(contaminatedWord.en, "to toss / pan-toss");
+
+  const lessonQuestion = {
+    word: contaminatedWord,
+    options: sanitizedWords.slice(0, 4).map((word) => ({ id: word.id, word })),
+    optionsAreHebrew: false,
+    locked: false,
+    selectedOptionId: null,
+  };
+  renderChoices(lessonQuestion);
+  document.querySelector("#choiceContainer").querySelectorAll(".choice-btn").forEach((button) => {
+    assert.equal(/[\u0590-\u05FF]/.test(button.textContent), false);
+  });
+
+  state.currentQuestion = {
+    ...lessonQuestion,
+    isReview: false,
+    selectedOptionId: "beta",
+  };
+  applyAnswer(false, "beta");
+  assert.equal(document.querySelector("#feedback").textContent.includes("חלוט"), false);
+
+  state.mode = "abbreviation";
+  state.abbreviation.active = true;
+  state.abbreviation.currentRound = 0;
+  nextAbbreviationQuestion();
+  assert.ok(state.abbreviation.currentQuestion);
+  assert.equal(/[\u0590-\u05FF]/.test(state.abbreviation.currentQuestion.entry.english), false);
+  state.abbreviation.currentQuestion.options.forEach((option) => {
+    assert.equal(/[\u0590-\u05FF]/.test(option.entry.english), false);
+  });
+
+  const advConjEnglish = buildAdvConjEnglishSentence(
+    {
+      literal_sg: "{s} gets {o} in line (להקפיץ)",
+      literal_pl: "{s} get {o} in line (להקפיץ)",
+    },
+    { en: "he" },
+    ADV_CONJ_OBJECTS.find((entry) => entry.key === "1sg"),
+    "present"
+  );
+  assert.equal(/[\u0590-\u05FF]/.test(advConjEnglish), false);
+});
+
+test("translation answer banks dedupe identical visible labels in both directions", () => {
+  const englishDuplicateVocab = [
+    { id: "alpha", category: "cooking_verbs", en: "whatever (חלוט)", he: "לא משנה א", heNiqqud: "לֹא מְשַׁנֶּה א", utility: 90, source: "test" },
+    { id: "beta", category: "cooking_verbs", en: "whatever", he: "לא משנה ב", heNiqqud: "לֹא מְשַׁנֶּה ב", utility: 80, source: "test" },
+    { id: "gamma", category: "cooking_verbs", en: "sort of", he: "בערך", heNiqqud: "בְּעֵרֶךְ", utility: 70, source: "test" },
+    { id: "delta", category: "cooking_verbs", en: "hilarious (slang)", he: "קורע", heNiqqud: "קוֹרֵעַ", utility: 60, source: "test" },
+    { id: "epsilon", category: "cooking_verbs", en: "never mind", he: "עזוב", heNiqqud: "עֲזוֹב", utility: 50, source: "test" },
+  ];
+  const reverseHarness = loadAppHarness(englishDuplicateVocab, [], [], {
+    mathRandom: () => 0.9,
+  });
+
+  reverseHarness.state.mode = "lesson";
+  reverseHarness.state.lesson.active = true;
+  reverseHarness.nextQuestion();
+  assert.ok(reverseHarness.state.currentQuestion);
+  const englishLabels = reverseHarness.state.currentQuestion.options.map((option) => option.word.en);
+  assert.equal(new Set(englishLabels).size, englishLabels.length);
+
+  const hebrewDuplicateVocab = [
+    { id: "alpha", category: "cooking_verbs", en: "whatever one", he: "לא משנה", heNiqqud: "לֹא מְשַׁנֶּה", utility: 90, source: "test" },
+    { id: "beta", category: "cooking_verbs", en: "whatever two", he: "לא משנה", heNiqqud: "לֹא מְשַׁנֶּה", utility: 80, source: "test" },
+    { id: "gamma", category: "cooking_verbs", en: "sort of", he: "בערך", heNiqqud: "בְּעֵרֶךְ", utility: 70, source: "test" },
+    { id: "delta", category: "cooking_verbs", en: "hilarious (slang)", he: "קורע", heNiqqud: "קוֹרֵעַ", utility: 60, source: "test" },
+    { id: "epsilon", category: "cooking_verbs", en: "never mind", he: "עזוב", heNiqqud: "עֲזוֹב", utility: 50, source: "test" },
+  ];
+  const forwardHarness = loadAppHarness(hebrewDuplicateVocab, [], [], {
+    mathRandom: () => 0.1,
+  });
+
+  forwardHarness.state.mode = "lesson";
+  forwardHarness.state.lesson.active = true;
+  forwardHarness.nextQuestion();
+  assert.ok(forwardHarness.state.currentQuestion);
+  const hebrewLabels = forwardHarness.state.currentQuestion.options.map((option) => option.word.he);
+  assert.equal(new Set(hebrewLabels).size, hebrewLabels.length);
+});
+
+test("abbreviation answer banks dedupe identical visible English labels", () => {
+  const abbreviations = [
+    { id: "abbr-1", abbr: "וכו׳", expansionHe: "וכולי", english: "whatever (חלוט)", bucket: "Daily Life & Home" },
+    { id: "abbr-2", abbr: "וגו׳", expansionHe: "וגומר", english: "whatever", bucket: "Daily Life & Home" },
+    { id: "abbr-3", abbr: "לדוג׳", expansionHe: "לדוגמה", english: "for example", bucket: "Daily Life & Home" },
+    { id: "abbr-4", abbr: "אח״כ", expansionHe: "אחר כך", english: "afterwards", bucket: "Daily Life & Home" },
+    { id: "abbr-5", abbr: "ז״א", expansionHe: "זאת אומרת", english: "that is", bucket: "Daily Life & Home" },
+  ];
+  const harness = loadAppHarness([], abbreviations, [], {
+    mathRandom: () => 0.1,
+  });
+
+  harness.state.mode = "abbreviation";
+  harness.state.abbreviation.active = true;
+  harness.nextAbbreviationQuestion();
+  assert.ok(harness.state.abbreviation.currentQuestion);
+  const labels = harness.state.abbreviation.currentQuestion.options.map((option) => option.label);
+  assert.equal(new Set(labels).size, labels.length);
+});
+
+test("verb match rounds dedupe identical visible English cards", () => {
+  const vocabulary = [
+    { id: "verb-go", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      word: { id: "verb-go", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת" },
+      formSource: "validated",
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+        { id: "past_first_person_singular", englishText: "he goes", valuePlain: "הלכתי", valueNiqqud: "הָלַכְתִּי" },
+        { id: "present_feminine_singular", englishText: "she goes", valuePlain: "הולכת", valueNiqqud: "הוֹלֶכֶת" },
+      ],
+    },
+  ];
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+
+  harness.state.mode = "verbMatch";
+  harness.state.match.active = true;
+  harness.state.match.verbQueue = [...verbDeck];
+  harness.loadNextVerbRound();
+  const englishCards = harness.state.match.leftCards.map((card) => card.englishText);
+  assert.equal(new Set(englishCards).size, englishCards.length);
+});
+
 test("sound preference defaults to disabled and toggle persists to localStorage", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },

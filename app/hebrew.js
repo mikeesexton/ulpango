@@ -8,6 +8,9 @@ const hebrew = app.hebrew = app.hebrew || {};
 
 const finalToMedial = constants.HEBREW_FINAL_TO_MEDIAL || {};
 const medialToFinal = constants.HEBREW_MEDIAL_TO_FINAL || {};
+const sanitizeEnglishText = utils.sanitizeEnglishDisplayText || function sanitizeEnglishDisplayText(text) {
+  return String(text || "").trim();
+};
 const normalizeAvailability = utils.normalizeVocabularyAvailability || function normalizeVocabularyAvailability(availability) {
   return {
     translationQuiz: availability?.translationQuiz !== false,
@@ -151,16 +154,18 @@ hebrew.prepareVocabulary = hebrew.prepareVocabulary || function prepareVocabular
   return words.map((word) => {
     const plain = String(word?.he || "");
     const existing = String(word?.heNiqqud || "");
+    const english = sanitizeEnglishText(word?.en);
     const availability = normalizeAvailability(word?.availability || availabilityDefaults);
 
     if (!plain) {
-      return { ...word, availability, heNiqqud: existing || plain };
+      return { ...word, availability, en: english, heNiqqud: existing || plain };
     }
 
     if (existing && existing !== plain) {
       return {
         ...word,
         availability,
+        en: english,
         heNiqqud: existing,
       };
     }
@@ -172,6 +177,7 @@ hebrew.prepareVocabulary = hebrew.prepareVocabulary || function prepareVocabular
     return {
       ...word,
       availability,
+      en: english,
       heNiqqud: marked,
     };
   });

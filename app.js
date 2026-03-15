@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260314k";
+const APP_BUILD = "20260315b";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;

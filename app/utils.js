@@ -46,4 +46,30 @@ utils.shuffle = utils.shuffle || function shuffle(items) {
 
   return arr;
 };
+
+utils.sanitizeEnglishDisplayText = utils.sanitizeEnglishDisplayText || function sanitizeEnglishDisplayText(text) {
+  let cleaned = String(text || "").trim();
+  if (!cleaned) return "";
+  if (!/[\u0590-\u05FF]/.test(cleaned)) return cleaned;
+
+  cleaned = cleaned
+    .replace(/[\u0590-\u05FF]+/g, "")
+    .replace(/:\s*,\s*/g, ": ")
+    .replace(/\(\s*,\s*/g, "(")
+    .replace(/,\s*\)/g, ")")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/\s+\)/g, ")")
+    .replace(/\(\s+/g, "(")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  cleaned = cleaned
+    .replace(/\(\s*(?:also|same word as|same as)?\s*:?\s*\)/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+
+  return cleaned;
+};
 })(typeof window !== "undefined" ? window : globalThis);
