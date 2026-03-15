@@ -205,6 +205,7 @@ function loadAppHarness(vocabulary, abbreviations = [], verbDeck = [], options =
 globalThis.__appTestExports = {
   ADV_CONJ_SUBJECTS,
   ADV_CONJ_OBJECTS,
+  app: globalThis.IvriQuestApp,
   applyAnswer,
   applyAbbreviationAnswer,
   applyAdvConjAnswer,
@@ -239,6 +240,7 @@ globalThis.__appTestExports = {
   startAdvConj,
   startVerbMatch,
   toggleSoundPreference,
+  toggleSpeechPreference,
   updateProgress,
   state,
 };
@@ -248,6 +250,8 @@ globalThis.__appTestExports = {
 
   const audioPlayLog = [];
   const audioLoadLog = [];
+  const speechSpeakLog = [];
+  let speechCancelCount = 0;
   const timeoutHandles = new Set();
   const intervalHandles = new Set();
   const elements = new Map();
@@ -346,6 +350,38 @@ globalThis.__appTestExports = {
         audioLoadLog.push(this.src);
       }
     },
+    SpeechSynthesisUtterance: class FakeSpeechSynthesisUtterance {
+      constructor(text) {
+        this.text = text;
+        this.lang = "";
+        this.voice = null;
+      }
+    },
+    speechSynthesis: {
+      _listeners: {},
+      getVoices() {
+        return Array.isArray(options.speechVoices)
+          ? options.speechVoices
+          : [{ lang: "he-IL", name: "Hebrew Test" }];
+      },
+      addEventListener(type, handler) {
+        this._listeners[type] = handler;
+      },
+      removeEventListener(type) {
+        delete this._listeners[type];
+      },
+      speak(utterance) {
+        speechSpeakLog.push({
+          text: utterance.text,
+          lang: utterance.lang,
+          voiceName: utterance.voice?.name || "",
+          voiceLang: utterance.voice?.lang || "",
+        });
+      },
+      cancel() {
+        speechCancelCount += 1;
+      },
+    },
     localStorage: createLocalStorage(options.localStorageData || {
       "ivriquest-welcome-seen-v1": "1",
     }),
@@ -399,6 +435,7 @@ globalThis.__appTestExports = {
     path.join(__dirname, "..", "app", "content-sources.js"),
     path.join(__dirname, "..", "app", "bootstrap-runtime.js"),
     path.join(__dirname, "..", "app", "audio.js"),
+    path.join(__dirname, "..", "app", "speech.js"),
     path.join(__dirname, "..", "app", "persistence.js"),
     path.join(__dirname, "..", "app", "session.js"),
     path.join(__dirname, "..", "app", "i18n.js"),
@@ -415,6 +452,10 @@ globalThis.__appTestExports = {
     ...context.__appTestExports,
     audioLoadLog,
     audioPlayLog,
+    speechSpeakLog,
+    getSpeechCancelCount() {
+      return speechCancelCount;
+    },
     cleanup() {
       timeoutHandles.forEach((handle) => nativeClearTimeout(handle));
       timeoutHandles.clear();
@@ -869,6 +910,193 @@ test("sound preference defaults to disabled and toggle persists to localStorage"
   assert.equal(localStorage.getItem("ivriquest-sound-v1"), JSON.stringify({ enabled: true }));
 });
 
+test("speech preference defaults to disabled and toggle persists separately", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { localStorage, state, toggleSpeechPreference } = loadAppHarness(vocabulary, [], [], {
+    localStorageData: {
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assert.equal(state.speech.enabled, false);
+  toggleSpeechPreference();
+  assert.equal(state.speech.enabled, true);
+  assert.equal(localStorage.getItem("ivriquest-speech-v1"), JSON.stringify({ enabled: true }));
+  assert.equal(localStorage.getItem("ivriquest-sound-v1"), null);
+});
+
+test("speech toggles disable cleanly when Hebrew speech is unavailable", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { document, state, toggleSpeechPreference } = loadAppHarness(vocabulary, [], [], {
+    speechVoices: [],
+    localStorageData: {
+      "ivriquest-welcome-seen-v1": "1",
+    },
+  });
+
+  assert.equal(document.querySelector("#speechToggle").disabled, true);
+  assert.equal(document.querySelector("#homeSpeechToggle").disabled, true);
+  assert.equal(state.speech.enabled, false);
+  toggleSpeechPreference();
+  assert.equal(state.speech.enabled, false);
+});
+
+test("prompt speech button appears for Hebrew prompts and reads them aloud on demand", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+
+  const hebrewHarness = loadAppHarness(vocabulary);
+  hebrewHarness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    prompt: vocabulary[0].he,
+    promptIsHebrew: true,
+    promptUsesWordSurface: true,
+    optionsAreHebrew: false,
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+  };
+
+  hebrewHarness.app.lessonMode.renderQuestion();
+  const promptButton = hebrewHarness.document.querySelector("#promptSpeechBtn");
+  assert.equal(promptButton.classList.contains("hidden"), false);
+  assert.equal(promptButton.textContent.trim(), "");
+  assert.equal(promptButton.getAttribute("aria-label"), "Play Hebrew prompt");
+  assert.equal(hebrewHarness.document.querySelector("#promptLabel").classList.contains("hidden"), true);
+  assert.equal(hebrewHarness.document.querySelector("#homeLessonStage").classList.contains("mode-standard"), true);
+  promptButton.click();
+  assert.deepEqual(hebrewHarness.speechSpeakLog.map((entry) => entry.text), ["אַלְפָא"]);
+
+  const englishHarness = loadAppHarness(vocabulary);
+  englishHarness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    prompt: vocabulary[0].en,
+    promptIsHebrew: false,
+    promptUsesWordSurface: false,
+    optionsAreHebrew: true,
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+  };
+
+  englishHarness.app.lessonMode.renderQuestion();
+  assert.equal(englishHarness.document.querySelector("#promptSpeechBtn").classList.contains("hidden"), true);
+  assert.deepEqual(englishHarness.speechSpeakLog, []);
+});
+
+test("verb match prompt speech button reads the current Hebrew prompt", () => {
+  const vocabulary = [
+    { id: "verb-word", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      id: "verb-1",
+      word: vocabulary[0],
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+      ],
+    },
+  ];
+
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+  harness.state.mode = "verbMatch";
+  harness.state.match.active = true;
+  harness.state.match.verbQueue = [...verbDeck];
+  harness.loadNextVerbRound();
+
+  const promptButton = harness.document.querySelector("#promptSpeechBtn");
+  assert.equal(promptButton.classList.contains("hidden"), false);
+  assert.equal(promptButton.textContent.trim(), "");
+  assert.equal(promptButton.getAttribute("aria-label"), "Play Hebrew prompt");
+  assert.equal(harness.document.querySelector("#homeLessonStage").classList.contains("mode-verb-match"), true);
+  assert.equal(harness.document.querySelector("#stickyLessonActions").classList.contains("is-empty"), true);
+  promptButton.click();
+  assert.deepEqual(harness.speechSpeakLog.map((entry) => entry.text), ["לָלֶכֶת"]);
+});
+
+test("header combo pill is displayed uniformly across lesson and conjugation", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      id: "verb-1",
+      word: { id: "verb-word", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+      ],
+    },
+  ];
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+
+  harness.state.sessionScore = 9;
+  harness.state.sessionStreak = 4;
+  harness.state.mode = "lesson";
+  harness.state.lesson.active = true;
+  harness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    prompt: vocabulary[0].en,
+    promptIsHebrew: false,
+    optionsAreHebrew: true,
+    options: [{ id: "alpha", word: vocabulary[0] }],
+    selectedOptionId: null,
+  };
+  harness.app.ui.renderSessionHeader();
+  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x4");
+
+  harness.state.mode = "verbMatch";
+  harness.state.match.active = true;
+  harness.state.match.currentVerb = verbDeck[0];
+  harness.state.match.matchedCount = 0;
+  harness.state.match.totalPairs = 1;
+  harness.state.match.bestCombo = 9;
+  harness.app.ui.renderSessionHeader();
+  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x4");
+});
+
+test("starting advanced conjugation resets the game score but preserves the shared combo", () => {
+  const idioms = [
+    {
+      id: "idiom-1",
+      english: "to open your eyes",
+      showMeaning: false,
+      object_type: "l_dative",
+      fixed_object: "את העיניים",
+      literal_sg: "{s} opens {p} eyes",
+      literal_pl: "{s} open {p} eyes",
+      literal_past: "{s} opened {p} eyes",
+      literal_future: "{s} will open {p} eyes",
+      present_tense: { msg: "פותח", fsg: "פותחת", mpl: "פותחים", fpl: "פותחות" },
+      past_tense: { msg: "פתח", fsg: "פתחה", mpl: "פתחו", fpl: "פתחו" },
+      future_tense: { msg: "יפתח", fsg: "תפתח", mpl: "תפתחו", fpl: "תפתחו" },
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { idioms });
+
+  harness.state.sessionScore = 6;
+  harness.state.sessionStreak = 3;
+  harness.startAdvConj();
+  harness.app.ui.renderSessionHeader();
+
+  assert.equal(harness.state.sessionScore, 0);
+  assert.equal(harness.state.sessionStreak, 3);
+  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x3");
+  harness.goHome();
+});
+
 test("translation submit plays the correct answer sound", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
@@ -956,6 +1184,157 @@ test("selecting a translation choice without submitting stays silent", () => {
 
   assert.equal(state.currentQuestion.selectedOptionId, "alpha");
   assert.deepEqual(audioPlayLog, []);
+});
+
+test("translation selection speaks Hebrew answers only and prefers niqqud for speech", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const hebrewHarness = loadAppHarness(vocabulary);
+  hebrewHarness.toggleSpeechPreference();
+
+  hebrewHarness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+    optionsAreHebrew: true,
+  };
+
+  hebrewHarness.renderChoices(hebrewHarness.state.currentQuestion);
+  let buttons = hebrewHarness.document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+
+  assert.equal(hebrewHarness.state.currentQuestion.selectedOptionId, "alpha");
+  assert.deepEqual(hebrewHarness.speechSpeakLog.map((entry) => entry.text), ["אַלְפָא"]);
+
+  const englishHarness = loadAppHarness(vocabulary);
+  englishHarness.toggleSpeechPreference();
+  englishHarness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+    optionsAreHebrew: false,
+  };
+
+  englishHarness.renderChoices(englishHarness.state.currentQuestion);
+  buttons = englishHarness.document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+  assert.deepEqual(englishHarness.speechSpeakLog, []);
+});
+
+test("locked translation choices do not trigger speech", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const harness = loadAppHarness(vocabulary);
+  harness.toggleSpeechPreference();
+
+  harness.state.currentQuestion = {
+    locked: true,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: null,
+    optionsAreHebrew: true,
+  };
+
+  harness.renderChoices(harness.state.currentQuestion);
+  const buttons = harness.document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+
+  assert.deepEqual(harness.speechSpeakLog, []);
+});
+
+test("abbreviation and advanced conjugation selections speak Hebrew answers before submit", () => {
+  const abbreviations = [
+    { id: "abbr-1", abbr: "ע״מ", expansionHe: "עוסק מורשה", english: "licensed business", bucket: "Daily Life & Home" },
+  ];
+  const harness = loadAppHarness([], abbreviations, []);
+  harness.toggleSpeechPreference();
+
+  harness.state.mode = "abbreviation";
+  harness.state.abbreviation.active = true;
+  harness.state.abbreviation.currentQuestion = {
+    locked: false,
+    direction: "en2he",
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", label: "ע״מ", entry: abbreviations[0] }],
+    selectedOptionId: null,
+  };
+  harness.app.abbreviation.renderAbbreviationChoices(harness.state.abbreviation.currentQuestion);
+  let buttons = harness.document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+
+  harness.state.mode = "advConj";
+  harness.state.advConj.active = true;
+  harness.state.advConj.currentQuestion = {
+    locked: false,
+    promptText: "he opened your eyes",
+    promptIsHebrew: false,
+    correctAnswer: "פתח לך את העיניים",
+    correctAnswerIsHebrew: true,
+    options: [{ id: "correct", text: "פתח לך את העיניים", isCorrect: true }],
+    selectedOptionId: null,
+  };
+  harness.app.advConj.renderAdvConjChoices(harness.state.advConj.currentQuestion);
+  buttons = harness.document.querySelector("#choiceContainer").querySelectorAll("button");
+  buttons[0].click();
+
+  assert.deepEqual(harness.speechSpeakLog.map((entry) => entry.text), ["ע״מ", "פתח לך את העיניים"]);
+});
+
+test("verb match speaks only when the Hebrew card is selected first and shows the tip", async () => {
+  const vocabulary = [
+    { id: "verb-word", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      id: "verb-1",
+      word: vocabulary[0],
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+      ],
+    },
+  ];
+
+  const rightFirstHarness = loadAppHarness(vocabulary, [], verbDeck);
+  rightFirstHarness.toggleSpeechPreference();
+  rightFirstHarness.state.mode = "verbMatch";
+  rightFirstHarness.state.match.active = true;
+  rightFirstHarness.state.match.verbQueue = [...verbDeck];
+  rightFirstHarness.loadNextVerbRound();
+
+  assert.equal(rightFirstHarness.document.querySelector("#promptHint").textContent, "Tip: select the Hebrew first to hear it aloud.");
+  assert.equal(rightFirstHarness.document.querySelector("#stickyLessonActions").classList.contains("is-empty"), true);
+  const rightCardId = rightFirstHarness.state.match.rightCards[0].id;
+  const leftCardId = rightFirstHarness.state.match.leftCards[0].id;
+  rightFirstHarness.app.verbMatch.handleVerbMatchRight(rightCardId);
+  assert.deepEqual(rightFirstHarness.speechSpeakLog.map((entry) => entry.text), ["הוֹלֵךְ"]);
+  rightFirstHarness.app.verbMatch.handleVerbMatchLeft(leftCardId);
+  assert.equal(rightFirstHarness.speechSpeakLog.length, 1);
+  await waitForTimers();
+
+  const leftFirstHarness = loadAppHarness(vocabulary, [], verbDeck);
+  leftFirstHarness.toggleSpeechPreference();
+  leftFirstHarness.state.mode = "verbMatch";
+  leftFirstHarness.state.match.active = true;
+  leftFirstHarness.state.match.verbQueue = [...verbDeck];
+  leftFirstHarness.loadNextVerbRound();
+  leftFirstHarness.app.verbMatch.handleVerbMatchLeft(leftFirstHarness.state.match.leftCards[0].id);
+  leftFirstHarness.app.verbMatch.handleVerbMatchRight(leftFirstHarness.state.match.rightCards[0].id);
+  assert.deepEqual(leftFirstHarness.speechSpeakLog, []);
 });
 
 test("abbreviation and advanced conjugation submits play feedback sounds", () => {

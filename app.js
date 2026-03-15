@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260315b";
+const APP_BUILD = "20260315h";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -16,6 +16,7 @@ const bootstrapDataModule = appFoundation.bootstrapData || {};
 const contentSourcesModule = appFoundation.contentSources || {};
 const bootstrapRuntimeModule = appFoundation.bootstrapRuntime || {};
 const audioModule = appFoundation.audio || {};
+const speechModule = appFoundation.speech || {};
 const persistenceModule = appFoundation.persistence || {};
 const sessionModule = appFoundation.session || {};
 const i18nModule = appFoundation.i18n || {};
@@ -89,6 +90,15 @@ const primeAudioCues = audioModule.primeAudioCues;
 const playSoundCue = audioModule.playSoundCue;
 const playAnswerFeedbackSound = audioModule.playAnswerFeedbackSound;
 
+const buildHebrewSpeechText = speechModule.buildHebrewSpeechText;
+const buildSpeechPayload = speechModule.buildSpeechPayload;
+const primeVoices = speechModule.primeVoices;
+const getHebrewVoice = speechModule.getHebrewVoice;
+const isSpeechSupported = speechModule.isSupported;
+const isSpeechEnabled = speechModule.isEnabled;
+const cancelSpeech = speechModule.cancel;
+const speakSpeechPayload = speechModule.speak;
+
 const clearPersistedSession = persistenceModule.clearPersistedSession;
 const loadLanguagePreference = persistenceModule.loadLanguagePreference;
 const saveLanguagePreference = persistenceModule.saveLanguagePreference;
@@ -96,6 +106,8 @@ const loadThemePreference = persistenceModule.loadThemePreference;
 const saveThemePreference = persistenceModule.saveThemePreference;
 const loadSoundPreference = persistenceModule.loadSoundPreference;
 const saveSoundPreference = persistenceModule.saveSoundPreference;
+const loadSpeechPreference = persistenceModule.loadSpeechPreference;
+const saveSpeechPreference = persistenceModule.saveSpeechPreference;
 const hasSeenWelcomeModal = persistenceModule.hasSeenWelcomeModal;
 const markWelcomeModalSeen = persistenceModule.markWelcomeModalSeen;
 const applySurveyLinks = persistenceModule.applySurveyLinks;
@@ -109,6 +121,7 @@ const toggleLanguage = i18nModule.toggleLanguage;
 const toggleTheme = i18nModule.toggleTheme;
 const toggleNiqqudPreference = i18nModule.toggleNiqqudPreference;
 const toggleSoundPreference = i18nModule.toggleSoundPreference;
+const toggleSpeechPreference = i18nModule.toggleSpeechPreference;
 const getLocaleBundle = i18nModule.getLocaleBundle;
 const getLanguageToggleLabel = i18nModule.getLanguageToggleLabel;
 const getNestedTranslation = i18nModule.getNestedTranslation;
@@ -155,6 +168,7 @@ const hideBlockingOverlay = uiModule.hideBlockingOverlay;
 const renderHomeButton = uiModule.renderHomeButton;
 const renderNiqqudToggle = uiModule.renderNiqqudToggle;
 const renderSoundToggle = uiModule.renderSoundToggle;
+const renderSpeechToggle = uiModule.renderSpeechToggle;
 const renderThemeToggle = uiModule.renderThemeToggle;
 const setGamePickerVisibility = uiModule.setGamePickerVisibility;
 const setPromptCardVisibility = uiModule.setPromptCardVisibility;
@@ -167,6 +181,7 @@ const buildAnswerDisplay = uiModule.buildAnswerDisplay;
 const setFeedback = uiModule.setFeedback;
 const clearFeedback = uiModule.clearFeedback;
 const resetSessionCounters = uiModule.resetSessionCounters;
+const resetSessionScore = uiModule.resetSessionScore;
 const renderAll = uiModule.renderAll;
 const renderLearnState = uiModule.renderLearnState;
 const renderSessionHeader = uiModule.renderSessionHeader;
@@ -199,6 +214,7 @@ const closeWelcomeModal = uiModule.closeWelcomeModal;
 const renderWelcomeModal = uiModule.renderWelcomeModal;
 const renderMasteredModal = uiModule.renderMasteredModal;
 const restoreSelectedMasteredWords = uiModule.restoreSelectedMasteredWords;
+const renderPromptHint = uiModule.renderPromptHint;
 
 const getMostMissedRanked = dataModule.getMostMissedRanked;
 const buildLessonMistakeSummary = dataModule.buildLessonMistakeSummary;
@@ -336,6 +352,14 @@ if (
   !primeAudioCues ||
   !playSoundCue ||
   !playAnswerFeedbackSound ||
+  !buildHebrewSpeechText ||
+  !buildSpeechPayload ||
+  !primeVoices ||
+  !getHebrewVoice ||
+  !isSpeechSupported ||
+  !isSpeechEnabled ||
+  !cancelSpeech ||
+  !speakSpeechPayload ||
   !clearPersistedSession ||
   !loadLanguagePreference ||
   !saveLanguagePreference ||
@@ -343,6 +367,8 @@ if (
   !saveThemePreference ||
   !loadSoundPreference ||
   !saveSoundPreference ||
+  !loadSpeechPreference ||
+  !saveSpeechPreference ||
   !hasSeenWelcomeModal ||
   !markWelcomeModalSeen ||
   !applySurveyLinks ||
@@ -355,6 +381,7 @@ if (
   !toggleTheme ||
   !toggleNiqqudPreference ||
   !toggleSoundPreference ||
+  !toggleSpeechPreference ||
   !getLocaleBundle ||
   !getLanguageToggleLabel ||
   !getNestedTranslation ||
@@ -399,6 +426,7 @@ if (
   !renderHomeButton ||
   !renderNiqqudToggle ||
   !renderSoundToggle ||
+  !renderSpeechToggle ||
   !renderThemeToggle ||
   !setGamePickerVisibility ||
   !setPromptCardVisibility ||
@@ -411,6 +439,7 @@ if (
   !setFeedback ||
   !clearFeedback ||
   !resetSessionCounters ||
+  !resetSessionScore ||
   !renderAll ||
   !renderLearnState ||
   !renderSessionHeader ||
@@ -443,6 +472,7 @@ if (
   !renderWelcomeModal ||
   !renderMasteredModal ||
   !restoreSelectedMasteredWords ||
+  !renderPromptHint ||
   !getMostMissedRanked ||
   !buildLessonMistakeSummary ||
   !buildAbbreviationMistakeSummary ||
@@ -603,6 +633,7 @@ const state = createInitialState({
   language: loadLanguagePreference(),
   theme: loadThemePreference(),
   audio: loadSoundPreference(),
+  speech: loadSpeechPreference(),
   welcomeModalSeen: hasSeenWelcomeModal(),
 });
 appRuntime.state = state;
@@ -646,6 +677,7 @@ appRuntime.helpers = {
   getDueWords,
   getLanguageToggleLabel,
   getHebrewText,
+  isUiLocked,
   getVisibleVerbMatchRows,
   goHome,
   hideBlockingOverlay,
@@ -676,15 +708,20 @@ appRuntime.helpers = {
   renderNiqqudToggle,
   renderPoolMeta,
   renderPromptText,
+  renderPromptHint,
   renderQuestion,
+  renderSpeechToggle,
   renderSessionHeader,
   renderVerbMatchRound,
   requestGoHome,
   resetAdvConjState,
   resetAbbreviationState,
   resetSessionCounters,
+  resetSessionScore,
   resetVerbMatchState,
   scheduleIntroAutoAdvance,
+  speakSpeechPayload,
+  cancelSpeech,
   setFeedback,
   setGamePickerVisibility,
   setPromptCardVisibility,
@@ -712,6 +749,7 @@ applyLanguage();
 bindUi();
 resumeActiveTimers();
 renderAll();
+primeVoices();
 primeAudioCues();
 
 })(typeof window !== "undefined" ? window : globalThis);

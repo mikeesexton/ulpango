@@ -9,6 +9,7 @@ constants.STORAGE_KEYS = constants.STORAGE_KEYS || Object.freeze({
   language: "ivriquest-language-v1",
   theme: "ivriquest-theme-v1",
   sound: "ivriquest-sound-v1",
+  speech: "ivriquest-speech-v1",
   ui: "ivriquest-ui-v1",
   session: "ivriquest-session-v1",
   welcomeSeen: "ivriquest-welcome-seen-v1",

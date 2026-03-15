@@ -98,4 +98,13 @@ i18n.toggleSoundPreference = i18n.toggleSoundPreference || function toggleSoundP
   app.audio?.primeAudioCues?.();
   getHelpers().renderAll?.();
 };
+
+i18n.toggleSpeechPreference = i18n.toggleSpeechPreference || function toggleSpeechPreference() {
+  const runtime = getRuntime();
+  if (!app.speech?.isSupported?.()) return;
+  runtime.state.speech.enabled = !runtime.state.speech.enabled;
+  app.persistence?.saveSpeechPreference?.(runtime.state.speech.enabled);
+  app.speech?.primeVoices?.();
+  getHelpers().renderAll?.();
+};
 })(typeof window !== "undefined" ? window : globalThis);

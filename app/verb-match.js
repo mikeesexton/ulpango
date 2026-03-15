@@ -30,6 +30,28 @@ function sanitizeEnglishText(text) {
     : String(text || "").trim();
 }
 
+verbMatch.getVerbMatchPromptSpeechPayload = verbMatch.getVerbMatchPromptSpeechPayload || function getVerbMatchPromptSpeechPayload() {
+  const runtime = getRuntime();
+  const current = runtime.state.match.currentVerb?.word;
+  if (!current) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: current.he,
+    niqqud: current.heNiqqud,
+    speechOverridePlain: current.speechHe,
+    speechOverrideNiqqud: current.speechHeNiqqud,
+    source: "prompt",
+  }) || null;
+};
+
+verbMatch.getVerbMatchCardSpeechPayload = verbMatch.getVerbMatchCardSpeechPayload || function getVerbMatchCardSpeechPayload(card) {
+  if (!card) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: card.hebrewPlain,
+    niqqud: card.hebrewNiqqud,
+    source: "answer",
+  }) || null;
+};
+
 verbMatch.moveEligibleVerbToMastered = verbMatch.moveEligibleVerbToMastered || function moveEligibleVerbToMastered() {
   const runtime = getRuntime();
   const h = getHelpers();
@@ -58,6 +80,7 @@ verbMatch.startVerbMatch = verbMatch.startVerbMatch || function startVerbMatch()
   const h = getHelpers();
   const s = getSession();
   const shuffle = app.utils?.shuffle;
+  app.speech?.cancel?.();
   s.stopVerbMatchTimer?.();
   s.stopLessonTimer?.();
   s.stopAbbreviationTimer?.();
@@ -71,7 +94,7 @@ verbMatch.startVerbMatch = verbMatch.startVerbMatch || function startVerbMatch()
   runtime.state.lesson.active = false;
   runtime.state.lesson.inReview = false;
   runtime.state.currentQuestion = null;
-  h.resetSessionCounters?.();
+  h.resetSessionScore?.();
   verbMatch.resetVerbMatchState();
   h.resetAbbreviationState?.();
   runtime.state.mode = "verbMatch";
@@ -303,12 +326,13 @@ verbMatch.renderVerbMatchIdleState = verbMatch.renderVerbMatchIdleState || funct
   h.setPromptCardVisibility?.(true);
   runtime.el.choiceContainer.classList.remove("summary-grid");
   h.renderSessionHeader?.();
-  runtime.el.promptLabel.textContent = translate("match.prompt");
+  app.ui?.renderPromptLabel?.("", false);
   runtime.el.promptText.classList.remove("hebrew");
   runtime.el.promptText.textContent = translate("prompt.verbMatchStart");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
   h.renderNiqqudToggle?.();
+  app.ui?.renderPromptSpeechButton?.();
 };
 
 verbMatch.renderVerbMatchRound = verbMatch.renderVerbMatchRound || function renderVerbMatchRound() {
@@ -323,7 +347,7 @@ verbMatch.renderVerbMatchRound = verbMatch.renderVerbMatchRound || function rend
   h.setPromptCardVisibility?.(true);
   runtime.el.choiceContainer.classList.remove("summary-grid");
   h.renderSessionHeader?.();
-  runtime.el.promptLabel.textContent = translate("match.prompt");
+  app.ui?.renderPromptLabel?.("", false);
   h.renderPromptText?.();
   verbMatch.renderVerbMatchCards();
 };
@@ -359,9 +383,6 @@ verbMatch.renderVerbMatchCards = verbMatch.renderVerbMatchCards || function rend
 
   const leftCol = global.document.createElement("section");
   leftCol.className = "match-col";
-  const leftTitle = global.document.createElement("p");
-  leftTitle.className = "match-col-title";
-  leftTitle.textContent = translate("match.leftColumn");
   const leftStack = global.document.createElement("div");
   leftStack.className = "match-stack";
 
@@ -382,13 +403,10 @@ verbMatch.renderVerbMatchCards = verbMatch.renderVerbMatchCards || function rend
     card.incoming = false;
   });
 
-  leftCol.append(leftTitle, leftStack);
+  leftCol.append(leftStack);
 
   const rightCol = global.document.createElement("section");
   rightCol.className = "match-col";
-  const rightTitle = global.document.createElement("p");
-  rightTitle.className = "match-col-title";
-  rightTitle.textContent = translate("match.rightColumn");
   const rightStack = global.document.createElement("div");
   rightStack.className = "match-stack";
 
@@ -409,7 +427,7 @@ verbMatch.renderVerbMatchCards = verbMatch.renderVerbMatchCards || function rend
     card.incoming = false;
   });
 
-  rightCol.append(rightTitle, rightStack);
+  rightCol.append(rightStack);
   wrap.append(leftCol, rightCol);
   runtime.el.choiceContainer.append(wrap);
 };
@@ -431,7 +449,11 @@ verbMatch.handleVerbMatchRight = verbMatch.handleVerbMatchRight || function hand
   const card = runtime.state.match.rightCards.find((item) => item.id === cardId);
   if (!card) return;
 
+  const shouldSpeak = !runtime.state.match.selectedLeftId && runtime.state.match.selectedRightId !== cardId;
   runtime.state.match.selectedRightId = runtime.state.match.selectedRightId === cardId ? null : cardId;
+  if (shouldSpeak && runtime.state.match.selectedRightId === cardId) {
+    app.speech?.speak?.(verbMatch.getVerbMatchCardSpeechPayload(card));
+  }
   verbMatch.resolveVerbMatchSelection();
   verbMatch.renderVerbMatchRound();
 };
@@ -461,6 +483,7 @@ verbMatch.applyVerbMatchSuccess = verbMatch.applyVerbMatchSuccess || function ap
   const h = getHelpers();
   const data = getData();
   const currentWordId = runtime.state.match.currentVerb?.word?.id || "";
+  app.speech?.cancel?.();
   runtime.state.match.isResolving = true;
   runtime.state.match.matchedCardIds = [leftCard.id, rightCard.id];
   runtime.state.match.selectedLeftId = null;
@@ -510,6 +533,7 @@ verbMatch.applyVerbMatchMismatch = verbMatch.applyVerbMatchMismatch || function 
   const h = getHelpers();
   const data = getData();
   const currentWordId = runtime.state.match.currentVerb?.word?.id || "";
+  app.speech?.cancel?.();
   runtime.state.match.isResolving = true;
   runtime.state.match.combo = 0;
   runtime.state.sessionStreak = 0;

@@ -33,11 +33,42 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+lessonMode.getLessonPromptSpeechPayload = lessonMode.getLessonPromptSpeechPayload || function getLessonPromptSpeechPayload(question = getRuntime().state.currentQuestion) {
+  if (!question?.promptIsHebrew) return null;
+  if (question.word && question.promptUsesWordSurface !== false) {
+    return app.speech?.buildSpeechPayload?.({
+      plain: question.word.he,
+      niqqud: question.word.heNiqqud,
+      speechOverridePlain: question.word.speechHe,
+      speechOverrideNiqqud: question.word.speechHeNiqqud,
+      source: "prompt",
+    }) || null;
+  }
+
+  return app.speech?.buildSpeechPayload?.({
+    plain: question.prompt,
+    niqqud: question.promptNiqqud,
+    source: "prompt",
+  }) || null;
+};
+
+lessonMode.getLessonSelectionSpeechPayload = lessonMode.getLessonSelectionSpeechPayload || function getLessonSelectionSpeechPayload(question, option) {
+  if (!question?.optionsAreHebrew || !option?.word) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: option.word.he,
+    niqqud: option.word.heNiqqud,
+    speechOverridePlain: option.word.speechHe,
+    speechOverrideNiqqud: option.word.speechHeNiqqud,
+    source: "answer",
+  }) || null;
+};
+
 lessonMode.startLesson = lessonMode.startLesson || function startLesson() {
   const runtime = getRuntime();
   const h = getHelpers();
   const session = getSession();
 
+  app.speech?.cancel?.();
   session.stopVerbMatchTimer?.();
   session.stopLessonTimer?.();
   session.stopAbbreviationTimer?.();
@@ -53,7 +84,7 @@ lessonMode.startLesson = lessonMode.startLesson || function startLesson() {
   session.clearSecondChanceIntro?.();
   session.clearVerbMatchIntro?.();
   session.clearAbbreviationIntro?.();
-  h.resetSessionCounters?.();
+  h.resetSessionScore?.();
   runtime.state.lesson.active = true;
   runtime.state.lesson.inReview = false;
   runtime.state.lesson.reviewQueue = [];
@@ -150,7 +181,7 @@ lessonMode.nextQuestion = lessonMode.nextQuestion || function nextQuestion() {
     runtime.state.lesson.active = false;
     runtime.state.currentQuestion = null;
     const hasMastered = (data.getMasteredWords?.() || []).length > 0;
-    runtime.el.promptLabel.textContent = hasMastered ? translate("prompt.masteredOnlyTitle") : translate("prompt.noVocabTitle");
+    app.ui?.renderPromptLabel?.(hasMastered ? translate("prompt.masteredOnlyTitle") : translate("prompt.noVocabTitle"), true);
     runtime.el.promptText.classList.remove("hebrew");
     runtime.el.promptText.textContent = hasMastered ? translate("prompt.masteredOnlyBody") : translate("prompt.noVocabBody");
     runtime.el.choiceContainer.innerHTML = "";
@@ -207,7 +238,7 @@ lessonMode.renderQuestion = lessonMode.renderQuestion || function renderQuestion
 
   if (!question) return;
 
-  runtime.el.promptLabel.textContent = question.promptLabel;
+  app.ui?.renderPromptLabel?.("", false);
   h.renderPromptText?.(question);
   lessonMode.renderChoices(question);
 };
@@ -232,6 +263,7 @@ lessonMode.renderChoices = lessonMode.renderChoices || function renderChoices(qu
         button.classList.toggle("selected", question.options[index]?.id === option.id);
       });
       h.renderSessionHeader?.();
+      app.speech?.speak?.(lessonMode.getLessonSelectionSpeechPayload(question, option));
     });
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
 
@@ -249,6 +281,7 @@ lessonMode.applyAnswer = lessonMode.applyAnswer || function applyAnswer(isCorrec
   const data = getData();
   if (!runtime.state.currentQuestion || runtime.state.currentQuestion.locked) return;
 
+  app.speech?.cancel?.();
   runtime.state.currentQuestion.locked = true;
   const word = runtime.state.currentQuestion.word;
 

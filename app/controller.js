@@ -51,12 +51,15 @@ controller.bindUi = controller.bindUi || function bindUi() {
   runtime.el.homeThemeToggle?.addEventListener("click", () => app.i18n?.toggleTheme?.());
   runtime.el.homeNiqqudToggle?.addEventListener("click", () => app.i18n?.toggleNiqqudPreference?.());
   runtime.el.homeSoundToggle?.addEventListener("click", () => app.i18n?.toggleSoundPreference?.());
+  runtime.el.homeSpeechToggle?.addEventListener("click", () => app.i18n?.toggleSpeechPreference?.());
   runtime.el.langToggle?.addEventListener("click", () => app.i18n?.toggleLanguage?.());
   runtime.el.themeToggle?.addEventListener("click", () => app.i18n?.toggleTheme?.());
   runtime.el.soundToggle?.addEventListener("click", () => app.i18n?.toggleSoundPreference?.());
+  runtime.el.speechToggle?.addEventListener("click", () => app.i18n?.toggleSpeechPreference?.());
   runtime.el.resultsContinueBtn?.addEventListener("click", () => controller.continueFromResults());
   runtime.el.resultsReviewBtn?.addEventListener("click", () => controller.leaveSummaryAndNavigate("review"));
   runtime.el.resultsHomeBtn?.addEventListener("click", () => controller.leaveSummaryAndNavigate("home"));
+  runtime.el.promptSpeechBtn?.addEventListener("click", () => app.ui?.playPromptSpeech?.());
   runtime.el.welcomeModalCloseBtn?.addEventListener("click", () => app.ui?.closeWelcomeModal?.());
   runtime.el.welcomeModal?.addEventListener("click", (event) => {
     if (event.target === runtime.el.welcomeModal) {

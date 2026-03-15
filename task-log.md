@@ -1165,3 +1165,122 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** In rare small-category pools, a translation or abbreviation question may now render fewer than four options instead of showing duplicates. That is intentional, but it is worth spot-checking a few tiny categories live to make sure the reduced option count still feels okay.
 
 ---
+
+### 2026-03-15 11:22 — Lay browser-TTS groundwork for spoken Hebrew
+
+**Requested:** Start laying the groundwork for spoken Hebrew in the games, with a separate speech setting, answer-first playback, and the special "Hebrew first" behavior for the conjugation match game.
+
+**Files changed:**
+- `app/speech.js` — Added a shared browser-TTS module around `speechSynthesis`, including Hebrew-voice detection, support checks, payload building, voice priming, cancellation, and speech playback.
+- `app/constants.js` / `app/persistence.js` / `app/bootstrap-runtime.js` / `app/i18n.js` / `app/controller.js` — Added a separate persisted speech preference (`ivriquest-speech-v1`), new runtime state, new toggle wiring, and a dedicated language-layer toggle separate from sound effects.
+- `app/ui.js` / `index.html` / `app/bootstrap-data.js` — Added Speech toggles in home and settings UI, localized speech labels and the conjugation tip, plus a prompt-hint slot that appears only in conjugation when speech is enabled.
+- `app/lesson.js` / `app/abbreviation.js` / `app/adv-conj.js` / `app/verb-match.js` — Added prompt/selection speech payload builders for future prompt audio, wired answer-first speech on Hebrew selections, and enforced the conjugation rule that only a first Hebrew-card selection speaks.
+- `tests/app-speech.test.js` / `tests/app-progress.test.js` — Added shared speech-module unit coverage plus runtime regressions for speech persistence, unsupported browsers, translation/abbreviation/advanced-conjugation speech, and the conjugation "Hebrew first" rule.
+- `app.js` / `index.html` — Registered the new speech module in the app bootstrap and bumped cache-busting versions for the changed JS bundle.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** The app now has a separate Speech setting that uses browser TTS for Hebrew selections without changing submit behavior. Translation, abbreviation, and advanced conjugation can speak Hebrew answers on selection, and conjugation match only speaks when the Hebrew card is chosen first.
+
+**Tests run:** `node --test tests/app-speech.test.js` — passed, 4/4. `node --test tests/app-progress.test.js` — passed, 42/42. `node --test` — passed, 68/68.
+
+**Risks / regressions to check:** Browser speech support depends on the presence of a Hebrew voice, so the new toggle intentionally disables itself when no Hebrew voice is available. Abbreviation pronunciation is still best-effort in v1 because it speaks the visible acronym token until curated overrides are added later.
+
+---
+
+### 2026-03-15 11:49 — Add on-demand Hebrew prompt playback
+
+**Requested:** Add a prompt-level option so whenever the prompt is Hebrew, the learner can click to hear it pronounced in Hebrew.
+
+**Files changed:**
+- `app/ui.js` / `app/controller.js` / `app/bootstrap-runtime.js` / `index.html` / `styles.css` — Added a dedicated prompt speech button on the prompt card, prompt-payload resolution, click handling, and lightweight prompt-action styling.
+- `app/speech.js` — Added a `force` path so explicit prompt-button playback can work on demand even when automatic answer speech is turned off.
+- `app/lesson.js` / `app/abbreviation.js` / `app/adv-conj.js` / `app/verb-match.js` — Reused the existing prompt speech payload builders so translation, abbreviation, advanced conjugation, and verb match can all expose Hebrew prompt playback through the shared button.
+- `app/bootstrap-data.js` / `app.js` / `index.html` — Added localized prompt-button text and bumped cache-busting/build versions.
+- `tests/app-speech.test.js` / `tests/app-progress.test.js` — Added coverage for forced prompt playback and for prompt-button visibility/click behavior in translation and conjugation.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** When a round has Hebrew available in the prompt, the prompt card now shows a `Hear Prompt` button that reads the Hebrew aloud on demand. This is explicit prompt playback, so it works even if the automatic Speech setting is off; unsupported browsers still hide the control.
+
+**Tests run:** `node --test tests/app-speech.test.js` — passed, 5/5. `node --test tests/app-progress.test.js` — passed, 44/44. `node --test` — passed, 71/71.
+
+**Risks / regressions to check:** Verb match prompts are mixed English + Hebrew, so the button intentionally reads only the Hebrew verb portion. Prompt-button audio is manual and separate from automatic answer speech, so the two pathways should be spot-checked together on mobile Safari once before shipping.
+
+---
+
+### 2026-03-15 16:57 — Polish gameplay layout and replace prompt text button with inline speaker control
+
+**Requested:** Tighten the gameplay shell spacing, make the prompt-audio control icon-only and inline, and give conjugation a cleaner, more intentional board layout without changing gameplay flow.
+
+**Files changed:**
+- `index.html` / `app/bootstrap-runtime.js` — Reworked the prompt card markup into a compact meta row plus content row and registered the sticky action bar in the runtime element registry.
+- `app/ui.js` — Added lesson-shell mode hooks, prompt-card state hooks, sticky-action collapse handling, and converted the prompt speech control to an icon-only button with localized accessibility text.
+- `app/lesson.js` / `app/abbreviation.js` / `app/verb-match.js` — Normalized prompt-label visibility so the shared shell can cleanly switch between standard quiz layouts and the conjugation board.
+- `app/bootstrap-data.js` — Replaced the visible prompt-button copy with accessibility-only strings for the inline speaker control.
+- `styles.css` — Tightened gameplay spacing, turned the session stats into compact metadata pills, styled the circular inline speaker button, and gave verb match a denser board-style prompt and column layout. Added an `is-empty` collapse state for sticky lesson actions.
+- `tests/app-progress.test.js` / `app.js` / `index.html` — Updated regressions for the new icon-only prompt control, mode/layout hooks, and cache-busting/build versions.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** The old `Hear Prompt` text button is now an inline circular speaker icon inside the prompt header. Translation, abbreviation, and advanced conjugation share a tighter prompt shell, while conjugation uses a more compact board-style header with the speech tip folded into the prompt metadata. Empty sticky action space no longer hangs around during active conjugation rounds.
+
+**Tests run:** `node --test tests/app-speech.test.js` — passed, 5/5. `node --test tests/app-progress.test.js` — passed, 44/44. `node --test` — passed, 71/71.
+
+**Risks / regressions to check:** The layout changes are structural, so the biggest real-world checks are visual: desktop verb match density, narrow mobile portrait wrapping in the status pills, and the inline speaker button’s tap target on iPhone/iPad Safari. Functionally the prompt button is unchanged, but a hard refresh is recommended because the prompt shell and module script URLs were cache-busted together.
+
+---
+
+### 2026-03-15 17:26 — Simplify prompt boxes and move conjugation hint out of the prompt card
+
+**Requested:** Remove redundant prompt labels from translation, abbreviation, and conjugation gameplay, keep conjugation prompts centered, move the “Hebrew first” hint out of the prompt box, and stop the speaker icon from creating a separate vertical row.
+
+**Files changed:**
+- `index.html` — Simplified the prompt-card markup so the speaker button sits directly on the card and the hint renders as a separate support note below it.
+- `app/ui.js` — Added a shared `renderPromptLabel()` helper, updated prompt-card state tracking, and kept the verb-match hint rendering separate from the prompt box.
+- `app/lesson.js` / `app/abbreviation.js` / `app/adv-conj.js` / `app/verb-match.js` — Hid redundant in-game prompt labels for active rounds while keeping empty-state titles available where they are still useful.
+- `styles.css` — Reworked the prompt shell again so the speaker icon is absolutely positioned in the corner, prompts stay centered, and the conjugation tip sits below the card instead of inside it.
+- `tests/app-progress.test.js` / `app.js` / `index.html` — Updated the regressions for the hidden prompt label behavior and bumped build/cache versions again.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Translation no longer shows `Translate to Hebrew/English` inside the prompt card, abbreviation no longer shows `Abbreviation`, and conjugation no longer shows `Match the pairs` in the prompt box. The conjugation speech tip now sits outside the prompt card as a small support line, and the prompt speaker icon stays pinned to the card corner instead of using its own layout row.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 44/44. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 71/71.
+
+**Risks / regressions to check:** This pass is mainly spatial, so the important manual check is whether the prompt still feels centered with very long English prompts and whether the corner speaker button ever overlaps unusually long Hebrew on smaller phones. The cache-bust moved again, so a fresh tab is safer than relying on a live-reloading localhost tab.
+
+---
+
+### 2026-03-15 17:44 — Unify in-game header stat as a shared combo counter
+
+**Requested:** Make the third in-game header stat consistent across modes by treating it as a combo counter rather than a mixed score/combo field, and make sure advanced conjugation does not inherit the previous game’s score total.
+
+**Files changed:**
+- `app/ui.js` — Split the old session counter responsibilities so the header now always displays a shared combo based on the current streak, while per-game score totals remain available for end-of-session summaries.
+- `app/lesson.js` / `app/abbreviation.js` / `app/verb-match.js` / `app/adv-conj.js` — Updated game starts to reset only the per-game score tally and preserve the shared combo unless the learner breaks it with a wrong answer or explicitly ends the session.
+- `app/bootstrap-data.js` / `index.html` — Added a shared `session.combo` label and updated the initial header placeholder from `Score` to `Combo`.
+- `app.js` — Wired the new `resetSessionScore` helper through the bootstrap/export surface and bumped the build version.
+- `tests/app-progress.test.js` — Added regressions proving the combo pill is uniform in lesson and conjugation, and that starting advanced conjugation resets the per-game score while preserving the shared combo.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** The third stat pill during active gameplay is now always a combo counter, shown as `Combo xN`, across translation, abbreviation, advanced conjugation, and conjugation match. It follows the learner’s consecutive-correct streak across game starts instead of mixing in per-mode score semantics, while end-of-session results still use proper per-game scoring.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 46/46. `node --test` — passed, 73/73.
+
+**Risks / regressions to check:** The main product decision here is that combo now survives starting a different game until the learner misses or explicitly exits/reset the session. If you want combo to reset when returning home between games, that’s an easy follow-up, but I left it continuous because that matches the “tracks between games” request most directly.
+
+---
+
+### 2026-03-15 17:54 — Remove conjugation column labels
+
+**Requested:** Remove the `English` and `Hebrew` column labels from the conjugation board so the learner just sees the two card stacks.
+
+**Files changed:**
+- `app/verb-match.js` — Stopped rendering the column-title nodes above the left and right card stacks.
+- `styles.css` — Removed the now-unused column-title styling.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Conjugation now shows the two matching columns without extra `English` / `Hebrew` headings, relying on the card content itself to make the distinction clear.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 46/46. `node --test` — passed, 73/73.
+
+**Risks / regressions to check:** This is a small visual simplification, so the main manual check is just whether first-time users still immediately understand the board. The automated tests stayed green because no gameplay logic changed.
+
+---

@@ -24,6 +24,8 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+const PROMPT_SPEAKER_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M5 9v6h4l5 4V5L9 9H5Z" fill="currentColor"></path><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path><path d="M18.75 6.25a8 8 0 0 1 0 11.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path></svg>';
+
 ui.isUiLocked = ui.isUiLocked || function isUiLocked() {
   const runtime = getRuntime();
   return Boolean(
@@ -110,6 +112,21 @@ ui.renderSoundToggle = ui.renderSoundToggle || function renderSoundToggle() {
   runtime.el.soundToggle.textContent = soundLabel;
   runtime.el.soundToggle.setAttribute("aria-label", soundLabel);
   runtime.el.soundToggle.setAttribute("aria-pressed", String(runtime.state.audio.enabled));
+};
+
+ui.renderSpeechToggle = ui.renderSpeechToggle || function renderSpeechToggle() {
+  const runtime = getRuntime();
+  const supported = app.speech?.isSupported?.() || false;
+  const speechText = supported
+    ? `${translate("speech.label")}: ${runtime.state.speech.enabled ? translate("speech.on") : translate("speech.off")}`
+    : `${translate("speech.label")}: ${translate("speech.unavailable")}`;
+
+  if (runtime.el?.speechToggle) {
+    runtime.el.speechToggle.textContent = speechText;
+    runtime.el.speechToggle.setAttribute("aria-label", speechText);
+    runtime.el.speechToggle.setAttribute("aria-pressed", String(supported && runtime.state.speech.enabled));
+    runtime.el.speechToggle.disabled = !supported;
+  }
 };
 
 ui.renderThemeToggle = ui.renderThemeToggle || function renderThemeToggle() {
@@ -200,10 +217,113 @@ ui.clearFeedback = ui.clearFeedback || function clearFeedback() {
   runtime.el.feedback.classList.remove("good", "bad");
 };
 
+ui.updateLessonShellModeState = ui.updateLessonShellModeState || function updateLessonShellModeState() {
+  const runtime = getRuntime();
+  const shell = runtime.el?.homeLessonStage;
+  const promptCard = runtime.el?.promptCard;
+  if (!shell || !promptCard) return;
+
+  const layoutMode = runtime.state.mode === "verbMatch"
+    ? "verb-match"
+    : (runtime.state.mode === "lesson" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj")
+      ? "standard"
+      : "idle";
+
+  shell.dataset.gameLayout = layoutMode;
+  promptCard.dataset.gameLayout = layoutMode;
+  shell.classList.toggle("mode-standard", layoutMode === "standard");
+  shell.classList.toggle("mode-verb-match", layoutMode === "verb-match");
+  promptCard.classList.toggle("mode-standard", layoutMode === "standard");
+  promptCard.classList.toggle("mode-verb-match", layoutMode === "verb-match");
+};
+
+ui.updatePromptCardState = ui.updatePromptCardState || function updatePromptCardState() {
+  const runtime = getRuntime();
+  const promptCard = runtime.el?.promptCard;
+  if (!promptCard) return;
+
+  const hasLabel = Boolean(runtime.el?.promptLabel?.textContent?.trim()) && !runtime.el.promptLabel.classList.contains("hidden");
+  const hasControl = Boolean(runtime.el?.promptSpeechBtn) && !runtime.el.promptSpeechBtn.classList.contains("hidden");
+  promptCard.classList.toggle("has-prompt-label", hasLabel);
+  promptCard.classList.toggle("has-prompt-control", hasControl);
+};
+
+ui.renderPromptLabel = ui.renderPromptLabel || function renderPromptLabel(text = "", visible = false) {
+  const runtime = getRuntime();
+  if (!runtime.el?.promptLabel) return;
+  const cleanText = String(text || "").trim();
+  const showLabel = Boolean(visible && cleanText);
+  runtime.el.promptLabel.textContent = showLabel ? cleanText : "";
+  runtime.el.promptLabel.classList.toggle("hidden", !showLabel);
+  ui.updatePromptCardState();
+};
+
+ui.updateStickyLessonActionsState = ui.updateStickyLessonActionsState || function updateStickyLessonActionsState() {
+  const runtime = getRuntime();
+  const actionBar = runtime.el?.stickyLessonActions || runtime.global?.document?.querySelector?.("#stickyLessonActions");
+  if (!actionBar) return;
+  const hasVisibleAction = Array.from(actionBar.querySelectorAll("button")).some((button) => !button.classList.contains("hidden"));
+  actionBar.classList.toggle("is-empty", !hasVisibleAction);
+  actionBar.setAttribute("aria-hidden", hasVisibleAction ? "false" : "true");
+};
+
+ui.renderPromptHint = ui.renderPromptHint || function renderPromptHint() {
+  const runtime = getRuntime();
+  if (!runtime.el?.promptHint) return;
+  const showHint = runtime.state.mode === "verbMatch"
+    && runtime.state.match.active
+    && (app.speech?.isEnabled?.() || false)
+    && (app.speech?.isSupported?.() || false);
+  runtime.el.promptHint.textContent = showHint ? translate("speech.tipSelectHebrewFirst") : "";
+  runtime.el.promptHint.classList.toggle("hidden", !showHint);
+  ui.updatePromptCardState();
+};
+
+ui.getCurrentPromptSpeechPayload = ui.getCurrentPromptSpeechPayload || function getCurrentPromptSpeechPayload() {
+  const runtime = getRuntime();
+  if (runtime.state.mode === "verbMatch") {
+    return app.verbMatch?.getVerbMatchPromptSpeechPayload?.() || null;
+  }
+  if (runtime.state.mode === "abbreviation") {
+    return app.abbreviation?.getAbbreviationPromptSpeechPayload?.() || null;
+  }
+  if (runtime.state.mode === "advConj") {
+    return app.advConj?.getAdvConjPromptSpeechPayload?.() || null;
+  }
+  return app.lessonMode?.getLessonPromptSpeechPayload?.() || null;
+};
+
+ui.renderPromptSpeechButton = ui.renderPromptSpeechButton || function renderPromptSpeechButton() {
+  const runtime = getRuntime();
+  if (!runtime.el?.promptSpeechBtn) return;
+  const payload = ui.getCurrentPromptSpeechPayload();
+  const supported = app.speech?.isSupported?.() || false;
+  const showButton = Boolean(payload) && supported;
+
+  runtime.el.promptSpeechBtn.innerHTML = PROMPT_SPEAKER_ICON;
+  runtime.el.promptSpeechBtn.setAttribute("aria-label", translate("speech.playPromptAria"));
+  runtime.el.promptSpeechBtn.setAttribute("title", translate("speech.playPromptTitle"));
+  runtime.el.promptSpeechBtn.classList.toggle("hidden", !showButton);
+  runtime.el.promptSpeechBtn.disabled = !showButton;
+  runtime.el.promptSpeechBtn.setAttribute("aria-hidden", showButton ? "false" : "true");
+  ui.updatePromptCardState();
+};
+
+ui.playPromptSpeech = ui.playPromptSpeech || function playPromptSpeech() {
+  const payload = ui.getCurrentPromptSpeechPayload();
+  if (!payload) return false;
+  return app.speech?.speak?.(payload, { force: true }) || false;
+};
+
 ui.resetSessionCounters = ui.resetSessionCounters || function resetSessionCounters() {
   const runtime = getRuntime();
   runtime.state.sessionScore = 0;
   runtime.state.sessionStreak = 0;
+};
+
+ui.resetSessionScore = ui.resetSessionScore || function resetSessionScore() {
+  const runtime = getRuntime();
+  runtime.state.sessionScore = 0;
 };
 
 ui.renderAll = ui.renderAll || function renderAll() {
@@ -229,7 +349,9 @@ ui.renderAll = ui.renderAll || function renderAll() {
 
 ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
   const runtime = getRuntime();
+  ui.updateLessonShellModeState();
   if (runtime.state.summary.active) {
+    ui.renderPromptHint();
     return;
   }
 
@@ -239,6 +361,7 @@ ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
     } else {
       app.verbMatch?.renderVerbMatchIdleState?.();
     }
+    ui.renderPromptHint();
     return;
   }
 
@@ -248,6 +371,7 @@ ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
     } else {
       app.abbreviation?.renderAbbreviationIdleState?.();
     }
+    ui.renderPromptHint();
     return;
   }
 
@@ -257,6 +381,7 @@ ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
     } else if (runtime.state.advConj.active) {
       ui.renderSessionHeader();
     }
+    ui.renderPromptHint();
     return;
   }
 
@@ -266,17 +391,26 @@ ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
     } else {
       ui.renderIdleLessonState();
     }
+    ui.renderPromptHint();
     return;
   }
 
   ui.renderIdleLessonState();
+  ui.renderPromptHint();
 };
 
 ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader() {
   const runtime = getRuntime();
   const data = getData();
+  ui.updateLessonShellModeState();
+  const finalizeHeaderRender = () => {
+    ui.updateStickyLessonActionsState();
+    app.persistence?.persistSessionState?.();
+  };
+
+  ui.renderPromptHint();
   if (runtime.el.sessionScore) {
-    runtime.el.sessionScore.textContent = translate("session.score", { score: runtime.state.sessionScore });
+    runtime.el.sessionScore.textContent = translate("session.combo", { count: runtime.state.sessionStreak });
   }
   runtime.el.statusRow?.classList.toggle("hidden", false);
   runtime.el.vocabCount.textContent = "";
@@ -289,7 +423,7 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     runtime.el.lessonStatus.textContent = "";
     runtime.el.sessionScore.textContent = "";
     runtime.el.nextBtn.classList.add("hidden");
-    app.persistence?.persistSessionState?.();
+    finalizeHeaderRender();
     return;
   }
 
@@ -304,7 +438,7 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     runtime.el.lessonStatus.textContent = pairProgress;
     runtime.el.vocabCount.classList.remove("hidden");
     runtime.el.vocabCount.textContent = translate("match.timer", { seconds: runtime.state.match.elapsedSeconds });
-    runtime.el.sessionScore.textContent = translate("match.combo", { count: runtime.state.match.bestCombo });
+    runtime.el.sessionScore.textContent = translate("session.combo", { count: runtime.state.sessionStreak });
     ui.updateLessonProgress(
       runtime.state.match.totalPairs
         ? Math.round((runtime.state.match.matchedCount / runtime.state.match.totalPairs) * 100)
@@ -329,7 +463,7 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
       runtime.el.masterVerbBtn.textContent = translate("mastered.moveCurrent");
       runtime.el.masterVerbBtn.classList.toggle("hidden", !showMasterAction);
     }
-    app.persistence?.persistSessionState?.();
+    finalizeHeaderRender();
     return;
   }
 
@@ -351,7 +485,7 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
       ? translate("session.submit")
       : translate("session.next");
     runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
-    app.persistence?.persistSessionState?.();
+    finalizeHeaderRender();
     return;
   }
 
@@ -374,7 +508,7 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
       ? translate("session.submit")
       : translate("session.next");
     runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
-    app.persistence?.persistSessionState?.();
+    finalizeHeaderRender();
     return;
   }
 
@@ -404,18 +538,20 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     ? translate("session.submit")
     : translate("session.next");
   runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
-  app.persistence?.persistSessionState?.();
+  finalizeHeaderRender();
 };
 
 ui.renderPromptText = ui.renderPromptText || function renderPromptText(question = getRuntime().state.currentQuestion) {
   const runtime = getRuntime();
   if (runtime.state.mode === "verbMatch") {
     app.verbMatch?.renderVerbMatchPrompt?.();
+    ui.renderPromptSpeechButton();
     return;
   }
 
   if (!question) {
     ui.renderNiqqudToggle();
+    ui.renderPromptSpeechButton();
     return;
   }
 
@@ -437,6 +573,7 @@ ui.renderPromptText = ui.renderPromptText || function renderPromptText(question 
   }
 
   ui.renderNiqqudToggle();
+  ui.renderPromptSpeechButton();
   if (!hasHebrewSurface) {
     return;
   }
@@ -724,6 +861,8 @@ ui.renderSettingsState = ui.renderSettingsState || function renderSettingsState(
   ui.renderThemeToggle();
   ui.renderNiqqudToggle();
   ui.renderSoundToggle();
+  ui.renderSpeechToggle();
+  ui.renderPromptSpeechButton();
 };
 
 ui.createCompactRow = ui.createCompactRow || function createCompactRow({ title, note }) {
@@ -766,13 +905,14 @@ ui.renderIdleLessonState = ui.renderIdleLessonState || function renderIdleLesson
   ui.setPromptCardVisibility(true);
   runtime.el.choiceContainer.classList.remove("summary-grid");
   h.renderSessionHeader?.();
-  runtime.el.promptLabel.textContent = translate("learn.idleLabel");
+  ui.renderPromptLabel("", false);
   runtime.el.promptText.classList.remove("hebrew");
   runtime.el.promptText.textContent = translate("learn.idlePrompt");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
   h.clearFeedback?.();
   ui.renderNiqqudToggle();
+  ui.renderPromptSpeechButton();
 };
 
 ui.renderHomeLessonButtons = ui.renderHomeLessonButtons || function renderHomeLessonButtons() {
@@ -815,6 +955,11 @@ ui.renderHomeOptions = ui.renderHomeOptions || function renderHomeOptions() {
       ? translate("audio.on")
       : translate("audio.off");
   }
+  if (runtime.el?.homeSpeechValue) {
+    runtime.el.homeSpeechValue.textContent = app.speech?.isSupported?.()
+      ? (runtime.state.speech.enabled ? translate("speech.on") : translate("speech.off"))
+      : translate("speech.unavailable");
+  }
   if (runtime.el?.homeThemeToggle) {
     runtime.el.homeThemeToggle.setAttribute("aria-pressed", String(runtime.state.theme === "dark"));
   }
@@ -823,6 +968,11 @@ ui.renderHomeOptions = ui.renderHomeOptions || function renderHomeOptions() {
   }
   if (runtime.el?.homeSoundToggle) {
     runtime.el.homeSoundToggle.setAttribute("aria-pressed", String(runtime.state.audio.enabled));
+  }
+  if (runtime.el?.homeSpeechToggle) {
+    const supported = app.speech?.isSupported?.() || false;
+    runtime.el.homeSpeechToggle.setAttribute("aria-pressed", String(supported && runtime.state.speech.enabled));
+    runtime.el.homeSpeechToggle.disabled = !supported;
   }
 };
 

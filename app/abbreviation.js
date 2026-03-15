@@ -42,6 +42,26 @@ abbreviation.getExpansionText = abbreviation.getExpansionText || function getExp
   return withNiqqud && marked ? marked : plain;
 };
 
+abbreviation.getAbbreviationPromptSpeechPayload = abbreviation.getAbbreviationPromptSpeechPayload || function getAbbreviationPromptSpeechPayload(question = getRuntime().state.abbreviation.currentQuestion) {
+  if (!question?.promptIsHebrew) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: question.prompt,
+    speechOverridePlain: question.entry?.speechHe,
+    speechOverrideNiqqud: question.entry?.speechHeNiqqud,
+    source: "prompt",
+  }) || null;
+};
+
+abbreviation.getAbbreviationSelectionSpeechPayload = abbreviation.getAbbreviationSelectionSpeechPayload || function getAbbreviationSelectionSpeechPayload(question, option) {
+  if (question?.direction !== "en2he" || !option?.entry) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: option.entry.abbr,
+    speechOverridePlain: option.entry.speechHe,
+    speechOverrideNiqqud: option.entry.speechHeNiqqud,
+    source: "answer",
+  }) || null;
+};
+
 abbreviation.getAbbreviationRoundTarget = abbreviation.getAbbreviationRoundTarget || function getAbbreviationRoundTarget() {
   const runtime = getRuntime();
   if (!runtime.abbreviationDeck?.length) return 0;
@@ -71,6 +91,8 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
     const expansionHe = String(entry?.expansionHe || entry?.expansion_he || "").trim();
     const expansionHeNiqqud = String(entry?.expansionHeNiqqud || entry?.expansion_he_niqqud || "").trim();
     const expansionHeNiqqudSource = String(entry?.expansionHeNiqqudSource || entry?.expansion_he_niqqud_source || "").trim();
+    const speechHe = String(entry?.speechHe || entry?.speech_he || "").trim();
+    const speechHeNiqqud = String(entry?.speechHeNiqqud || entry?.speech_he_niqqud || "").trim();
     const english = sanitizeEnglishText(entry?.english);
     if (!abbr || !expansionHe || !english) return;
 
@@ -93,6 +115,8 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
       expansionHe,
       expansionHeNiqqud,
       expansionHeNiqqudSource,
+      speechHe,
+      speechHeNiqqud,
       english,
       bucket: String(entry?.bucket || "").trim(),
       notes: String(entry?.notes || "").trim(),
@@ -114,18 +138,20 @@ abbreviation.renderAbbreviationIdleState = abbreviation.renderAbbreviationIdleSt
   h.setPromptCardVisibility?.(true);
   runtime.el.choiceContainer.classList.remove("summary-grid");
   h.renderSessionHeader?.();
-  runtime.el.promptLabel.textContent = translate("prompt.abbreviation");
+  app.ui?.renderPromptLabel?.("", false);
   runtime.el.promptText.classList.remove("hebrew");
   runtime.el.promptText.textContent = translate("prompt.abbreviationStart");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
   h.renderNiqqudToggle?.();
+  app.ui?.renderPromptSpeechButton?.();
 };
 
 abbreviation.startAbbreviation = abbreviation.startAbbreviation || function startAbbreviation() {
   const runtime = getRuntime();
   const h = getHelpers();
   const s = getSession();
+  app.speech?.cancel?.();
   s.stopVerbMatchTimer?.();
   s.stopLessonTimer?.();
   s.stopAbbreviationTimer?.();
@@ -139,7 +165,7 @@ abbreviation.startAbbreviation = abbreviation.startAbbreviation || function star
   runtime.state.lesson.active = false;
   runtime.state.lesson.inReview = false;
   runtime.state.currentQuestion = null;
-  h.resetSessionCounters?.();
+  h.resetSessionScore?.();
   h.resetVerbMatchState?.();
   abbreviation.resetAbbreviationState();
   runtime.state.mode = "abbreviation";
@@ -153,7 +179,7 @@ abbreviation.startAbbreviation = abbreviation.startAbbreviation || function star
   if (!runtime.abbreviationDeck?.length) {
     runtime.state.abbreviation.active = false;
     abbreviation.renderAbbreviationIdleState();
-    runtime.el.promptLabel.textContent = translate("prompt.noAbbreviationTitle");
+    app.ui?.renderPromptLabel?.(translate("prompt.noAbbreviationTitle"), true);
     runtime.el.promptText.classList.remove("hebrew");
     runtime.el.promptText.textContent = translate("prompt.noAbbreviationBody");
     h.setFeedback?.(translate("prompt.noAbbreviationTitle"), false);
@@ -260,7 +286,7 @@ abbreviation.renderAbbreviationQuestion = abbreviation.renderAbbreviationQuestio
 
   if (!question) return;
 
-  runtime.el.promptLabel.textContent = question.promptLabel;
+  app.ui?.renderPromptLabel?.("", false);
   if (question.promptIsHebrew) {
     runtime.el.promptText.classList.add("hebrew");
     runtime.el.promptText.classList.remove("english-prompt");
@@ -271,6 +297,7 @@ abbreviation.renderAbbreviationQuestion = abbreviation.renderAbbreviationQuestio
   runtime.el.promptText.textContent = question.prompt;
   abbreviation.renderAbbreviationChoices(question);
   h.renderNiqqudToggle?.();
+  app.ui?.renderPromptSpeechButton?.();
 };
 
 abbreviation.renderAbbreviationChoices = abbreviation.renderAbbreviationChoices || function renderAbbreviationChoices(question) {
@@ -295,6 +322,7 @@ abbreviation.renderAbbreviationChoices = abbreviation.renderAbbreviationChoices 
         button.classList.toggle("selected", question.options[index]?.id === option.id);
       });
       getHelpers().renderSessionHeader?.();
+      app.speech?.speak?.(abbreviation.getAbbreviationSelectionSpeechPayload(question, option));
     });
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
     runtime.el.choiceContainer.append(btn);
@@ -312,6 +340,7 @@ abbreviation.applyAbbreviationAnswer = abbreviation.applyAbbreviationAnswer || f
   const question = runtime.state.abbreviation.currentQuestion;
   if (!question || question.locked) return;
 
+  app.speech?.cancel?.();
   question.locked = true;
   const entry = question.entry;
 

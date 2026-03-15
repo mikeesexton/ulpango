@@ -30,6 +30,28 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+advConj.getAdvConjPromptSpeechPayload = advConj.getAdvConjPromptSpeechPayload || function getAdvConjPromptSpeechPayload(question = getRuntime().state.advConj.currentQuestion) {
+  if (!question?.promptIsHebrew) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: question.promptText,
+    niqqud: question.promptNiqqud,
+    speechOverridePlain: question.promptSpeechText,
+    speechOverrideNiqqud: question.promptSpeechTextNiqqud,
+    source: "prompt",
+  }) || null;
+};
+
+advConj.getAdvConjSelectionSpeechPayload = advConj.getAdvConjSelectionSpeechPayload || function getAdvConjSelectionSpeechPayload(question, option) {
+  if (!question?.correctAnswerIsHebrew || !option) return null;
+  return app.speech?.buildSpeechPayload?.({
+    plain: option.text,
+    niqqud: option.textNiqqud,
+    speechOverridePlain: option.speechText,
+    speechOverrideNiqqud: option.speechTextNiqqud,
+    source: "answer",
+  }) || null;
+};
+
 function isSecondPersonSubject(subject) {
   return /^you\b/i.test(String(subject?.en || ""));
 }
@@ -223,6 +245,7 @@ advConj.startAdvConj = advConj.startAdvConj || function startAdvConj() {
   const h = getHelpers();
   const s = getSession();
   const shuffle = app.utils?.shuffle;
+  app.speech?.cancel?.();
   s.stopVerbMatchTimer?.();
   s.stopLessonTimer?.();
   s.stopAbbreviationTimer?.();
@@ -230,6 +253,7 @@ advConj.startAdvConj = advConj.startAdvConj || function startAdvConj() {
   s.clearAbbreviationIntro?.();
   s.clearSummaryState?.();
   s.resetAdvConjState?.();
+  h.resetSessionScore?.();
   runtime.state.mode = "advConj";
   runtime.state.route = "home";
   runtime.state.lastPlayedMode = "advConj";
@@ -283,10 +307,7 @@ advConj.renderAdvConjQuestion = advConj.renderAdvConjQuestion || function render
   runtime.el.choiceContainer.classList.remove("summary-grid");
   runtime.el.choiceContainer.classList.remove("match-grid");
   h.renderSessionHeader?.();
-  if (runtime.el.promptLabel) {
-    runtime.el.promptLabel.textContent = "";
-    runtime.el.promptLabel.classList.add("hidden");
-  }
+  app.ui?.renderPromptLabel?.("", false);
   if (runtime.el.promptText) {
     runtime.el.promptText.textContent = question.promptText;
     runtime.el.promptText.classList.remove("hidden");
@@ -294,6 +315,7 @@ advConj.renderAdvConjQuestion = advConj.renderAdvConjQuestion || function render
   }
   advConj.renderAdvConjChoices(question);
   h.renderNiqqudToggle?.();
+  app.ui?.renderPromptSpeechButton?.();
 };
 
 advConj.renderAdvConjChoices = advConj.renderAdvConjChoices || function renderAdvConjChoices(question) {
@@ -316,6 +338,7 @@ advConj.renderAdvConjChoices = advConj.renderAdvConjChoices || function renderAd
         button.classList.toggle("selected", question.options[index]?.id === option.id);
       });
       getHelpers().renderSessionHeader?.();
+      app.speech?.speak?.(advConj.getAdvConjSelectionSpeechPayload(question, option));
     });
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
     runtime.el.choiceContainer.appendChild(btn);
@@ -341,6 +364,7 @@ advConj.applyAdvConjAnswer = advConj.applyAdvConjAnswer || function applyAdvConj
   const h = getHelpers();
   const question = runtime.state.advConj.currentQuestion;
   if (!question || question.locked) return;
+  app.speech?.cancel?.();
   question.locked = true;
   const selected = question.options.find((option) => option.id === question.selectedOptionId);
   const isCorrect = selected?.isCorrect ?? false;

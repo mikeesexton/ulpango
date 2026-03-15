@@ -88,6 +88,21 @@ persistence.saveSoundPreference = persistence.saveSoundPreference || function sa
   });
 };
 
+persistence.loadSpeechPreference = persistence.loadSpeechPreference || function loadSpeechPreference() {
+  const runtime = getRuntime();
+  const raw = runtime.storageApi.loadJson(runtime.constants.STORAGE_KEYS.speech, null);
+  return {
+    enabled: raw?.enabled === true,
+  };
+};
+
+persistence.saveSpeechPreference = persistence.saveSpeechPreference || function saveSpeechPreference(enabled) {
+  const runtime = getRuntime();
+  runtime.storageApi.saveJson(runtime.constants.STORAGE_KEYS.speech, {
+    enabled: enabled === true,
+  });
+};
+
 persistence.hasSeenWelcomeModal = persistence.hasSeenWelcomeModal || function hasSeenWelcomeModal() {
   const runtime = getRuntime();
   const storage = getStorage();
