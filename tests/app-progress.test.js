@@ -1836,6 +1836,33 @@ test("starting conjugation immediately swaps out the home picker and shows five 
   harness.goHome();
 });
 
+test("conjugation keeps English on the left and Hebrew on the right in Hebrew UI", async () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      word: { id: "verb-come", en: "to come", he: "לבוא", heNiqqud: "לָבוֹא" },
+      formSource: "validated",
+      forms: [
+        { id: "present_masculine_singular", englishText: "he comes", valuePlain: "בא", valueNiqqud: "בָּא" },
+        { id: "future_first_person_singular", englishText: "I will come", valuePlain: "אבוא", valueNiqqud: "אָבוֹא" },
+      ],
+    },
+  ];
+
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+  harness.state.language = "he";
+  harness.startVerbMatch();
+  await waitForTimers();
+
+  const columns = harness.document.querySelector("#choiceContainer").querySelector(".match-columns");
+  assert.equal(columns.getAttribute("dir"), "ltr");
+  assert.equal(columns.children[0].querySelector(".match-card").classList.contains("hebrew"), false);
+  assert.equal(columns.children[1].querySelector(".match-card").classList.contains("hebrew"), true);
+  harness.goHome();
+});
+
 test("conjugation sessions are capped to a small verb set so results are reachable", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },

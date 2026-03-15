@@ -380,6 +380,7 @@ verbMatch.renderVerbMatchCards = verbMatch.renderVerbMatchCards || function rend
 
   const wrap = global.document.createElement("div");
   wrap.className = "match-columns";
+  wrap.setAttribute("dir", "ltr");
 
   const leftCol = global.document.createElement("section");
   leftCol.className = "match-col";

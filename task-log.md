@@ -1284,3 +1284,21 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** This is a small visual simplification, so the main manual check is just whether first-time users still immediately understand the board. The automated tests stayed green because no gameplay logic changed.
 
 ---
+
+### 2026-03-15 17:58 — Keep conjugation columns fixed in Hebrew UI
+
+**Requested:** Prevent the conjugation board from flipping columns in Hebrew UI so English always stays on the left and Hebrew always stays on the right.
+
+**Files changed:**
+- `app/verb-match.js` — Set the rendered match-column wrapper to `dir="ltr"` so the board order is explicit in the DOM.
+- `styles.css` — Reinforced the match-column container with `direction: ltr` so the lesson shell’s Hebrew RTL mode cannot reverse the board.
+- `tests/app-progress.test.js` — Added a regression proving Hebrew UI still renders an English left column and a Hebrew right column.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** Conjugation now keeps the same left/right board layout in both English UI and Hebrew UI. Only the Hebrew card text remains RTL; the column order itself no longer flips with the overall page direction.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 47/47. `node --test` — passed, 74/74.
+
+**Risks / regressions to check:** This is intentionally narrow, but it is worth eyeballing the Hebrew UI once on desktop and mobile to make sure the fixed LTR board still feels natural inside the otherwise RTL shell.
+
+---
