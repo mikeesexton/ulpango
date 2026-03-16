@@ -1028,9 +1028,10 @@ ui.renderMostMissed = ui.renderMostMissed || function renderMostMissed() {
   runtime.el.mostMissedList.style.gap = "1.25rem";
   runtime.el.mostMissedList.style.alignItems = "flex-start";
 
-  const isRTL = global.document.documentElement.dataset.uiLang === "he";
   const half = Math.ceil(ranked.length / 2);
   const cols = [ranked.slice(0, half), ranked.slice(half)];
+
+  runtime.el.mostMissedList.style.direction = "ltr";
 
   cols.forEach((col, colIdx) => {
     const ol = global.document.createElement("ol");
@@ -1038,22 +1039,26 @@ ui.renderMostMissed = ui.renderMostMissed || function renderMostMissed() {
     ol.start = colIdx * half + 1;
     ol.style.flex = "1";
     ol.style.margin = "0";
-    ol.style.paddingLeft = isRTL ? "0" : "1.25rem";
-    ol.style.paddingRight = isRTL ? "1.25rem" : "0";
+    ol.style.paddingLeft = "1.25rem";
+    ol.style.paddingRight = "0";
 
     col.forEach((entry) => {
       const word = wordsById.get(entry.wordId);
       if (!word) return;
 
       const item = global.document.createElement("li");
+      item.style.textAlign = "center";
       const line = global.document.createElement("p");
       line.className = "missed-word";
+      line.setAttribute("dir", "rtl");
+      line.setAttribute("lang", "he");
       line.textContent = h.getHebrewText?.(word, true) || "";
       line.title = word.en;
       item.title = word.en;
 
       const meta = global.document.createElement("p");
       meta.className = "missed-meta";
+      meta.setAttribute("dir", "ltr");
       meta.textContent = String(entry.missed);
 
       item.append(line, meta);

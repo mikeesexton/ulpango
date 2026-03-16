@@ -285,7 +285,7 @@ lessonMode.applyAnswer = lessonMode.applyAnswer || function applyAnswer(isCorrec
   runtime.state.currentQuestion.locked = true;
   const word = runtime.state.currentQuestion.word;
 
-  data.updateProgress?.(word.id, isCorrect);
+  data.updateProgress?.(word.id, isCorrect, { mode: "translationQuiz" });
   runtime.state.sessionStreak = isCorrect ? runtime.state.sessionStreak + 1 : 0;
 
   if (isCorrect) {
@@ -387,7 +387,9 @@ lessonMode.buildQuestion = lessonMode.buildQuestion || function buildQuestion(po
   const domainPool = targetDomainId
     ? freshPool.filter((word) => data.getDomainIdForWord?.(word) === targetDomainId)
     : freshPool;
-  const word = data.pickBestWord?.(domainPool.length ? domainPool : freshPool);
+  const word = data.pickBestWord?.(domainPool.length ? domainPool : freshPool, runtime.state.lesson.askedWordIds, {
+    mode: "translationQuiz",
+  });
   if (!word) return null;
 
   runtime.state.lesson.askedWordIds.push(word.id);

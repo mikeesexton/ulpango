@@ -159,7 +159,32 @@ data.pickLeastSeenLessonDomainId = data.pickLeastSeenLessonDomainId || function 
   return leastSeenDomainIds[Math.floor(Math.random() * leastSeenDomainIds.length)];
 };
 
-data.pickBestWord = data.pickBestWord || function pickBestWord(pool, usedWordIds = []) {
+data.getTranslationRecoveryStreak = data.getTranslationRecoveryStreak || function getTranslationRecoveryStreak(record) {
+  const runtime = getRuntime();
+  const target = Math.max(1, Number(runtime.constants.TRANSLATION_MISS_RECOVERY_TARGET || 5));
+  return Math.max(0, Math.min(target, Number(record?.translationRecoveryStreak || 0)));
+};
+
+data.getTranslationMissBiasMultiplier = data.getTranslationMissBiasMultiplier || function getTranslationMissBiasMultiplier(record, options = {}) {
+  const runtime = getRuntime();
+  const mode = String(options?.mode || "translationQuiz");
+  if (mode !== "translationQuiz") return 1;
+
+  const misses = data.getMissCountForRecord(record);
+  if (misses <= 0) return 1;
+
+  const target = Math.max(1, Number(runtime.constants.TRANSLATION_MISS_RECOVERY_TARGET || 5));
+  const streak = data.getTranslationRecoveryStreak(record);
+  if (streak >= target) return 1;
+
+  const perMiss = Math.max(0, Number(runtime.constants.TRANSLATION_MISS_BIAS_PER_MISS || 0.55));
+  const recoveryProgress = streak / target;
+  const remainingFocus = 1 - recoveryProgress;
+  const missPressure = Math.min(3, misses) * perMiss;
+  return 1 + missPressure * remainingFocus;
+};
+
+data.pickBestWord = data.pickBestWord || function pickBestWord(pool, usedWordIds = [], options = {}) {
   const runtime = getRuntime();
   const weightedRandomWord = getUtils().weightedRandomWord;
   const now = Date.now();
@@ -178,20 +203,22 @@ data.pickBestWord = data.pickBestWord || function pickBestWord(pool, usedWordIds
     const dueBoost = rec.attempts > 0 && rec.nextDue <= now ? 1 + Math.min(1.4, overdueHours / 12) : 1;
     const weaknessBoost = 1 + (1 - accuracy) * 0.85;
     const levelBoost = 1 + ((maxLevel - rec.level) / maxLevel) * 0.45;
+    const missBiasBoost = data.getTranslationMissBiasMultiplier(rec, options);
     const utilityBoost = 0.7 + Math.min(1, (word.utility || 50) / 100) * 0.6;
     const jitter = 0.7 + Math.random() * 0.8;
 
     return {
       word,
-      weight: newWordBoost * dueBoost * weaknessBoost * levelBoost * utilityBoost * jitter,
+      weight: newWordBoost * dueBoost * weaknessBoost * levelBoost * missBiasBoost * utilityBoost * jitter,
     };
   });
 
   return typeof weightedRandomWord === "function" ? weightedRandomWord(weighted) : null;
 };
 
-data.updateProgress = data.updateProgress || function updateProgress(wordId, isCorrect) {
+data.updateProgress = data.updateProgress || function updateProgress(wordId, isCorrect, options = {}) {
   const runtime = getRuntime();
+  const mode = String(options?.mode || "translationQuiz");
   const rec = data.getProgressRecord(wordId);
   const now = Date.now();
   rec.attempts += 1;
@@ -205,6 +232,20 @@ data.updateProgress = data.updateProgress || function updateProgress(wordId, isC
     rec.misses = data.getMissCountForRecord(rec) + 1;
     rec.level = Math.max(0, rec.level - 1);
     rec.nextDue = now + 2 * 60 * 1000;
+  }
+
+  if (mode === "translationQuiz") {
+    if (isCorrect) {
+      const hadPriorMiss = data.getMissCountForRecord(rec) > 0 || data.getTranslationRecoveryStreak(rec) > 0;
+      rec.translationRecoveryStreak = hadPriorMiss
+        ? Math.min(
+            Math.max(1, Number(runtime.constants.TRANSLATION_MISS_RECOVERY_TARGET || 5)),
+            data.getTranslationRecoveryStreak(rec) + 1
+          )
+        : 0;
+    } else {
+      rec.translationRecoveryStreak = 0;
+    }
   }
 
   runtime.state.progress[wordId] = rec;
@@ -223,6 +264,7 @@ data.getProgressRecord = data.getProgressRecord || function getProgressRecord(wo
     lastSeen: 0,
     mastered: false,
     misses: 0,
+    translationRecoveryStreak: 0,
     conjugationAttempts: 0,
     conjugationCorrect: 0,
     conjugationStreak: 0,
@@ -231,6 +273,7 @@ data.getProgressRecord = data.getProgressRecord || function getProgressRecord(wo
     attempts,
     correct,
     misses: data.getMissCountForRecord(existing),
+    translationRecoveryStreak: data.getTranslationRecoveryStreak(existing),
   };
 };
 

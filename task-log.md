@@ -1448,3 +1448,23 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** This is intentionally driven by the existing `showMeaning` flag, so any idiom that should surface a colloquial explanation but is not marked yet will stay on the single-line feedback path until its data is updated.
 
 ---
+
+### 2026-03-15 20:16 — Add hidden missed-word refocus weighting to translation
+
+**Requested:** Add a hidden gameplay mechanic that skews translation vocab toward previously missed words, then drop that skew completely after five correct recoveries in a row.
+
+**Files changed:**
+- `app/constants.js` — Added tuning constants for the hidden translation miss-recovery system.
+- `app/data.js` — Added per-record translation recovery streak tracking, a hidden missed-word bias multiplier, and wired that multiplier into the translation word picker so previously missed words get extra weight until they recover.
+- `app/lesson.js` — Marked translation progress updates and translation word selection explicitly as translation-mode operations.
+- `app/abbreviation.js` — Marked abbreviation progress updates separately so they do not affect the translation miss-recovery mechanic.
+- `tests/app-progress.test.js` — Added regressions proving the hidden recovery streak resets on misses, caps at five, and fully neutralizes the extra selection bias after recovery.
+- `index.html`, `app.js` — Bumped frontend asset versions to `20260315j`.
+
+**Behavior changed:** Translation mode now quietly leans toward words the learner has previously missed, but that extra focus fades as the learner gets those words right again and disappears completely once a word has been answered correctly five translation times in a row after being missed.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 54/54. `node --test` — passed, 86/86.
+
+**Risks / regressions to check:** This is intentionally a soft weighting rather than a hard override, so domain balancing and due-word scheduling still matter. If you later want the game to feel more or less aggressive about resurfacing misses, the two new constants are the safest tuning points.
+
+---

@@ -344,7 +344,7 @@ abbreviation.applyAbbreviationAnswer = abbreviation.applyAbbreviationAnswer || f
   question.locked = true;
   const entry = question.entry;
 
-  data.updateProgress?.(entry.id, isCorrect);
+  data.updateProgress?.(entry.id, isCorrect, { mode: "abbreviationQuiz" });
   runtime.state.sessionStreak = isCorrect ? runtime.state.sessionStreak + 1 : 0;
   if (isCorrect) {
     runtime.state.sessionScore += 1;

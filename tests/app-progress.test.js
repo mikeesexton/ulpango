@@ -582,6 +582,73 @@ test("most-missed rankings ignore words that are unavailable for translation qui
   );
 });
 
+test("translation miss recovery streak resets on misses and neutralizes the hidden bias after five correct recoveries", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const { getProgressRecord, updateProgress } = loadAppHarness(vocabulary);
+
+  updateProgress("alpha", false, { mode: "translationQuiz" });
+  assert.equal(getProgressRecord("alpha").translationRecoveryStreak, 0);
+
+  for (let i = 1; i <= 5; i += 1) {
+    updateProgress("alpha", true, { mode: "translationQuiz" });
+    assert.equal(getProgressRecord("alpha").translationRecoveryStreak, i);
+  }
+
+  updateProgress("alpha", true, { mode: "translationQuiz" });
+  assert.equal(getProgressRecord("alpha").translationRecoveryStreak, 5);
+
+  updateProgress("alpha", false, { mode: "translationQuiz" });
+  assert.equal(getProgressRecord("alpha").translationRecoveryStreak, 0);
+});
+
+test("translation selection weights previously missed words until their five-answer recovery streak clears the bias", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 60, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 60, source: "test" },
+  ];
+  const harness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0,
+  });
+
+  harness.state.progress.alpha = {
+    attempts: 4,
+    correct: 4,
+    misses: 2,
+    level: 0,
+    nextDue: 0,
+    lastSeen: 0,
+    translationRecoveryStreak: 0,
+  };
+  harness.state.progress.beta = {
+    attempts: 4,
+    correct: 4,
+    misses: 0,
+    level: 0,
+    nextDue: 0,
+    lastSeen: 0,
+    translationRecoveryStreak: 0,
+  };
+
+  let weighted = [];
+  harness.app.utils.weightedRandomWord = (items) => {
+    weighted = items;
+    return items[0]?.word || null;
+  };
+
+  harness.app.data.pickBestWord(vocabulary, [], { mode: "translationQuiz" });
+  const alphaFocusedWeight = weighted.find((item) => item.word.id === "alpha")?.weight || 0;
+  const betaNeutralWeight = weighted.find((item) => item.word.id === "beta")?.weight || 0;
+  assert.ok(alphaFocusedWeight > betaNeutralWeight);
+
+  harness.state.progress.alpha.translationRecoveryStreak = 5;
+  harness.app.data.pickBestWord(vocabulary, [], { mode: "translationQuiz" });
+  const alphaRecoveredWeight = weighted.find((item) => item.word.id === "alpha")?.weight || 0;
+  const betaRecoveredWeight = weighted.find((item) => item.word.id === "beta")?.weight || 0;
+  assert.equal(alphaRecoveredWeight, betaRecoveredWeight);
+});
+
 test("show nikud preference persists when advancing translation and abbreviation questions", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },

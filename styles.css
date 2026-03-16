@@ -1715,6 +1715,35 @@ body[data-ui-lang="he"] .option-button {
   text-align: right;
 }
 
+body[data-ui-lang="he"] #reviewView .section-head {
+  align-items: center;
+  text-align: center;
+}
+
+body[data-ui-lang="he"] #reviewView .section-head h2 {
+  width: 100%;
+  text-align: center;
+}
+
+body[data-ui-lang="he"] #reviewView .missed-list,
+body[data-ui-lang="he"] #reviewView .domain-grid,
+body[data-ui-lang="he"] #reviewView .mode-grid,
+body[data-ui-lang="he"] #reviewView .domain-card {
+  direction: ltr;
+}
+
+body[data-ui-lang="he"] #reviewView .missed-col li,
+body[data-ui-lang="he"] #reviewView .missed-word,
+body[data-ui-lang="he"] #reviewView .missed-meta,
+body[data-ui-lang="he"] #reviewView .domain-meta {
+  text-align: center;
+}
+
+body[data-ui-lang="he"] #reviewView .missed-word {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
 
 body[data-ui-lang="he"] .mastered-row {
   grid-template-columns: 1fr auto;
