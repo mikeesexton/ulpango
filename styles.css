@@ -210,7 +210,7 @@ h3 {
 .section-copy {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.86rem;
+  font-size: 0.94rem;
   line-height: 1.45;
 }
 
@@ -353,7 +353,7 @@ body[data-theme="light"] .shell-logo {
 .shell-summary {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: 0.96rem;
 }
 
 .shell-status {
@@ -366,13 +366,13 @@ body[data-theme="light"] .shell-logo {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  min-height: 40px;
-  padding: 0.5rem 0.8rem;
+  min-height: 42px;
+  padding: 0.54rem 0.86rem;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--panel-bg);
   color: var(--ink-soft);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
 }
 
 .shell-body {
@@ -466,15 +466,15 @@ body[data-theme="light"] .nav-link.active .nav-link-icon {
 }
 
 .page-card {
-  padding: 1rem;
+  padding: 1.08rem;
   display: grid;
-  gap: 0.8rem;
+  gap: 0.86rem;
 }
 
 .section-head {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.86rem;
   align-items: start;
 }
 
@@ -484,6 +484,8 @@ body[data-theme="light"] .nav-link.active .nav-link-icon {
 
 .section-head h2 {
   color: var(--brand);
+  font-size: clamp(1.35rem, 2.6vw, 1.55rem);
+  line-height: 1.08;
 }
 
 .dashboard-header-card,
@@ -609,9 +611,9 @@ body[data-theme="light"] .nav-link.active .nav-link-icon {
 .domain-card {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.58rem;
+  gap: 0.64rem;
   align-items: center;
-  padding: 0.64rem;
+  padding: 0.7rem;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--surface-bg);
@@ -660,29 +662,29 @@ body[data-theme="light"] .domain-emoji {
 }
 
 .domain-title {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   font-weight: 700;
 }
 
 .domain-score {
   color: var(--ink-soft);
-  font-size: 0.74rem;
+  font-size: 0.8rem;
 }
 
 .lesson-shell {
-  padding: 0.78rem;
+  padding: 0.86rem;
   display: grid;
-  gap: 0.58rem;
+  gap: 0.64rem;
 }
 
 .lesson-header {
   display: grid;
-  gap: 0.38rem;
+  gap: 0.42rem;
 }
 
 .lesson-header-main {
   display: grid;
-  gap: 0.48rem;
+  gap: 0.54rem;
   min-width: 0;
 }
 
@@ -701,7 +703,7 @@ body[data-theme="light"] .domain-emoji {
 }
 
 #modeTitle {
-  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-size: clamp(1.65rem, 4.4vw, 2.25rem);
   overflow-wrap: anywhere;
 }
 
@@ -721,17 +723,17 @@ body[data-theme="light"] .domain-emoji {
 .status-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
+  gap: 0.54rem;
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: 0.86rem;
 }
 
 .status-row span {
-  min-height: 1.9rem;
+  min-height: 2.04rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.36rem 0.62rem;
+  padding: 0.4rem 0.68rem;
   border-radius: 999px;
   border: 1px solid rgba(171, 191, 220, 0.18);
   background: rgba(17, 28, 58, 0.42);
@@ -759,18 +761,18 @@ body[data-theme="light"] .domain-emoji {
 
 .prompt-card {
   position: relative;
-  padding: 0.94rem 1rem 0.98rem;
+  padding: 1.02rem 1.08rem 1.06rem;
   border: 1px solid var(--line-strong);
   border-radius: 20px;
   background: var(--prompt-bg);
   display: grid;
-  gap: 0.34rem;
+  gap: 0.38rem;
   text-align: center;
 }
 
 .prompt-label {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   letter-spacing: 0.08em;
   color: var(--ink-soft);
   text-align: center;
@@ -779,8 +781,8 @@ body[data-theme="light"] .domain-emoji {
 
 .prompt-support-note {
   margin: -0.04rem 0 0;
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: 0.84rem;
+  line-height: 1.4;
   text-align: center;
 }
 
@@ -789,7 +791,7 @@ body[data-theme="light"] .domain-emoji {
   align-items: center;
   justify-content: center;
   min-width: 0;
-  min-height: clamp(3.2rem, 7vw, 4.2rem);
+  min-height: clamp(3.4rem, 7.2vw, 4.5rem);
   padding-inline: 0.7rem;
 }
 
@@ -825,10 +827,10 @@ body[data-theme="light"] .domain-emoji {
 
 .prompt-text {
   margin: 0;
-  font-size: clamp(1.28rem, 4.2vw, 1.88rem);
-  line-height: 1.18;
+  font-size: clamp(1.4rem, 4.4vw, 2rem);
+  line-height: 1.2;
   min-width: 0;
-  max-width: min(100%, 26ch);
+  max-width: min(100%, 28ch);
   overflow-wrap: anywhere;
   text-align: center;
 }
@@ -852,17 +854,17 @@ body[data-theme="light"] .domain-emoji {
 }
 
 .lesson-shell.mode-verb-match .prompt-support-note {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
 .lesson-shell.mode-verb-match .prompt-content-row {
   justify-content: center;
-  min-height: clamp(3rem, 6vw, 3.8rem);
+  min-height: clamp(3.2rem, 6.2vw, 4rem);
 }
 
 .lesson-shell.mode-verb-match .prompt-text {
   max-width: min(100%, 22ch);
-  font-size: clamp(1.14rem, 3vw, 1.54rem);
+  font-size: clamp(1.22rem, 3.1vw, 1.66rem);
   line-height: 1.2;
   text-align: center;
 }
@@ -878,21 +880,21 @@ body[data-theme="light"] .domain-emoji {
 }
 
 .game-tile {
-  min-height: 116px;
+  min-height: 124px;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.42rem 0.72rem;
+  gap: 0.46rem 0.76rem;
   align-items: start;
   align-content: start;
   text-align: left;
-  padding: 0.84rem;
+  padding: 0.92rem;
   border-radius: 18px;
   border: 1px solid var(--tile-border);
   background: var(--tile-bg);
 }
 
 .game-tile.home-game-tile {
-  min-height: 102px;
+  min-height: 110px;
 }
 
 .game-tile:hover {
@@ -939,7 +941,7 @@ body[data-theme="light"] .game-tile:hover {
 
 .game-tile-title {
   font-family: "Alegreya", serif;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 800;
   align-self: center;
 }
@@ -947,16 +949,16 @@ body[data-theme="light"] .game-tile:hover {
 .game-tile-note {
   grid-column: 1 / -1;
   color: var(--ink-soft);
-  font-size: 0.84rem;
-  line-height: 1.4;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .option-button {
   width: 100%;
-  min-height: 72px;
-  padding: 0.82rem 0.9rem;
+  min-height: 78px;
+  padding: 0.88rem 0.96rem;
   display: grid;
-  gap: 0.18rem;
+  gap: 0.22rem;
   justify-items: start;
   align-content: center;
   text-align: left;
@@ -965,12 +967,12 @@ body[data-theme="light"] .game-tile:hover {
 
 .option-button-label {
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: 0.88rem;
 }
 
 .option-button-value {
   font-family: "Alegreya", serif;
-  font-size: 1.08rem;
+  font-size: 1.14rem;
   font-weight: 800;
 }
 
@@ -985,12 +987,12 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .choice-btn {
-  min-height: 58px;
-  padding: 0.82rem 0.92rem;
+  min-height: 62px;
+  padding: 0.9rem 1rem;
   display: grid;
   place-items: center;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.06rem;
   border-radius: 18px;
   background: var(--surface-bg);
 }
@@ -998,7 +1000,7 @@ body[data-theme="light"] .game-tile:hover {
 .choice-btn.hebrew {
   direction: rtl;
   text-align: center;
-  font-size: 1.08rem;
+  font-size: 1.14rem;
 }
 
 .choice-btn.selected,
@@ -1039,15 +1041,15 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .match-card {
-  min-height: 66px;
-  padding: 0.66rem 0.52rem;
+  min-height: 72px;
+  padding: 0.72rem 0.58rem;
   text-align: center;
-  font-size: clamp(0.92rem, 2.7vw, 1rem);
+  font-size: clamp(0.98rem, 2.7vw, 1.06rem);
 }
 
 .match-card.hebrew {
   direction: rtl;
-  font-size: clamp(1rem, 2.9vw, 1.12rem);
+  font-size: clamp(1.06rem, 2.9vw, 1.14rem);
 }
 
 .match-card.incoming {
@@ -1130,7 +1132,7 @@ body[data-theme="light"] .game-tile:hover {
 
 .feedback-detail {
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   line-height: 1.35;
 }
 
@@ -1146,8 +1148,8 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .next-btn {
-  min-height: 60px;
-  font-size: 1.08rem;
+  min-height: 62px;
+  font-size: 1.12rem;
   box-shadow: var(--next-shadow);
 }
 
@@ -1172,14 +1174,14 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .results-head h2 {
-  font-size: clamp(1.15rem, 2.3vw, 1.5rem);
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
 }
 
 .results-praise {
   margin: 0;
   max-width: 12ch;
   font-family: "Alegreya", serif;
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(2.1rem, 4vw, 3.1rem);
   font-weight: 800;
   line-height: 0.95;
   text-align: center;
@@ -1245,12 +1247,12 @@ body[data-theme="light"] .game-tile:hover {
 .results-metric-label {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.74rem;
+  font-size: 0.8rem;
 }
 
 .results-metric-value {
   margin: 0.22rem 0 0;
-  font-size: 1.02rem;
+  font-size: 1.1rem;
   font-weight: 800;
 }
 
@@ -1260,7 +1262,7 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .results-section-title {
-  font-size: 1rem;
+  font-size: 1.08rem;
 }
 
 .results-actions {
@@ -1313,12 +1315,12 @@ body[data-theme="light"] .game-tile:hover {
 }
 
 .review-analytics-card .domain-title {
-  font-size: 0.75rem;
+  font-size: 0.84rem;
   line-height: 1.22;
 }
 
 .review-analytics-card .domain-score {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
 }
 
 .missed-list {
@@ -1346,7 +1348,7 @@ body[data-theme="light"] .game-tile:hover {
 .missed-meta {
   margin: 0.14rem 0 0;
   color: var(--ink-soft);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
 }
 
 .settings-list {
@@ -1452,7 +1454,7 @@ body[data-theme="light"] .mobile-bottom-nav .nav-link.active .nav-link-icon {
 }
 
 .mobile-nav-link span:last-child {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   line-height: 1.1;
 }
 
@@ -1510,7 +1512,7 @@ body[data-theme="light"] .mobile-bottom-nav .nav-link.active .nav-link-icon {
 
 .mastered-row-he {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 1.08rem;
   font-weight: 700;
   direction: rtl;
 }
@@ -1518,7 +1520,7 @@ body[data-theme="light"] .mobile-bottom-nav .nav-link.active .nav-link-icon {
 .mastered-row-en {
   margin: 0.08rem 0 0;
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: 0.86rem;
 }
 
 .mastered-actions {
@@ -1851,86 +1853,99 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 }
 
-@media (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   body {
     min-height: 100dvh;
   }
 
   .app-shell {
     min-height: 100dvh;
-    padding: 0.58rem 0.58rem calc(5.15rem + env(safe-area-inset-bottom));
-    gap: 0.5rem;
+    padding: 0.72rem 0.72rem calc(5.25rem + env(safe-area-inset-bottom));
+    gap: 0.6rem;
   }
 
   .shell-topbar {
-    padding: 0.58rem 0.72rem;
+    padding: 0.68rem 0.82rem;
   }
 
   .shell-brand {
-    gap: 0.58rem;
+    gap: 0.68rem;
   }
 
   .shell-logo {
-    width: 2.1rem;
-    height: 2.1rem;
-    font-size: 1.44rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.56rem;
   }
 
   .shell-brand-title h1 {
-    font-size: 1.34rem;
+    font-size: 1.6rem;
+  }
+
+  .small-note,
+  .section-copy {
+    font-size: 0.92rem;
   }
 
   .page-card {
-    padding: 0.9rem;
-    gap: 0.72rem;
+    padding: 1rem;
+    gap: 0.8rem;
   }
 
   .home-lesson-grid {
-    gap: 0.52rem;
+    gap: 0.58rem;
   }
 
   .game-tile {
-    min-height: 96px;
-    padding: 0.72rem;
-    gap: 0.34rem 0.62rem;
+    min-height: 104px;
+    padding: 0.8rem;
+    gap: 0.38rem 0.66rem;
   }
 
   .game-tile.home-game-tile {
-    min-height: 92px;
+    min-height: 100px;
   }
 
   .game-tile-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 1.12rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.16rem;
   }
 
   .game-tile-title {
-    font-size: 1rem;
+    font-size: 1.12rem;
   }
 
   .game-tile-note {
-    font-size: 0.78rem;
-    line-height: 1.28;
+    font-size: 0.88rem;
+    line-height: 1.36;
+  }
+
+  .option-button-label {
+    font-size: 0.84rem;
+  }
+
+  .option-button-value {
+    font-size: 1.1rem;
   }
 
   .lesson-shell {
-    padding: 0.58rem;
-    gap: 0.42rem;
+    padding: 0.72rem;
+    gap: 0.5rem;
   }
 
   .lesson-header-main {
-    gap: 0.28rem;
+    gap: 0.36rem;
   }
 
   .lesson-title-row {
-    gap: 0.42rem;
-    min-height: 2.2rem;
-    padding-right: 2.75rem;
+    gap: 0.52rem;
+    min-height: 2.35rem;
+    padding-right: 2.9rem;
   }
 
   #modeTitle {
-    font-size: clamp(0.98rem, 4.9vw, 1.18rem);
+    font-size: clamp(1.32rem, 3.8vw, 1.6rem);
     line-height: 1.06;
   }
 
@@ -1942,96 +1957,96 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .status-row {
-    gap: 0.28rem;
-    font-size: 0.72rem;
+    gap: 0.34rem;
+    font-size: 0.82rem;
   }
 
   .status-row span {
-    min-height: 1.46rem;
-    padding: 0.26rem 0.42rem;
+    min-height: 1.64rem;
+    padding: 0.32rem 0.5rem;
   }
 
   .progress-strip {
-    height: 5px;
+    height: 6px;
   }
 
   .prompt-card {
-    padding: 0.7rem 0.74rem 0.76rem;
-    border-radius: 16px;
-    gap: 0.24rem;
+    padding: 0.82rem 0.86rem 0.88rem;
+    border-radius: 18px;
+    gap: 0.28rem;
   }
 
   .prompt-label {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
   }
 
   .prompt-support-note {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
   }
 
   .prompt-speech-btn {
-    top: 0.62rem;
-    right: 0.62rem;
-    inset-inline-end: 0.62rem;
-    width: 2.08rem;
-    min-width: 2.08rem;
-    min-height: 2.08rem;
+    top: 0.68rem;
+    right: 0.68rem;
+    inset-inline-end: 0.68rem;
+    width: 2.18rem;
+    min-width: 2.18rem;
+    min-height: 2.18rem;
   }
 
   .prompt-speech-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
   }
 
   .prompt-text {
-    font-size: clamp(0.9rem, 4.2vw, 1.08rem);
-    line-height: 1.1;
+    font-size: clamp(1.16rem, 3.8vw, 1.42rem);
+    line-height: 1.14;
   }
 
   .choices {
-    gap: 0.44rem;
+    gap: 0.5rem;
   }
 
   .choices.match-grid {
-    gap: 0.56rem;
+    gap: 0.6rem;
   }
 
   .choice-btn {
-    min-height: 50px;
-    padding: 0.62rem 0.72rem;
-    border-radius: 15px;
-    font-size: 0.92rem;
+    min-height: 56px;
+    padding: 0.72rem 0.82rem;
+    border-radius: 16px;
+    font-size: 1rem;
   }
 
   .choice-btn.hebrew {
-    font-size: 0.98rem;
+    font-size: 1.08rem;
   }
 
   .match-columns {
-    gap: 0.26rem;
+    gap: 0.34rem;
   }
 
   .match-col {
-    gap: 0.18rem;
+    gap: 0.24rem;
   }
 
   .match-stack {
-    gap: 0.18rem;
+    gap: 0.24rem;
   }
 
   .match-card {
-    min-height: 46px;
-    padding: 0.46rem 0.34rem;
+    min-height: 52px;
+    padding: 0.54rem 0.4rem;
     border-radius: 15px;
-    font-size: clamp(0.78rem, 3vw, 0.92rem);
+    font-size: clamp(0.9rem, 2.9vw, 1rem);
   }
 
   .match-card.hebrew {
-    font-size: clamp(0.88rem, 3.2vw, 1.04rem);
+    font-size: clamp(1rem, 3vw, 1.08rem);
   }
 
   .lesson-footer {
-    bottom: calc(4.15rem + env(safe-area-inset-bottom));
+    bottom: calc(4.35rem + env(safe-area-inset-bottom));
   }
 
   .sticky-lesson-actions {
@@ -2040,22 +2055,22 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .feedback-tray {
-    padding: 0.62rem 0.76rem 0.68rem;
+    padding: 0.68rem 0.82rem 0.72rem;
   }
 
   .feedback-sentence,
   .feedback-detail {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
   }
 
   .next-btn {
-    min-height: 52px;
-    font-size: 1rem;
+    min-height: 56px;
+    font-size: 1.04rem;
   }
 
   .master-btn {
-    min-height: 42px;
-    font-size: 0.88rem;
+    min-height: 44px;
+    font-size: 0.92rem;
   }
 
   .second-chance-scene {
@@ -2086,6 +2101,296 @@ body[data-ui-lang="he"] .mastered-row input {
     padding: 0.9rem;
     gap: 0.68rem;
   }
+  
+  .review-analytics-card .domain-title {
+    font-size: 0.82rem;
+  }
+
+  .review-analytics-card .domain-score {
+    font-size: 0.78rem;
+  }
+
+  .mobile-nav-link span:last-child {
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    min-height: 100dvh;
+  }
+
+  .app-shell {
+    min-height: 100dvh;
+    padding: 0.62rem 0.62rem calc(5.2rem + env(safe-area-inset-bottom));
+    gap: 0.54rem;
+  }
+
+  .shell-topbar {
+    padding: 0.64rem 0.76rem;
+  }
+
+  .shell-brand {
+    gap: 0.64rem;
+  }
+
+  .shell-logo {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.48rem;
+  }
+
+  .shell-brand-title h1 {
+    font-size: 1.46rem;
+  }
+
+  .small-note,
+  .section-copy {
+    font-size: 0.9rem;
+  }
+
+  .page-card {
+    padding: 0.96rem;
+    gap: 0.78rem;
+  }
+
+  .home-lesson-grid {
+    gap: 0.54rem;
+  }
+
+  .game-tile {
+    min-height: 100px;
+    padding: 0.76rem;
+    gap: 0.36rem 0.64rem;
+  }
+
+  .game-tile.home-game-tile {
+    min-height: 96px;
+  }
+
+  .game-tile-icon {
+    width: 39px;
+    height: 39px;
+    font-size: 1.14rem;
+  }
+
+  .game-tile-title {
+    font-size: 1.08rem;
+  }
+
+  .game-tile-note {
+    font-size: 0.84rem;
+    line-height: 1.34;
+  }
+
+  .option-button-label {
+    font-size: 0.82rem;
+  }
+
+  .option-button-value {
+    font-size: 1.04rem;
+  }
+
+  .lesson-shell {
+    padding: 0.66rem;
+    gap: 0.46rem;
+  }
+
+  .lesson-header-main {
+    gap: 0.32rem;
+  }
+
+  .lesson-title-row {
+    gap: 0.46rem;
+    min-height: 2.26rem;
+    padding-right: 2.82rem;
+  }
+
+  #modeTitle {
+    font-size: clamp(1.12rem, 5vw, 1.32rem);
+    line-height: 1.06;
+  }
+
+  .lesson-home-btn {
+    display: inline-grid;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .status-row {
+    gap: 0.3rem;
+    font-size: 0.78rem;
+  }
+
+  .status-row span {
+    min-height: 1.58rem;
+    padding: 0.3rem 0.46rem;
+  }
+
+  .progress-strip {
+    height: 5px;
+  }
+
+  .prompt-card {
+    padding: 0.78rem 0.8rem 0.84rem;
+    border-radius: 17px;
+    gap: 0.26rem;
+  }
+
+  .prompt-label {
+    font-size: 0.74rem;
+  }
+
+  .prompt-support-note {
+    font-size: 0.74rem;
+  }
+
+  .prompt-speech-btn {
+    top: 0.64rem;
+    right: 0.64rem;
+    inset-inline-end: 0.64rem;
+    width: 2.1rem;
+    min-width: 2.1rem;
+    min-height: 2.1rem;
+  }
+
+  .prompt-text {
+    font-size: clamp(1.02rem, 4.6vw, 1.22rem);
+    line-height: 1.12;
+  }
+
+  .choices {
+    gap: 0.46rem;
+  }
+
+  .choices.match-grid {
+    gap: 0.56rem;
+  }
+
+  .choice-btn {
+    min-height: 54px;
+    padding: 0.68rem 0.78rem;
+    border-radius: 15px;
+    font-size: 0.98rem;
+  }
+
+  .choice-btn.hebrew {
+    font-size: 1.04rem;
+  }
+
+  .match-columns {
+    gap: 0.28rem;
+  }
+
+  .match-col {
+    gap: 0.2rem;
+  }
+
+  .match-stack {
+    gap: 0.2rem;
+  }
+
+  .match-card {
+    min-height: 50px;
+    padding: 0.5rem 0.38rem;
+    border-radius: 15px;
+    font-size: clamp(0.86rem, 3.2vw, 0.98rem);
+  }
+
+  .match-card.hebrew {
+    font-size: clamp(0.94rem, 3.4vw, 1.04rem);
+  }
+
+  .lesson-footer {
+    bottom: calc(4.15rem + env(safe-area-inset-bottom));
+  }
+
+  .sticky-lesson-actions {
+    gap: 0.42rem;
+    padding-top: 0.04rem;
+  }
+
+  .feedback-tray {
+    padding: 0.62rem 0.76rem 0.68rem;
+  }
+
+  .feedback-sentence,
+  .feedback-detail {
+    font-size: 0.86rem;
+  }
+
+  .next-btn {
+    min-height: 54px;
+    font-size: 1rem;
+  }
+
+  .master-btn {
+    min-height: 42px;
+    font-size: 0.9rem;
+  }
+
+  .results-head h2 {
+    font-size: clamp(1.18rem, 4.2vw, 1.3rem);
+  }
+
+  .results-metric-label {
+    font-size: 0.78rem;
+  }
+
+  .results-metric-value {
+    font-size: 1.04rem;
+  }
+
+  .results-section-title {
+    font-size: 1.02rem;
+  }
+
+  .review-analytics-card .domain-title {
+    font-size: 0.8rem;
+  }
+
+  .review-analytics-card .domain-score {
+    font-size: 0.76rem;
+  }
+
+  .mobile-nav-link {
+    min-height: 56px;
+    padding: 0.44rem 0.12rem;
+  }
+
+  .mobile-nav-link span:last-child {
+    font-size: 0.86rem;
+  }
+
+  .second-chance-scene {
+    width: min(82vw, 18rem);
+    padding: 0.7rem 0.62rem 0.62rem;
+    gap: 0.48rem;
+  }
+
+  .second-chance-bubble {
+    max-width: 100%;
+    padding: 0.54rem 0.82rem;
+    font-size: clamp(0.96rem, 4.9vw, 1.22rem);
+  }
+
+  .second-chance-bubble::after {
+    bottom: -9px;
+    left: 20%;
+    width: 14px;
+    height: 14px;
+  }
+
+  .second-chance-note {
+    font-size: 0.7rem;
+  }
+
+  .session-leave-dialog {
+    width: min(90vw, 360px);
+    padding: 0.9rem;
+    gap: 0.68rem;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2105,22 +2410,31 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 }
 
-@media (max-width: 1023px) and (max-height: 760px) {
+@media (max-width: 767px) and (max-height: 760px) {
   .game-tile {
-    min-height: 90px;
+    min-height: 94px;
   }
 
   .lesson-shell {
-    gap: 0.5rem;
+    gap: 0.48rem;
   }
 
   .prompt-card {
-    padding: 0.66rem 0.72rem;
+    padding: 0.72rem 0.76rem;
+  }
+
+  .prompt-text {
+    font-size: clamp(0.98rem, 4.4vw, 1.12rem);
   }
 
   .choice-btn {
-    min-height: 46px;
-    padding: 0.54rem 0.66rem;
+    min-height: 48px;
+    padding: 0.6rem 0.72rem;
+    font-size: 0.94rem;
+  }
+
+  .choice-btn.hebrew {
+    font-size: 1rem;
   }
 
   .feedback-tray {
@@ -2128,11 +2442,11 @@ body[data-ui-lang="he"] .mastered-row input {
   }
 
   .match-card {
-    min-height: 38px;
-    font-size: 0.8rem;
+    min-height: 42px;
+    font-size: 0.86rem;
   }
 
   .match-card.hebrew {
-    font-size: 0.9rem;
+    font-size: 0.94rem;
   }
 }

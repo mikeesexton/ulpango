@@ -1468,3 +1468,19 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** This is intentionally a soft weighting rather than a hard override, so domain balancing and due-word scheduling still matter. If you later want the game to feel more or less aggressive about resurfacing misses, the two new constants are the safest tuning points.
 
 ---
+
+### 2026-03-15 21:05 — Add a moderate three-tier typography scale for desktop, tablet, and phone
+
+**Requested:** Increase text size and related spacing across desktop, iPad, and iPhone without going to a maximal scale, and stop iPad from inheriting the same compressed typography as phone layouts.
+
+**Files changed:**
+- `styles.css` — Added a moderate desktop/base typography lift across gameplay, review, dashboard, settings, results, and navigation; split the old `max-width: 1023px` mobile block into separate tablet (`768px–1023px`) and phone (`<=767px`) tiers; and softened the short-height phone override so it preserves readable minimum text sizes.
+- `index.html`, `app.js` — Bumped frontend asset versions to `20260315k` so the refreshed browser picks up the new typography and spacing rules immediately.
+
+**Behavior changed:** The app now uses a clearer three-tier responsive type system. Desktop gets a modest overall lift, iPad no longer uses the phone-compressed scale, and phones keep a compact layout without shrinking gameplay text back to the old tiny sizes on shorter screens. Prompt text, answer buttons, match cards, review analytics, dashboard tiles, settings controls, and navigation labels all use space more generously while preserving the existing structure and interaction flow.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 54/54. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 86/86.
+
+**Risks / regressions to check:** This pass intentionally increases text and padding together, so the main things to watch in the browser are long Hebrew prompt wrapping, prompt-speaker-button overlap, and whether any especially dense gameplay states feel a little too tall on the smallest phones. If any one screen feels slightly overgrown, it should be trimmed by reducing local padding before shrinking the shared scale back down.
+
+---
