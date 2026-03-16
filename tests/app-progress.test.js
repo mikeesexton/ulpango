@@ -1219,6 +1219,51 @@ test("header combo pill is displayed uniformly across lesson and conjugation", (
   assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x4");
 });
 
+test("active gameplay shows the game title beside the app title and hides the in-stage title row", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const harness = loadAppHarness(vocabulary);
+
+  harness.state.route = "home";
+  harness.state.mode = "lesson";
+  harness.state.lesson.active = true;
+  harness.app.ui.renderShellChrome();
+  harness.app.ui.updateLessonShellModeState();
+
+  assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "true");
+  assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
+  assert.equal(harness.document.querySelector("#shellGameTitle").textContent, "Translation");
+  assert.equal(harness.document.querySelector("#shellGameTitle").classList.contains("hidden"), false);
+  assert.equal(harness.document.querySelector("#lessonTitleRow").classList.contains("hidden"), true);
+
+  harness.state.lesson.active = false;
+  harness.state.route = "review";
+  harness.app.ui.renderShellChrome();
+  harness.app.ui.updateLessonShellModeState();
+
+  assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "false");
+  assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
+  assert.equal(harness.document.querySelector("#shellGameTitle").classList.contains("hidden"), true);
+});
+
+test("all game summaries now use only score accuracy and time metrics", () => {
+  const harness = loadAppHarness([]);
+  const expectedLabels = ["Score", "Accuracy", "Time"];
+
+  ["lesson", "abbreviation", "verbMatch", "advConj"].forEach((game) => {
+    harness.state.summary.game = game;
+    harness.state.summary.elapsedSeconds = 42;
+    const metrics = harness.app.ui.buildSummaryMetrics({
+      scoreValue: 7,
+      scoreTotal: 10,
+      accuracy: 70,
+    });
+    assert.equal(metrics.length, 3);
+    assert.deepEqual(Array.from(metrics, (metric) => metric.label), expectedLabels);
+  });
+});
+
 test("starting advanced conjugation resets the game score but preserves the shared combo", () => {
   const idioms = [
     {

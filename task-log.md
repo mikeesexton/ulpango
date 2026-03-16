@@ -1484,3 +1484,73 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** This pass intentionally increases text and padding together, so the main things to watch in the browser are long Hebrew prompt wrapping, prompt-speaker-button overlap, and whether any especially dense gameplay states feel a little too tall on the smallest phones. If any one screen feels slightly overgrown, it should be trimmed by reducing local padding before shrinking the shared scale back down.
 
 ---
+
+### 2026-03-15 21:34 — Move gameplay titles into the top banner and simplify result metrics
+
+**Requested:** Reclaim vertical space during gameplay by moving the current game title out of the lesson box and into the top banner, remove unnecessary mobile gameplay scrolling when everything already fits on screen, and trim results metrics so the mobile end pages can safely use a single three-card row.
+
+**Files changed:**
+- `index.html` — Added dedicated IDs for the top banner title and lesson-stage title row, and bumped frontend asset versions to `20260315l`.
+- `app/bootstrap-runtime.js` — Registered the new top-banner title and lesson-title-row elements.
+- `app/ui.js` — Added a shared gameplay-route detector, routed active game titles into the top banner, hid the in-stage lesson title row during active gameplay, exposed a `data-gameplay-active` body state, and simplified summary metrics down to score, accuracy, and time for all four games.
+- `styles.css` — Added gameplay-active topbar styling, hid the in-stage lesson title row during active play, locked the mobile/tablet gameplay viewport to prevent stray scrolling, and tuned the results metric grid so the end pages can render as a single three-card row on smaller screens.
+- `tests/app-progress.test.js` — Added regressions covering the new top-banner gameplay title behavior and the three-metric summary layout contract.
+
+**Behavior changed:** During active gameplay, the top banner now shows the current game name and the lesson box no longer spends vertical space on a duplicate title row. On tablet and phone, gameplay now uses a cleaner locked viewport instead of allowing minor extra scrolling when the full lesson already fits onscreen. Translation, Abbreviation, Conjugation, and Advanced Conjugation results now all use the same three summary boxes: score, accuracy, and time.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 56/56. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 88/88.
+
+**Risks / regressions to check:** The mobile/tablet viewport lock assumes the active gameplay shells fit within the available height after the reclaimed title space. The main manual QA follow-up is checking especially long prompt/feedback combinations on smaller phones to confirm nothing important is clipped now that stray scrolling is suppressed.
+
+---
+
+### 2026-03-15 21:49 — Refine the gameplay banner title and remove the over-strong mobile height lock
+
+**Requested:** Put the active game title beside `IvritElite` in the top banner instead of replacing the app name, and fix the mobile gameplay dead space / possible fourth-answer clipping.
+
+**Files changed:**
+- `index.html` — Split the top banner into a persistent app title plus a separate gameplay title label, and bumped frontend asset versions to `20260315m`.
+- `app/bootstrap-runtime.js` — Registered the new banner game-title element.
+- `app/ui.js` — Kept the app title fixed as `IvritElite`, routed the active game name into the new secondary banner label, and hid that label outside gameplay.
+- `styles.css` — Styled the banner game-title label as a smaller inline companion to the app name, and removed the aggressive tablet/phone gameplay height-lock rules that were stretching the lesson shell and clipping content.
+- `tests/app-progress.test.js` — Updated the gameplay-banner regression to cover the new paired-title behavior.
+
+**Behavior changed:** The top banner now reads as `IvritElite` plus the current game label, rather than swapping the app name out entirely. On mobile and tablet, gameplay no longer forces the lesson shell to fill the entire available height, which fixes the dead space at the bottom of the lesson card and prevents the last answer from being clipped under the action area.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 56/56. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 88/88.
+
+**Risks / regressions to check:** This follow-up intentionally relaxes the earlier anti-scroll lock, so the remaining manual QA item is simply confirming whether the original light mobile scroll is now gone naturally after the stretching fix. If any tiny residual scroll remains, it should be addressed with lighter padding tuning rather than another full-height lock.
+
+---
+
+### 2026-03-15 21:58 — Push the gameplay title to the far side of the banner and promote it visually
+
+**Requested:** Align the active game title to the opposite side of `IvritElite` and make it feel more prominent.
+
+**Files changed:**
+- `styles.css` — Made the banner row stretch to full width, kept the logo and `IvritElite` grouped, pushed the active game title to the far edge with auto spacing that respects LTR/RTL direction, and promoted the game title with stronger serif typography and brand-colored styling.
+- `index.html`, `app.js` — Bumped frontend asset versions to `20260315n`.
+
+**Behavior changed:** During gameplay, the banner now reads as a two-sided header: `IvritElite` stays anchored on its natural side and the active game name sits on the opposite side, with directionality handled naturally by the English/Hebrew UI mode. The game name is now styled as a true header companion rather than a small metadata tag.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 56/56. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 88/88.
+
+**Risks / regressions to check:** The main manual QA item is checking very narrow phone widths in Hebrew to confirm the app title and game title still sit comfortably on one line. If that feels too tight, the safest next step would be trimming the inter-title gap slightly before shrinking either title.
+
+---
+
+### 2026-03-15 23:03 — Fix light-mode gameplay pill contrast and feedback readability
+
+**Requested:** Improve the light-mode appearance of the three gameplay status pills and make positive/negative feedback readable. Follow-up: cover the conjugation prompt box as part of the same light-mode cleanup.
+
+**Files changed:**
+- `styles.css` — Added light-theme overrides for gameplay status pills, conjugation prompt-card surface, success/error card text, and the full feedback tray so light mode now uses pale tinted surfaces with dark readable text instead of inheriting dark-mode treatments.
+- `index.html`, `app.js` — Bumped frontend asset versions to `20260315o`.
+
+**Behavior changed:** In light mode, the three top status pills now read as intentional blue-gray controls instead of muddy dark capsules. The feedback tray now uses readable light success/error/info surfaces with strong sentence/detail contrast, and conjugation prompt cards no longer retain a dark-mode background in light theme.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 56/56. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 88/88.
+
+**Risks / regressions to check:** Manual QA should confirm the success/error tint balance still feels calm in light mode and that the updated card-state text colors remain readable across translation, abbreviation, advanced conjugation, and conjugation.
+
+---

@@ -154,9 +154,48 @@ ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisib
   runtime.el?.settingsView?.classList.toggle("active", runtime.state.route === "settings");
 };
 
+ui.isGameplayRouteActive = ui.isGameplayRouteActive || function isGameplayRouteActive() {
+  const runtime = getRuntime();
+  return runtime.state.route === "home" && !runtime.state.summary.active && (app.session?.hasActiveLearnSession?.() || false);
+};
+
+ui.getShellGameTitleKey = ui.getShellGameTitleKey || function getShellGameTitleKey() {
+  const runtime = getRuntime();
+  if (!ui.isGameplayRouteActive()) {
+    return "";
+  }
+  if (runtime.state.mode === "verbMatch") {
+    return "game.conjugationName";
+  }
+  if (runtime.state.mode === "abbreviation") {
+    return "game.abbreviationName";
+  }
+  if (runtime.state.mode === "advConj") {
+    return "game.advConjName";
+  }
+  return "game.translationName";
+};
+
 ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
   const runtime = getRuntime();
   const routeKey = `nav.${runtime.state.route}`;
+  const shellGameTitleKey = ui.getShellGameTitleKey();
+  const gameplayActive = ui.isGameplayRouteActive();
+  runtime.global.document.body?.setAttribute("data-gameplay-active", gameplayActive ? "true" : "false");
+  if (runtime.el?.shellTopbar) {
+    runtime.el.shellTopbar.classList.toggle("gameplay-active", gameplayActive);
+  }
+  if (runtime.el?.shellTopTitle) {
+    const appTitleText = translate("app.name");
+    runtime.el.shellTopTitle.textContent = appTitleText;
+    runtime.el.shellTopTitle.setAttribute("aria-label", appTitleText);
+  }
+  if (runtime.el?.shellGameTitle) {
+    const gameTitleText = shellGameTitleKey ? translate(shellGameTitleKey) : "";
+    runtime.el.shellGameTitle.textContent = gameTitleText;
+    runtime.el.shellGameTitle.classList.toggle("hidden", !gameplayActive || !gameTitleText);
+    runtime.el.shellGameTitle.setAttribute("aria-hidden", gameplayActive && gameTitleText ? "false" : "true");
+  }
   if (runtime.el?.shellRouteChip) {
     runtime.el.shellRouteChip.textContent = translate(routeKey);
   }
@@ -238,6 +277,7 @@ ui.updateLessonShellModeState = ui.updateLessonShellModeState || function update
   const runtime = getRuntime();
   const shell = runtime.el?.homeLessonStage;
   const promptCard = runtime.el?.promptCard;
+  const lessonTitleRow = runtime.el?.lessonTitleRow;
   if (!shell || !promptCard) return;
 
   const layoutMode = runtime.state.mode === "verbMatch"
@@ -252,6 +292,10 @@ ui.updateLessonShellModeState = ui.updateLessonShellModeState || function update
   shell.classList.toggle("mode-verb-match", layoutMode === "verb-match");
   promptCard.classList.toggle("mode-standard", layoutMode === "standard");
   promptCard.classList.toggle("mode-verb-match", layoutMode === "verb-match");
+  if (lessonTitleRow) {
+    lessonTitleRow.classList.toggle("hidden", ui.isGameplayRouteActive());
+    lessonTitleRow.setAttribute("aria-hidden", ui.isGameplayRouteActive() ? "true" : "false");
+  }
 };
 
 ui.updatePromptCardState = ui.updatePromptCardState || function updatePromptCardState() {
@@ -837,36 +881,11 @@ ui.formatResultSeconds = ui.formatResultSeconds || function formatResultSeconds(
 
 ui.buildSummaryMetrics = ui.buildSummaryMetrics || function buildSummaryMetrics({ scoreValue, scoreTotal, accuracy }) {
   const runtime = getRuntime();
-  const metrics = [
+  return [
     { label: translate("results.score"), value: `${scoreValue}/${scoreTotal}` },
     { label: translate("results.accuracy"), value: `${accuracy}%` },
     { label: translate("results.time"), value: ui.formatResultSeconds(runtime.state.summary.elapsedSeconds) },
   ];
-
-  if (runtime.state.summary.game === "lesson") {
-    metrics.push({
-      label: translate("results.reviewRounds"),
-      value: String(Math.max(0, Number(runtime.state.summary.noteVars?.count || 0))),
-    });
-    return metrics;
-  }
-
-  if (runtime.state.summary.game === "abbreviation") {
-    metrics.push({
-      label: translate("results.rounds"),
-      value: String(Math.max(0, Number(runtime.state.summary.noteVars?.rounds || 0))),
-    });
-    return metrics;
-  }
-
-  if (runtime.state.summary.game === "verbMatch") {
-    metrics.push({
-      label: translate("results.bestCombo"),
-      value: `x${Math.max(0, Number(runtime.state.summary.noteVars?.combo || 0))}`,
-    });
-  }
-
-  return metrics;
 };
 
 ui.createResultsPerformanceGraphic = ui.createResultsPerformanceGraphic || function createResultsPerformanceGraphic(accuracy) {

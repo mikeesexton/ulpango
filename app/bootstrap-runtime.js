@@ -7,6 +7,9 @@ const bootstrapRuntime = app.bootstrapRuntime = app.bootstrapRuntime || {};
 bootstrapRuntime.createElementRegistry = bootstrapRuntime.createElementRegistry || function createElementRegistry(document) {
   return {
     appShell: document.querySelector(".app-shell"),
+    shellTopbar: document.querySelector(".shell-topbar"),
+    shellTopTitle: document.querySelector("#shellTopTitle"),
+    shellGameTitle: document.querySelector("#shellGameTitle"),
     routeButtons: Array.from(document.querySelectorAll("[data-route]")),
     homeView: document.querySelector("#homeView"),
     homeDashboard: document.querySelector("#homeDashboard"),
@@ -43,6 +46,7 @@ bootstrapRuntime.createElementRegistry = bootstrapRuntime.createElementRegistry 
     feedbackSurveyLink: document.querySelector("#feedbackSurveyLink"),
     lessonStatus: document.querySelector("#lessonStatus"),
     lessonProgressFill: document.querySelector("#lessonProgressFill"),
+    lessonTitleRow: document.querySelector("#lessonTitleRow"),
     modeTitle: document.querySelector("#modeTitle"),
     promptCard: document.querySelector(".prompt-card"),
     promptLabel: document.querySelector("#promptLabel"),
