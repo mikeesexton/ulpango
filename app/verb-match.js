@@ -71,8 +71,6 @@ verbMatch.moveEligibleVerbToMastered = verbMatch.moveEligibleVerbToMastered || f
   h.renderMostMissed?.();
   h.renderMasteredModal?.();
 
-  const label = word ? `${word.en} / ${h.getHebrewText?.(word, runtime.state.showNiqqudInline) || ""}` : "";
-  h.setFeedback?.(translate("mastered.added", { word: label || wordId }), true);
 };
 
 verbMatch.startVerbMatch = verbMatch.startVerbMatch || function startVerbMatch() {
@@ -107,7 +105,6 @@ verbMatch.startVerbMatch = verbMatch.startVerbMatch || function startVerbMatch()
   if (!runtime.verbFormDeck?.length) {
     runtime.state.match.active = false;
     verbMatch.renderVerbMatchIdleState();
-    h.setFeedback?.(translate("match.noVerbs"), false);
     return;
   }
 
@@ -518,9 +515,7 @@ verbMatch.applyVerbMatchSuccess = verbMatch.applyVerbMatchSuccess || function ap
       const reachedMasterThreshold = streakCount >= runtime.constants.CONJUGATION_MASTER_STREAK && !data.isWordMastered?.(current.id);
       runtime.state.match.eligibleMasterWordId = reachedMasterThreshold ? current.id : "";
       const hasMoreVerbs = runtime.state.match.verbQueue.length > 0;
-      if (hasMoreVerbs) {
-        h.setFeedback?.(translate("feedback.matchDoneVerb", { verb: current.en }), true);
-      } else {
+      if (!hasMoreVerbs) {
         verbMatch.finishVerbMatchSession();
         return;
       }

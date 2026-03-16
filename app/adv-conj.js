@@ -30,6 +30,18 @@ function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
 
+function getIdiomById(id) {
+  return getIdioms().find((entry) => entry.id === id) || null;
+}
+
+function getAdvConjMeaningDetail(question) {
+  const idiom = getIdiomById(question?.idiomId);
+  const showMeaning = question?.showMeaning ?? idiom?.showMeaning;
+  const meaning = sanitizeEnglishText(question?.colloquialMeaning || question?.englishMeaning || idiom?.english_meaning || idiom?.english);
+  if (!showMeaning || !meaning) return "";
+  return meaning;
+}
+
 advConj.getAdvConjPromptSpeechPayload = advConj.getAdvConjPromptSpeechPayload || function getAdvConjPromptSpeechPayload(question = getRuntime().state.advConj.currentQuestion) {
   if (!question?.promptIsHebrew) return null;
   return app.speech?.buildSpeechPayload?.({
@@ -229,6 +241,8 @@ advConj.buildAdvConjDeck = advConj.buildAdvConjDeck || function buildAdvConjDeck
             promptIsHebrew: direction === "he2en",
             correctAnswer: correctText,
             correctAnswerIsHebrew: direction === "en2he",
+            showMeaning: Boolean(idiom.showMeaning),
+            colloquialMeaning: sanitizeEnglishText(idiom.english_meaning),
             options,
             selectedOptionId: null,
             locked: false,
@@ -379,16 +393,18 @@ advConj.applyAdvConjAnswer = advConj.applyAdvConjAnswer || function applyAdvConj
     }
   }
 
-  const idiom = getIdioms().find((entry) => entry.id === question.idiomId);
-  let feedbackAnswer = question.correctAnswer;
-  if (idiom?.showMeaning) {
-    feedbackAnswer += ` (${sanitizeEnglishText(idiom.english)})`;
-  }
   h.setFeedback?.(
-    isCorrect
-      ? translate("feedback.advConjCorrect", { answer: feedbackAnswer })
-      : translate("feedback.advConjWrong", { answer: feedbackAnswer }),
-    isCorrect
+    {
+      tone: isCorrect ? "success" : "error",
+      sentence: translate(
+        isCorrect ? "feedback.advConjCorrectSentence" : "feedback.advConjWrongSentence",
+        { answer: question.correctAnswer }
+      ),
+      detail: (() => {
+        const meaning = getAdvConjMeaningDetail(question);
+        return meaning ? translate("feedback.advConjMeaningDetail", { meaning }) : "";
+      })(),
+    }
   );
   h.playAnswerFeedbackSound?.(isCorrect);
   advConj.updateAdvConjStats(isCorrect);

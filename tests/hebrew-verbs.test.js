@@ -219,6 +219,86 @@ test("generated English past labels use irregular forms for keep", () => {
   );
 });
 
+test("starter conjugation verbs can carry stored niqqud across their visible forms", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const expected = [
+    ["starter-verb-lisgor--sense-1", "present_masculine_singular", "סוֹגֵר"],
+    ["starter-verb-liftoach--sense-1", "future_first_person_singular", "אֶפְתַּח"],
+    ["starter-verb-lichtov--sense-1", "past_third_person_plural", "כָּתְבוּ"],
+    ["starter-verb-lishmor--sense-1", "future_second_person_plural", "תִּשְׁמְרוּ"],
+    ["starter-verb-lilmod--sense-1", "future_first_person_singular", "אֶלְמַד"],
+    ["starter-verb-leechol--sense-1", "future_first_person_singular", "אֹכַל"],
+    ["starter-verb-lishtot--sense-1", "present_feminine_singular", "שׁוֹתָה"],
+    ["starter-verb-lesachek--sense-1", "past_third_person_masculine_singular", "שִׂיחֵק"],
+    ["starter-verb-laavod--sense-1", "future_first_person_singular", "אֶעֱבֹד"],
+    ["starter-verb-lagur--sense-1", "future_first_person_singular", "אָגוּר"],
+    ["starter-verb-lavo--sense-1", "future_third_person_plural", "יָבוֹאוּ"],
+    ["starter-verb-lihyot--sense-1", "future_first_person_singular", "אֶהְיֶה"],
+    ["starter-verb-lirot--sense-1", "present_feminine_singular", "רוֹאָה"],
+    ["starter-verb-lakachat--sense-1", "future_first_person_singular", "אֶקַּח"],
+    ["starter-verb-lasim--sense-1", "present_feminine_plural", "שָׂמוֹת"],
+    ["starter-verb-latet--sense-1", "future_first_person_singular", "אֶתֵּן"],
+    ["starter-verb-lalechet--sense-1", "future_first_person_plural", "נֵלֵךְ"],
+    ["starter-verb-lehagid--sense-1", "future_first_person_singular", "אַגִּיד"],
+    ["starter-verb-laamod--sense-1", "future_second_person_plural", "תַּעַמְדוּ"],
+    ["starter-verb-lashevet--sense-1", "present_masculine_singular", "יוֹשֵׁב"],
+    ["starter-verb-lekhabot--sense-1", "present_masculine_singular", "מְכַבֶּה"],
+    ["starter-verb-letzanen--sense-1", "future_first_person_singular", "אֲצַנֵּן"],
+  ];
+
+  expected.forEach(([itemId, formId, expectedNiqqud]) => {
+    const item = deck.find((entry) => entry.id === itemId);
+    assert.ok(item, `${itemId} should appear in the starter deck`);
+    assert.equal(item.formSource, "authoritative");
+    assert.equal(
+      String(item.forms.find((form) => form.id === formId)?.valueNiqqud || "").normalize("NFC"),
+      expectedNiqqud.normalize("NFC")
+    );
+    assert.equal(
+      item.forms.every((form) => /[\u0591-\u05C7]/.test(String(form.valueNiqqud || ""))),
+      true,
+      `${itemId} should expose niqqud on every learner-facing form`
+    );
+  });
+});
+
+test("the full conjugation deck now exposes niqqud on every learner-facing form", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+
+  assert.equal(deck.length > 0, true);
+  assert.equal(
+    deck.every((item) => item.forms.every((form) => /[\u0591-\u05C7]/.test(String(form.valueNiqqud || "")))),
+    true
+  );
+});
+
+test("the full conjugation deck now exposes stored infinitive niqqud for prompt surfaces", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  assert.equal(deck.length > 0, true);
+  assert.equal(
+    deck.every((item) => {
+      const plain = String(item.word.he || "").normalize("NFC");
+      const marked = String(item.word.heNiqqud || "").normalize("NFC");
+      return Boolean(plain) && Boolean(marked) && plain !== marked;
+    }),
+    true
+  );
+});
+
+test("string-backed stored verb forms preserve separate plain and niqqud values", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const item = deck.find((entry) => entry.id === "starter-verb-leshacharer--sense-1");
+
+  assert.ok(item);
+  const present = item.forms.find((form) => form.id === "present_masculine_singular");
+  assert.ok(present);
+  assert.equal(present.valuePlain, "משחרר");
+  assert.equal(
+    String(present.valueNiqqud || "").normalize("NFC"),
+    "מְשַׁחְרֵר".normalize("NFC")
+  );
+});
+
 test("difficult curated verbs can appear in conjugation mode when authoritative forms exist", () => {
   const deck = verbApi.buildVerbConjugationDeck({
     vocabulary: [],

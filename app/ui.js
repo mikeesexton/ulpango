@@ -197,24 +197,41 @@ ui.getHebrewText = ui.getHebrewText || function getHebrewText(word, withNiqqud) 
 };
 
 ui.buildAnswerDisplay = ui.buildAnswerDisplay || function buildAnswerDisplay(word, withNiqqud = false) {
-  const plain = ui.getHebrewText(word, false);
-  const marked = ui.getHebrewText(word, true);
-
-  if (!plain || marked === plain || !withNiqqud) return plain;
-  return `${plain} (${marked})`;
+  return ui.getHebrewText(word, withNiqqud);
 };
 
-ui.setFeedback = ui.setFeedback || function setFeedback(text, success) {
+ui.setFeedback = ui.setFeedback || function setFeedback(payload, success) {
   const runtime = getRuntime();
-  runtime.el.feedback.textContent = text;
-  runtime.el.feedback.classList.toggle("good", Boolean(success));
-  runtime.el.feedback.classList.toggle("bad", success === false);
+  if (!runtime.el?.feedbackTray || !runtime.el?.feedbackSentence || !runtime.el?.feedbackDetail) return;
+
+  const normalized = payload && typeof payload === "object" && !Array.isArray(payload)
+    ? {
+        tone: String(payload.tone || "info"),
+        sentence: String(payload.sentence || "").trim(),
+        detail: String(payload.detail || "").trim(),
+      }
+    : {
+        tone: success === false ? "error" : success ? "success" : "info",
+        sentence: String(payload || "").trim(),
+        detail: "",
+      };
+
+  runtime.el.feedbackSentence.textContent = normalized.sentence;
+  runtime.el.feedbackDetail.textContent = normalized.detail;
+  runtime.el.feedbackDetail.classList.toggle("hidden", !normalized.detail);
+  runtime.el.feedbackTray.classList.remove("success", "error", "info");
+  runtime.el.feedbackTray.classList.add(normalized.tone);
+  ui.updateStickyLessonActionsState();
 };
 
 ui.clearFeedback = ui.clearFeedback || function clearFeedback() {
   const runtime = getRuntime();
-  runtime.el.feedback.textContent = "";
-  runtime.el.feedback.classList.remove("good", "bad");
+  if (!runtime.el?.feedbackTray || !runtime.el?.feedbackSentence || !runtime.el?.feedbackDetail) return;
+  runtime.el.feedbackSentence.textContent = "";
+  runtime.el.feedbackDetail.textContent = "";
+  runtime.el.feedbackDetail.classList.add("hidden");
+  runtime.el.feedbackTray.classList.remove("success", "error", "info");
+  ui.updateStickyLessonActionsState();
 };
 
 ui.updateLessonShellModeState = ui.updateLessonShellModeState || function updateLessonShellModeState() {
@@ -260,11 +277,30 @@ ui.renderPromptLabel = ui.renderPromptLabel || function renderPromptLabel(text =
 
 ui.updateStickyLessonActionsState = ui.updateStickyLessonActionsState || function updateStickyLessonActionsState() {
   const runtime = getRuntime();
+  const footer = runtime.el?.lessonFooter || runtime.global?.document?.querySelector?.("#lessonFooter");
   const actionBar = runtime.el?.stickyLessonActions || runtime.global?.document?.querySelector?.("#stickyLessonActions");
+  const feedbackTray = runtime.el?.feedbackTray || runtime.global?.document?.querySelector?.("#feedbackTray");
+  const feedbackSentence = runtime.el?.feedbackSentence || runtime.global?.document?.querySelector?.("#feedbackSentence");
+  const feedbackDetail = runtime.el?.feedbackDetail || runtime.global?.document?.querySelector?.("#feedbackDetail");
   if (!actionBar) return;
   const hasVisibleAction = Array.from(actionBar.querySelectorAll("button")).some((button) => !button.classList.contains("hidden"));
+  const canShowFeedback = runtime.state.mode === "lesson" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj";
+  const hasFeedback = canShowFeedback && Boolean(
+    String(feedbackSentence?.textContent || "").trim() ||
+    String(feedbackDetail?.textContent || "").trim()
+  );
   actionBar.classList.toggle("is-empty", !hasVisibleAction);
   actionBar.setAttribute("aria-hidden", hasVisibleAction ? "false" : "true");
+  if (feedbackTray) {
+    feedbackTray.classList.toggle("hidden", !hasFeedback);
+    feedbackTray.setAttribute("aria-hidden", hasFeedback ? "false" : "true");
+  }
+  if (footer) {
+    const showFooter = hasVisibleAction || hasFeedback;
+    footer.classList.toggle("hidden", !showFooter);
+    footer.classList.toggle("is-empty", !showFooter);
+    footer.setAttribute("aria-hidden", showFooter ? "false" : "true");
+  }
 };
 
 ui.renderPromptHint = ui.renderPromptHint || function renderPromptHint() {

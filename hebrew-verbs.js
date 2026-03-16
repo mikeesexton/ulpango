@@ -29,6 +29,7 @@ if (root) {
  * @typedef {{
  *   id: string,
  *   lemma: string,
+ *   lemma_niqqud?: string,
  *   root: string[] | null,
  *   binyan: string | null,
  *   regularity: "regular" | "irregular" | "ambiguous" | "phrase",
@@ -219,6 +220,10 @@ function makeFuture(firstPersonSingular, secondMasculineSingular, secondFeminine
   return future;
 }
 
+function markedForm(plain, niqqud) {
+  return { plain, niqqud };
+}
+
 function makeForms(present, past, future) {
   const forms = {};
   if (present) forms.present = present;
@@ -247,6 +252,7 @@ function createVerbEntry(config) {
   return {
     id: String(config?.id || slugifyHebrewId(config?.lemma || config?.gloss || "verb")),
     lemma: String(config?.lemma || "").trim(),
+    lemma_niqqud: String(config?.lemma_niqqud || config?.lemmaNiqqud || "").trim(),
     root: Array.isArray(config?.root) ? config.root.slice(0, 3) : null,
     binyan: config?.binyan || null,
     regularity: RECOGNIZED_REGULARITY.has(config?.regularity) ? config.regularity : "regular",
@@ -277,15 +283,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lisgor",
       availability: getStarterVerbAvailability("starter-verb-lisgor"),
       lemma: "לסגור",
+      lemma_niqqud: "לִסְגּוֹר",
       root: ["ס", "ג", "ר"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to close", null, true)],
       forms: makeForms(
-        makePresent("סוגר", "סוגרת", "סוגרים", "סוגרות"),
-        makePast("סגרתי", "סגרת", "סגרת", "סגר", "סגרה", "סגרנו", "סגרתם", "סגרתן", "סגרו"),
-        makeFuture("אסגור", "תסגור", "תסגרי", "יסגור", "תסגור", "נסגור", "תסגרו", "יסגרו")
+        makePresent(
+          markedForm("סוגר", "סוֹגֵר"),
+          markedForm("סוגרת", "סוֹגֶרֶת"),
+          markedForm("סוגרים", "סוֹגְרִים"),
+          markedForm("סוגרות", "סוֹגְרוֹת")
+        ),
+        makePast(
+          markedForm("סגרתי", "סָגַרְתִּי"),
+          markedForm("סגרת", "סָגַרְתָּ"),
+          markedForm("סגרת", "סָגַרְתְּ"),
+          markedForm("סגר", "סָגַר"),
+          markedForm("סגרה", "סָגְרָה"),
+          markedForm("סגרנו", "סָגַרְנוּ"),
+          markedForm("סגרתם", "סְגַרְתֶּם"),
+          markedForm("סגרתן", "סְגַרְתֶּן"),
+          markedForm("סגרו", "סָגְרוּ")
+        ),
+        makeFuture(
+          markedForm("אסגור", "אֶסְגּוֹר"),
+          markedForm("תסגור", "תִּסְגּוֹר"),
+          markedForm("תסגרי", "תִּסְגְּרִי"),
+          markedForm("יסגור", "יִסְגּוֹר"),
+          markedForm("תסגור", "תִּסְגּוֹר"),
+          markedForm("נסגור", "נִסְגּוֹר"),
+          markedForm("תסגרו", "תִּסְגְּרוּ"),
+          markedForm("יסגרו", "יִסְגְּרוּ")
+        )
       ),
       review_status: "approved",
       notes: "Authoritative stored forms override generation.",
@@ -298,15 +329,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-liftoach",
       availability: getStarterVerbAvailability("starter-verb-liftoach"),
       lemma: "לפתוח",
+      lemma_niqqud: "לִפְתּוֹחַ",
       root: ["פ", "ת", "ח"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to open", null, true)],
       forms: makeForms(
-        makePresent("פותח", "פותחת", "פותחים", "פותחות"),
-        makePast("פתחתי", "פתחת", "פתחת", "פתח", "פתחה", "פתחנו", "פתחתם", "פתחתן", "פתחו"),
-        makeFuture("אפתח", "תפתח", "תפתחי", "יפתח", "תפתח", "נפתח", "תפתחו", "יפתחו")
+        makePresent(
+          markedForm("פותח", "פּוֹתֵחַ"),
+          markedForm("פותחת", "פּוֹתַחַת"),
+          markedForm("פותחים", "פּוֹתְחִים"),
+          markedForm("פותחות", "פּוֹתְחוֹת")
+        ),
+        makePast(
+          markedForm("פתחתי", "פָּתַחְתִּי"),
+          markedForm("פתחת", "פָּתַחְתָּ"),
+          markedForm("פתחת", "פָּתַחְתְּ"),
+          markedForm("פתח", "פָּתַח"),
+          markedForm("פתחה", "פָּתְחָה"),
+          markedForm("פתחנו", "פָּתַחְנוּ"),
+          markedForm("פתחתם", "פְּתַחְתֶּם"),
+          markedForm("פתחתן", "פְּתַחְתֶּן"),
+          markedForm("פתחו", "פָּתְחוּ")
+        ),
+        makeFuture(
+          markedForm("אפתח", "אֶפְתַּח"),
+          markedForm("תפתח", "תִּפְתַּח"),
+          markedForm("תפתחי", "תִּפְתְּחִי"),
+          markedForm("יפתח", "יִפְתַּח"),
+          markedForm("תפתח", "תִּפְתַּח"),
+          markedForm("נפתח", "נִפְתַּח"),
+          markedForm("תפתחו", "תִּפְתְּחוּ"),
+          markedForm("יפתחו", "יִפְתְּחוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 1,
@@ -317,15 +373,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lichtov",
       availability: getStarterVerbAvailability("starter-verb-lichtov"),
       lemma: "לכתוב",
+      lemma_niqqud: "לִכְתּוֹב",
       root: ["כ", "ת", "ב"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to write", null, true)],
       forms: makeForms(
-        makePresent("כותב", "כותבת", "כותבים", "כותבות"),
-        makePast("כתבתי", "כתבת", "כתבת", "כתב", "כתבה", "כתבנו", "כתבתם", "כתבתן", "כתבו"),
-        makeFuture("אכתוב", "תכתוב", "תכתבי", "יכתוב", "תכתוב", "נכתוב", "תכתבו", "יכתבו")
+        makePresent(
+          markedForm("כותב", "כּוֹתֵב"),
+          markedForm("כותבת", "כּוֹתֶבֶת"),
+          markedForm("כותבים", "כּוֹתְבִים"),
+          markedForm("כותבות", "כּוֹתְבוֹת")
+        ),
+        makePast(
+          markedForm("כתבתי", "כָּתַבְתִּי"),
+          markedForm("כתבת", "כָּתַבְתָּ"),
+          markedForm("כתבת", "כָּתַבְתְּ"),
+          markedForm("כתב", "כָּתַב"),
+          markedForm("כתבה", "כָּתְבָה"),
+          markedForm("כתבנו", "כָּתַבְנוּ"),
+          markedForm("כתבתם", "כְּתַבְתֶּם"),
+          markedForm("כתבתן", "כְּתַבְתֶּן"),
+          markedForm("כתבו", "כָּתְבוּ")
+        ),
+        makeFuture(
+          markedForm("אכתוב", "אֶכְתֹּב"),
+          markedForm("תכתוב", "תִּכְתֹּב"),
+          markedForm("תכתבי", "תִּכְתְּבִי"),
+          markedForm("יכתוב", "יִכְתֹּב"),
+          markedForm("תכתוב", "תִּכְתֹּב"),
+          markedForm("נכתוב", "נִכְתֹּב"),
+          markedForm("תכתבו", "תִּכְתְּבוּ"),
+          markedForm("יכתבו", "יִכְתְּבוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -336,15 +417,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lishmor",
       availability: getStarterVerbAvailability("starter-verb-lishmor"),
       lemma: "לשמור",
+      lemma_niqqud: "לִשְׁמוֹר",
       root: ["ש", "מ", "ר"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to keep", null, true)],
       forms: makeForms(
-        makePresent("שומר", "שומרת", "שומרים", "שומרות"),
-        makePast("שמרתי", "שמרת", "שמרת", "שמר", "שמרה", "שמרנו", "שמרתם", "שמרתן", "שמרו"),
-        makeFuture("אשמור", "תשמור", "תשמרי", "ישמור", "תשמור", "נשמור", "תשמרו", "ישמרו")
+        makePresent(
+          markedForm("שומר", "שׁוֹמֵר"),
+          markedForm("שומרת", "שׁוֹמֶרֶת"),
+          markedForm("שומרים", "שׁוֹמְרִים"),
+          markedForm("שומרות", "שׁוֹמְרוֹת")
+        ),
+        makePast(
+          markedForm("שמרתי", "שָׁמַרְתִּי"),
+          markedForm("שמרת", "שָׁמַרְתָּ"),
+          markedForm("שמרת", "שָׁמַרְתְּ"),
+          markedForm("שמר", "שָׁמַר"),
+          markedForm("שמרה", "שָׁמְרָה"),
+          markedForm("שמרנו", "שָׁמַרְנוּ"),
+          markedForm("שמרתם", "שְׁמַרְתֶּם"),
+          markedForm("שמרתן", "שְׁמַרְתֶּן"),
+          markedForm("שמרו", "שָׁמְרוּ")
+        ),
+        makeFuture(
+          markedForm("אשמור", "אֶשְׁמֹר"),
+          markedForm("תשמור", "תִּשְׁמֹר"),
+          markedForm("תשמרי", "תִּשְׁמְרִי"),
+          markedForm("ישמור", "יִשְׁמֹר"),
+          markedForm("תשמור", "תִּשְׁמֹר"),
+          markedForm("נשמור", "נִשְׁמֹר"),
+          markedForm("תשמרו", "תִּשְׁמְרוּ"),
+          markedForm("ישמרו", "יִשְׁמְרוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 1,
@@ -356,15 +462,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lilmod",
       availability: getStarterVerbAvailability("starter-verb-lilmod"),
       lemma: "ללמוד",
+      lemma_niqqud: "לִלְמֹד",
       root: ["ל", "מ", "ד"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to study", null, true)],
       forms: makeForms(
-        makePresent("לומד", "לומדת", "לומדים", "לומדות"),
-        makePast("למדתי", "למדת", "למדת", "למד", "למדה", "למדנו", "למדתם", "למדתן", "למדו"),
-        makeFuture("אלמד", "תלמד", "תלמדי", "ילמד", "תלמד", "נלמד", "תלמדו", "ילמדו")
+        makePresent(
+          markedForm("לומד", "לוֹמֵד"),
+          markedForm("לומדת", "לוֹמֶדֶת"),
+          markedForm("לומדים", "לוֹמְדִים"),
+          markedForm("לומדות", "לוֹמְדוֹת")
+        ),
+        makePast(
+          markedForm("למדתי", "לָמַדְתִּי"),
+          markedForm("למדת", "לָמַדְתָּ"),
+          markedForm("למדת", "לָמַדְתְּ"),
+          markedForm("למד", "לָמַד"),
+          markedForm("למדה", "לָמְדָה"),
+          markedForm("למדנו", "לָמַדְנוּ"),
+          markedForm("למדתם", "לְמַדְתֶּם"),
+          markedForm("למדתן", "לְמַדְתֶּן"),
+          markedForm("למדו", "לָמְדוּ")
+        ),
+        makeFuture(
+          markedForm("אלמד", "אֶלְמַד"),
+          markedForm("תלמד", "תִּלְמַד"),
+          markedForm("תלמדי", "תִּלְמְדִי"),
+          markedForm("ילמד", "יִלְמַד"),
+          markedForm("תלמד", "תִּלְמַד"),
+          markedForm("נלמד", "נִלְמַד"),
+          markedForm("תלמדו", "תִּלְמְדוּ"),
+          markedForm("ילמדו", "יִלְמְדוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -375,15 +506,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-leechol",
       availability: getStarterVerbAvailability("starter-verb-leechol"),
       lemma: "לאכול",
+      lemma_niqqud: "לֶאֱכֹל",
       root: ["א", "כ", "ל"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to eat", null, true)],
       forms: makeForms(
-        makePresent("אוכל", "אוכלת", "אוכלים", "אוכלות"),
-        makePast("אכלתי", "אכלת", "אכלת", "אכל", "אכלה", "אכלנו", "אכלתם", "אכלתן", "אכלו"),
-        makeFuture("אוכל", "תאכל", "תאכלי", "יאכל", "תאכל", "נאכל", "תאכלו", "יאכלו")
+        makePresent(
+          markedForm("אוכל", "אוֹכֵל"),
+          markedForm("אוכלת", "אוֹכֶלֶת"),
+          markedForm("אוכלים", "אוֹכְלִים"),
+          markedForm("אוכלות", "אוֹכְלוֹת")
+        ),
+        makePast(
+          markedForm("אכלתי", "אָכַלְתִּי"),
+          markedForm("אכלת", "אָכַלְתָּ"),
+          markedForm("אכלת", "אָכַלְתְּ"),
+          markedForm("אכל", "אָכַל"),
+          markedForm("אכלה", "אָכְלָה"),
+          markedForm("אכלנו", "אָכַלְנוּ"),
+          markedForm("אכלתם", "אֲכַלְתֶּם"),
+          markedForm("אכלתן", "אֲכַלְתֶּן"),
+          markedForm("אכלו", "אָכְלוּ")
+        ),
+        makeFuture(
+          markedForm("אוכל", "אֹכַל"),
+          markedForm("תאכל", "תֹּאכַל"),
+          markedForm("תאכלי", "תֹּאכְלִי"),
+          markedForm("יאכל", "יֹאכַל"),
+          markedForm("תאכל", "תֹּאכַל"),
+          markedForm("נאכל", "נֹאכַל"),
+          markedForm("תאכלו", "תֹּאכְלוּ"),
+          markedForm("יאכלו", "יֹאכְלוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -394,15 +550,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lishtot",
       availability: getStarterVerbAvailability("starter-verb-lishtot"),
       lemma: "לשתות",
+      lemma_niqqud: "לִשְׁתּוֹת",
       root: ["ש", "ת", "ה"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to drink", null, true)],
       forms: makeForms(
-        makePresent("שותה", "שותה", "שותים", "שותות"),
-        makePast("שתיתי", "שתית", "שתית", "שתה", "שתתה", "שתינו", "שתיתם", "שתיתן", "שתו"),
-        makeFuture("אשתה", "תשתה", "תשתי", "ישתה", "תשתה", "נשתה", "תשתו", "ישתו")
+        makePresent(
+          markedForm("שותה", "שׁוֹתֶה"),
+          markedForm("שותה", "שׁוֹתָה"),
+          markedForm("שותים", "שׁוֹתִים"),
+          markedForm("שותות", "שׁוֹתוֹת")
+        ),
+        makePast(
+          markedForm("שתיתי", "שָׁתִיתִי"),
+          markedForm("שתית", "שָׁתִיתָ"),
+          markedForm("שתית", "שָׁתִיתְ"),
+          markedForm("שתה", "שָׁתָה"),
+          markedForm("שתתה", "שָׁתְתָה"),
+          markedForm("שתינו", "שָׁתִינוּ"),
+          markedForm("שתיתם", "שְׁתִיתֶם"),
+          markedForm("שתיתן", "שְׁתִיתֶן"),
+          markedForm("שתו", "שָׁתוּ")
+        ),
+        makeFuture(
+          markedForm("אשתה", "אֶשְׁתֶּה"),
+          markedForm("תשתה", "תִּשְׁתֶּה"),
+          markedForm("תשתי", "תִּשְׁתִּי"),
+          markedForm("ישתה", "יִשְׁתֶּה"),
+          markedForm("תשתה", "תִּשְׁתֶּה"),
+          markedForm("נשתה", "נִשְׁתֶּה"),
+          markedForm("תשתו", "תִּשְׁתּוּ"),
+          markedForm("ישתו", "יִשְׁתּוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 3,
@@ -413,15 +594,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lesachek",
       availability: getStarterVerbAvailability("starter-verb-lesachek"),
       lemma: "לשחק",
+      lemma_niqqud: "לְשַׂחֵק",
       root: ["ש", "ח", "ק"],
       binyan: "piel",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to play", null, true)],
       forms: makeForms(
-        makePresent("משחק", "משחקת", "משחקים", "משחקות"),
-        makePast("שיחקתי", "שיחקת", "שיחקת", "שיחק", "שיחקה", "שיחקנו", "שיחקתם", "שיחקתן", "שיחקו"),
-        makeFuture("אשחק", "תשחק", "תשחקי", "ישחק", "תשחק", "נשחק", "תשחקו", "ישחקו")
+        makePresent(
+          markedForm("משחק", "מְשַׂחֵק"),
+          markedForm("משחקת", "מְשַׂחֶקֶת"),
+          markedForm("משחקים", "מְשַׂחֲקִים"),
+          markedForm("משחקות", "מְשַׂחֲקוֹת")
+        ),
+        makePast(
+          markedForm("שיחקתי", "שִׂיחַקְתִּי"),
+          markedForm("שיחקת", "שִׂיחַקְתָּ"),
+          markedForm("שיחקת", "שִׂיחַקְתְּ"),
+          markedForm("שיחק", "שִׂיחֵק"),
+          markedForm("שיחקה", "שִׂיחֲקָה"),
+          markedForm("שיחקנו", "שִׂיחַקְנוּ"),
+          markedForm("שיחקתם", "שִׂיחַקְתֶּם"),
+          markedForm("שיחקתן", "שִׂיחַקְתֶּן"),
+          markedForm("שיחקו", "שִׂיחֲקוּ")
+        ),
+        makeFuture(
+          markedForm("אשחק", "אֲשַׂחֵק"),
+          markedForm("תשחק", "תְּשַׂחֵק"),
+          markedForm("תשחקי", "תְּשַׂחֲקִי"),
+          markedForm("ישחק", "יְשַׂחֵק"),
+          markedForm("תשחק", "תְּשַׂחֵק"),
+          markedForm("נשחק", "נְשַׂחֵק"),
+          markedForm("תשחקו", "תְּשַׂחֲקוּ"),
+          markedForm("ישחקו", "יְשַׂחֲקוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 1,
@@ -432,15 +638,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-laavod",
       availability: getStarterVerbAvailability("starter-verb-laavod"),
       lemma: "לעבוד",
+      lemma_niqqud: "לַעֲבֹד",
       root: ["ע", "ב", "ד"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to work", null, true)],
       forms: makeForms(
-        makePresent("עובד", "עובדת", "עובדים", "עובדות"),
-        makePast("עבדתי", "עבדת", "עבדת", "עבד", "עבדה", "עבדנו", "עבדתם", "עבדתן", "עבדו"),
-        makeFuture("אעבוד", "תעבוד", "תעבדי", "יעבוד", "תעבוד", "נעבוד", "תעבדו", "יעבדו")
+        makePresent(
+          markedForm("עובד", "עוֹבֵד"),
+          markedForm("עובדת", "עוֹבֶדֶת"),
+          markedForm("עובדים", "עוֹבְדִים"),
+          markedForm("עובדות", "עוֹבְדוֹת")
+        ),
+        makePast(
+          markedForm("עבדתי", "עָבַדְתִּי"),
+          markedForm("עבדת", "עָבַדְתָּ"),
+          markedForm("עבדת", "עָבַדְתְּ"),
+          markedForm("עבד", "עָבַד"),
+          markedForm("עבדה", "עָבְדָה"),
+          markedForm("עבדנו", "עָבַדְנוּ"),
+          markedForm("עבדתם", "עֲבַדְתֶּם"),
+          markedForm("עבדתן", "עֲבַדְתֶּן"),
+          markedForm("עבדו", "עָבְדוּ")
+        ),
+        makeFuture(
+          markedForm("אעבוד", "אֶעֱבֹד"),
+          markedForm("תעבוד", "תַּעֲבֹד"),
+          markedForm("תעבדי", "תַּעַבְדִי"),
+          markedForm("יעבוד", "יַעֲבֹד"),
+          markedForm("תעבוד", "תַּעֲבֹד"),
+          markedForm("נעבוד", "נַעֲבֹד"),
+          markedForm("תעבדו", "תַּעַבְדוּ"),
+          markedForm("יעבדו", "יַעַבְדוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -451,15 +682,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lagur",
       availability: getStarterVerbAvailability("starter-verb-lagur"),
       lemma: "לגור",
+      lemma_niqqud: "לָגוּר",
       root: ["ג", "ו", "ר"],
       binyan: "paal",
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense("to live", null, true)],
       forms: makeForms(
-        makePresent("גר", "גרה", "גרים", "גרות"),
-        makePast("גרתי", "גרת", "גרת", "גר", "גרה", "גרנו", "גרתם", "גרתן", "גרו"),
-        makeFuture("אגור", "תגור", "תגורי", "יגור", "תגור", "נגור", "תגורו", "יגורו")
+        makePresent(
+          markedForm("גר", "גָּר"),
+          markedForm("גרה", "גָּרָה"),
+          markedForm("גרים", "גָּרִים"),
+          markedForm("גרות", "גָּרוֹת")
+        ),
+        makePast(
+          markedForm("גרתי", "גַּרְתִּי"),
+          markedForm("גרת", "גַּרְתָּ"),
+          markedForm("גרת", "גַּרְתְּ"),
+          markedForm("גר", "גָּר"),
+          markedForm("גרה", "גָּרָה"),
+          markedForm("גרנו", "גַּרְנוּ"),
+          markedForm("גרתם", "גַּרְתֶּם"),
+          markedForm("גרתן", "גַּרְתֶּן"),
+          markedForm("גרו", "גָּרוּ")
+        ),
+        makeFuture(
+          markedForm("אגור", "אָגוּר"),
+          markedForm("תגור", "תָּגוּר"),
+          markedForm("תגורי", "תָּגוּרִי"),
+          markedForm("יגור", "יָגוּר"),
+          markedForm("תגור", "תָּגוּר"),
+          markedForm("נגור", "נָגוּר"),
+          markedForm("תגורו", "תָּגוּרוּ"),
+          markedForm("יגורו", "יָגוּרוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -470,15 +726,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lavo",
       availability: getStarterVerbAvailability("starter-verb-lavo"),
       lemma: "לבוא",
+      lemma_niqqud: "לָבוֹא",
       root: ["ב", "ו", "א"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to come", null, false)],
       forms: makeForms(
-        makePresent("בא", "באה", "באים", "באות"),
-        makePast("באתי", "באת", "באת", "בא", "באה", "באנו", "באתם", "באתן", "באו"),
-        makeFuture("אבוא", "תבוא", "תבואי", "יבוא", "תבוא", "נבוא", "תבואו", "יבואו")
+        makePresent(
+          markedForm("בא", "בָּא"),
+          markedForm("באה", "בָּאָה"),
+          markedForm("באים", "בָּאִים"),
+          markedForm("באות", "בָּאוֹת")
+        ),
+        makePast(
+          markedForm("באתי", "בָּאתִי"),
+          markedForm("באת", "בָּאתָ"),
+          markedForm("באת", "בָּאתְ"),
+          markedForm("בא", "בָּא"),
+          markedForm("באה", "בָּאָה"),
+          markedForm("באנו", "בָּאנוּ"),
+          markedForm("באתם", "בָּאתֶם"),
+          markedForm("באתן", "בָּאתֶן"),
+          markedForm("באו", "בָּאוּ")
+        ),
+        makeFuture(
+          markedForm("אבוא", "אָבוֹא"),
+          markedForm("תבוא", "תָּבוֹא"),
+          markedForm("תבואי", "תָּבוֹאִי"),
+          markedForm("יבוא", "יָבוֹא"),
+          markedForm("תבוא", "תָּבוֹא"),
+          markedForm("נבוא", "נָבוֹא"),
+          markedForm("תבואו", "תָּבוֹאוּ"),
+          markedForm("יבואו", "יָבוֹאוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 4,
@@ -489,6 +770,7 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lihyot",
       availability: getStarterVerbAvailability("starter-verb-lihyot"),
       lemma: "להיות",
+      lemma_niqqud: "לִהְיוֹת",
       root: ["ה", "י", "ה"],
       binyan: "paal",
       regularity: "irregular",
@@ -496,8 +778,27 @@ function buildStarterVerbEntries() {
       senses: [makeSense("to be", null, false)],
       forms: makeForms(
         null,
-        makePast("הייתי", "היית", "היית", "היה", "הייתה", "היינו", "הייתם", "הייתן", "היו"),
-        makeFuture("אהיה", "תהיה", "תהיי", "יהיה", "תהיה", "נהיה", "תהיו", "יהיו")
+        makePast(
+          markedForm("הייתי", "הָיִיתִי"),
+          markedForm("היית", "הָיִיתָ"),
+          markedForm("היית", "הָיִיתְ"),
+          markedForm("היה", "הָיָה"),
+          markedForm("הייתה", "הָיְתָה"),
+          markedForm("היינו", "הָיִינוּ"),
+          markedForm("הייתם", "הֱיִיתֶם"),
+          markedForm("הייתן", "הֱיִיתֶן"),
+          markedForm("היו", "הָיוּ")
+        ),
+        makeFuture(
+          markedForm("אהיה", "אֶהְיֶה"),
+          markedForm("תהיה", "תִּהְיֶה"),
+          markedForm("תהיי", "תִּהְיִי"),
+          markedForm("יהיה", "יִהְיֶה"),
+          markedForm("תהיה", "תִּהְיֶה"),
+          markedForm("נהיה", "נִהְיֶה"),
+          markedForm("תהיו", "תִּהְיוּ"),
+          markedForm("יהיו", "יִהְיוּ")
+        )
       ),
       review_status: "approved",
       notes: "Modern practical Hebrew usually omits the present-tense copula.",
@@ -509,15 +810,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lirot",
       availability: getStarterVerbAvailability("starter-verb-lirot"),
       lemma: "לראות",
+      lemma_niqqud: "לִרְאוֹת",
       root: ["ר", "א", "ה"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to see", null, false)],
       forms: makeForms(
-        makePresent("רואה", "רואה", "רואים", "רואות"),
-        makePast("ראיתי", "ראית", "ראית", "ראה", "ראתה", "ראינו", "ראיתם", "ראיתן", "ראו"),
-        makeFuture("אראה", "תראה", "תראי", "יראה", "תראה", "נראה", "תראו", "יראו")
+        makePresent(
+          markedForm("רואה", "רוֹאֶה"),
+          markedForm("רואה", "רוֹאָה"),
+          markedForm("רואים", "רוֹאִים"),
+          markedForm("רואות", "רוֹאוֹת")
+        ),
+        makePast(
+          markedForm("ראיתי", "רָאִיתִי"),
+          markedForm("ראית", "רָאִיתָ"),
+          markedForm("ראית", "רָאִיתְ"),
+          markedForm("ראה", "רָאָה"),
+          markedForm("ראתה", "רָאֲתָה"),
+          markedForm("ראינו", "רָאִינוּ"),
+          markedForm("ראיתם", "רְאִיתֶם"),
+          markedForm("ראיתן", "רְאִיתֶן"),
+          markedForm("ראו", "רָאוּ")
+        ),
+        makeFuture(
+          markedForm("אראה", "אֶרְאֶה"),
+          markedForm("תראה", "תִּרְאֶה"),
+          markedForm("תראי", "תִּרְאִי"),
+          markedForm("יראה", "יִרְאֶה"),
+          markedForm("תראה", "תִּרְאֶה"),
+          markedForm("נראה", "נִרְאֶה"),
+          markedForm("תראו", "תִּרְאוּ"),
+          markedForm("יראו", "יִרְאוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 4,
@@ -528,15 +854,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lakachat",
       availability: getStarterVerbAvailability("starter-verb-lakachat"),
       lemma: "לקחת",
+      lemma_niqqud: "לָקַחַת",
       root: ["ל", "ק", "ח"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to take", null, false)],
       forms: makeForms(
-        makePresent("לוקח", "לוקחת", "לוקחים", "לוקחות"),
-        makePast("לקחתי", "לקחת", "לקחת", "לקח", "לקחה", "לקחנו", "לקחתם", "לקחתן", "לקחו"),
-        makeFuture("אקח", "תיקח", "תיקחי", "ייקח", "תיקח", "ניקח", "תיקחו", "ייקחו")
+        makePresent(
+          markedForm("לוקח", "לוֹקֵחַ"),
+          markedForm("לוקחת", "לוֹקַחַת"),
+          markedForm("לוקחים", "לוֹקְחִים"),
+          markedForm("לוקחות", "לוֹקְחוֹת")
+        ),
+        makePast(
+          markedForm("לקחתי", "לָקַחְתִּי"),
+          markedForm("לקחת", "לָקַחְתָּ"),
+          markedForm("לקחת", "לָקַחְתְּ"),
+          markedForm("לקח", "לָקַח"),
+          markedForm("לקחה", "לָקְחָה"),
+          markedForm("לקחנו", "לָקַחְנוּ"),
+          markedForm("לקחתם", "לְקַחְתֶּם"),
+          markedForm("לקחתן", "לְקַחְתֶּן"),
+          markedForm("לקחו", "לָקְחוּ")
+        ),
+        makeFuture(
+          markedForm("אקח", "אֶקַּח"),
+          markedForm("תיקח", "תִּקַּח"),
+          markedForm("תיקחי", "תִּקְחִי"),
+          markedForm("ייקח", "יִקַּח"),
+          markedForm("תיקח", "תִּקַּח"),
+          markedForm("ניקח", "נִקַּח"),
+          markedForm("תיקחו", "תִּקְחוּ"),
+          markedForm("ייקחו", "יִקְחוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 4,
@@ -547,15 +898,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lasim",
       availability: getStarterVerbAvailability("starter-verb-lasim"),
       lemma: "לשים",
+      lemma_niqqud: "לָשִׂים",
       root: ["ש", "י", "ם"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to put", null, false)],
       forms: makeForms(
-        makePresent("שם", "שמה", "שמים", "שמות"),
-        makePast("שמתי", "שמת", "שמת", "שם", "שמה", "שמנו", "שמתם", "שמתן", "שמו"),
-        makeFuture("אשים", "תשים", "תשימי", "ישים", "תשים", "נשים", "תשימו", "ישימו")
+        makePresent(
+          markedForm("שם", "שָׂם"),
+          markedForm("שמה", "שָׂמָה"),
+          markedForm("שמים", "שָׂמִים"),
+          markedForm("שמות", "שָׂמוֹת")
+        ),
+        makePast(
+          markedForm("שמתי", "שַׂמְתִּי"),
+          markedForm("שמת", "שַׂמְתָּ"),
+          markedForm("שמת", "שַׂמְתְּ"),
+          markedForm("שם", "שָׂם"),
+          markedForm("שמה", "שָׂמָה"),
+          markedForm("שמנו", "שַׂמְנוּ"),
+          markedForm("שמתם", "שַׂמְתֶּם"),
+          markedForm("שמתן", "שַׂמְתֶּן"),
+          markedForm("שמו", "שָׂמוּ")
+        ),
+        makeFuture(
+          markedForm("אשים", "אָשִׂים"),
+          markedForm("תשים", "תָּשִׂים"),
+          markedForm("תשימי", "תָּשִׂימִי"),
+          markedForm("ישים", "יָשִׂים"),
+          markedForm("תשים", "תָּשִׂים"),
+          markedForm("נשים", "נָשִׂים"),
+          markedForm("תשימו", "תָּשִׂימוּ"),
+          markedForm("ישימו", "יָשִׂימוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 4,
@@ -566,15 +942,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-latet",
       availability: getStarterVerbAvailability("starter-verb-latet"),
       lemma: "לתת",
+      lemma_niqqud: "לָתֵת",
       root: ["נ", "ת", "נ"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to give", null, false)],
       forms: makeForms(
-        makePresent("נותן", "נותנת", "נותנים", "נותנות"),
-        makePast("נתתי", "נתת", "נתת", "נתן", "נתנה", "נתנו", "נתתם", "נתתן", "נתנו"),
-        makeFuture("אתן", "תיתן", "תיתני", "ייתן", "תיתן", "ניתן", "תיתנו", "ייתנו")
+        makePresent(
+          markedForm("נותן", "נוֹתֵן"),
+          markedForm("נותנת", "נוֹתֶנֶת"),
+          markedForm("נותנים", "נוֹתְנִים"),
+          markedForm("נותנות", "נוֹתְנוֹת")
+        ),
+        makePast(
+          markedForm("נתתי", "נָתַתִּי"),
+          markedForm("נתת", "נָתַתָּ"),
+          markedForm("נתת", "נָתַתְּ"),
+          markedForm("נתן", "נָתַן"),
+          markedForm("נתנה", "נָתְנָה"),
+          markedForm("נתנו", "נָתַנּוּ"),
+          markedForm("נתתם", "נְתַתֶּם"),
+          markedForm("נתתן", "נְתַתֶּן"),
+          markedForm("נתנו", "נָתְנוּ")
+        ),
+        makeFuture(
+          markedForm("אתן", "אֶתֵּן"),
+          markedForm("תיתן", "תִּתֵּן"),
+          markedForm("תיתני", "תִּתְּנִי"),
+          markedForm("ייתן", "יִתֵּן"),
+          markedForm("תיתן", "תִּתֵּן"),
+          markedForm("ניתן", "נִתֵּן"),
+          markedForm("תיתנו", "תִּתְּנוּ"),
+          markedForm("ייתנו", "יִתְּנוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 5,
@@ -585,15 +986,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lalechet",
       availability: getStarterVerbAvailability("starter-verb-lalechet"),
       lemma: "ללכת",
+      lemma_niqqud: "לָלֶכֶת",
       root: ["ה", "ל", "כ"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to go", null, false)],
       forms: makeForms(
-        makePresent("הולך", "הולכת", "הולכים", "הולכות"),
-        makePast("הלכתי", "הלכת", "הלכת", "הלך", "הלכה", "הלכנו", "הלכתם", "הלכתן", "הלכו"),
-        makeFuture("אלך", "תלך", "תלכי", "ילך", "תלך", "נלך", "תלכו", "ילכו")
+        makePresent(
+          markedForm("הולך", "הוֹלֵךְ"),
+          markedForm("הולכת", "הוֹלֶכֶת"),
+          markedForm("הולכים", "הוֹלְכִים"),
+          markedForm("הולכות", "הוֹלְכוֹת")
+        ),
+        makePast(
+          markedForm("הלכתי", "הָלַכְתִּי"),
+          markedForm("הלכת", "הָלַכְתָּ"),
+          markedForm("הלכת", "הָלַכְתְּ"),
+          markedForm("הלך", "הָלַךְ"),
+          markedForm("הלכה", "הָלְכָה"),
+          markedForm("הלכנו", "הָלַכְנוּ"),
+          markedForm("הלכתם", "הֲלַכְתֶּם"),
+          markedForm("הלכתן", "הֲלַכְתֶּן"),
+          markedForm("הלכו", "הָלְכוּ")
+        ),
+        makeFuture(
+          markedForm("אלך", "אֵלֵךְ"),
+          markedForm("תלך", "תֵּלֵךְ"),
+          markedForm("תלכי", "תֵּלְכִי"),
+          markedForm("ילך", "יֵלֵךְ"),
+          markedForm("תלך", "תֵּלֵךְ"),
+          markedForm("נלך", "נֵלֵךְ"),
+          markedForm("תלכו", "תֵּלְכוּ"),
+          markedForm("ילכו", "יֵלְכוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 4,
@@ -604,15 +1030,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lehagid",
       availability: getStarterVerbAvailability("starter-verb-lehagid"),
       lemma: "להגיד",
+      lemma_niqqud: "לְהַגִּיד",
       root: ["נ", "ג", "ד"],
       binyan: "hifil",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to say", null, false)],
       forms: makeForms(
-        makePresent("אומר", "אומרת", "אומרים", "אומרות"),
-        makePast("אמרתי", "אמרת", "אמרת", "אמר", "אמרה", "אמרנו", "אמרתם", "אמרתן", "אמרו"),
-        makeFuture("אגיד", "תגיד", "תגידי", "יגיד", "תגיד", "נגיד", "תגידו", "יגידו")
+        makePresent(
+          markedForm("אומר", "אוֹמֵר"),
+          markedForm("אומרת", "אוֹמֶרֶת"),
+          markedForm("אומרים", "אוֹמְרִים"),
+          markedForm("אומרות", "אוֹמְרוֹת")
+        ),
+        makePast(
+          markedForm("אמרתי", "אָמַרְתִּי"),
+          markedForm("אמרת", "אָמַרְתָּ"),
+          markedForm("אמרת", "אָמַרְתְּ"),
+          markedForm("אמר", "אָמַר"),
+          markedForm("אמרה", "אָמְרָה"),
+          markedForm("אמרנו", "אָמַרְנוּ"),
+          markedForm("אמרתם", "אֲמַרְתֶּם"),
+          markedForm("אמרתן", "אֲמַרְתֶּן"),
+          markedForm("אמרו", "אָמְרוּ")
+        ),
+        makeFuture(
+          markedForm("אגיד", "אַגִּיד"),
+          markedForm("תגיד", "תַּגִּיד"),
+          markedForm("תגידי", "תַּגִּידִי"),
+          markedForm("יגיד", "יַגִּיד"),
+          markedForm("תגיד", "תַּגִּיד"),
+          markedForm("נגיד", "נַגִּיד"),
+          markedForm("תגידו", "תַּגִּידוּ"),
+          markedForm("יגידו", "יַגִּידוּ")
+        )
       ),
       review_status: "approved",
       notes: "Modern usage is suppletive: present and past come from אמר, future from להגיד.",
@@ -624,15 +1075,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-laamod",
       availability: getStarterVerbAvailability("starter-verb-laamod"),
       lemma: "לעמוד",
+      lemma_niqqud: "לַעֲמֹד",
       root: ["ע", "מ", "ד"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to stand", null, false)],
       forms: makeForms(
-        makePresent("עומד", "עומדת", "עומדים", "עומדות"),
-        makePast("עמדתי", "עמדת", "עמדת", "עמד", "עמדה", "עמדנו", "עמדתם", "עמדתן", "עמדו"),
-        makeFuture("אעמוד", "תעמוד", "תעמדי", "יעמוד", "תעמוד", "נעמוד", "תעמדו", "יעמדו")
+        makePresent(
+          markedForm("עומד", "עוֹמֵד"),
+          markedForm("עומדת", "עוֹמֶדֶת"),
+          markedForm("עומדים", "עוֹמְדִים"),
+          markedForm("עומדות", "עוֹמְדוֹת")
+        ),
+        makePast(
+          markedForm("עמדתי", "עָמַדְתִּי"),
+          markedForm("עמדת", "עָמַדְתָּ"),
+          markedForm("עמדת", "עָמַדְתְּ"),
+          markedForm("עמד", "עָמַד"),
+          markedForm("עמדה", "עָמְדָה"),
+          markedForm("עמדנו", "עָמַדְנוּ"),
+          markedForm("עמדתם", "עֲמַדְתֶּם"),
+          markedForm("עמדתן", "עֲמַדְתֶּן"),
+          markedForm("עמדו", "עָמְדוּ")
+        ),
+        makeFuture(
+          markedForm("אעמוד", "אֶעֱמֹד"),
+          markedForm("תעמוד", "תַּעֲמֹד"),
+          markedForm("תעמדי", "תַּעַמְדִי"),
+          markedForm("יעמוד", "יַעֲמֹד"),
+          markedForm("תעמוד", "תַּעֲמֹד"),
+          markedForm("נעמוד", "נַעֲמֹד"),
+          markedForm("תעמדו", "תַּעַמְדוּ"),
+          markedForm("יעמדו", "יַעַמְדוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 3,
@@ -643,15 +1119,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lashevet",
       availability: getStarterVerbAvailability("starter-verb-lashevet"),
       lemma: "לשבת",
+      lemma_niqqud: "לָשֶׁבֶת",
       root: ["י", "ש", "ב"],
       binyan: "paal",
       regularity: "irregular",
       conjugation_mode: "curated",
       senses: [makeSense("to sit", null, false)],
       forms: makeForms(
-        makePresent("יושב", "יושבת", "יושבים", "יושבות"),
-        makePast("ישבתי", "ישבת", "ישבת", "ישב", "ישבה", "ישבנו", "ישבתם", "ישבתן", "ישבו"),
-        makeFuture("אשב", "תשב", "תשבי", "ישב", "תשב", "נשב", "תשבו", "ישבו")
+        makePresent(
+          markedForm("יושב", "יוֹשֵׁב"),
+          markedForm("יושבת", "יוֹשֶׁבֶת"),
+          markedForm("יושבים", "יוֹשְׁבִים"),
+          markedForm("יושבות", "יוֹשְׁבוֹת")
+        ),
+        makePast(
+          markedForm("ישבתי", "יָשַׁבְתִּי"),
+          markedForm("ישבת", "יָשַׁבְתָּ"),
+          markedForm("ישבת", "יָשַׁבְתְּ"),
+          markedForm("ישב", "יָשַׁב"),
+          markedForm("ישבה", "יָשְׁבָה"),
+          markedForm("ישבנו", "יָשַׁבְנוּ"),
+          markedForm("ישבתם", "יְשַׁבְתֶּם"),
+          markedForm("ישבתן", "יְשַׁבְתֶּן"),
+          markedForm("ישבו", "יָשְׁבוּ")
+        ),
+        makeFuture(
+          markedForm("אשב", "אֵשֵׁב"),
+          markedForm("תשב", "תֵּשֵׁב"),
+          markedForm("תשבי", "תֵּשְׁבִי"),
+          markedForm("ישב", "יֵשֵׁב"),
+          markedForm("תשב", "תֵּשֵׁב"),
+          markedForm("נשב", "נֵשֵׁב"),
+          markedForm("תשבו", "תֵּשְׁבוּ"),
+          markedForm("ישבו", "יֵשְׁבוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 3,
@@ -662,6 +1163,7 @@ function buildStarterVerbEntries() {
       id: "cooking-verb-lamoach",
       availability: { translationQuiz: true, sentenceHints: true },
       lemma: "למעוך",
+      lemma_niqqud: "לִמְעוֹךְ",
       root: ["מ", "ע", "ך"],
       binyan: "paal",
       regularity: "irregular",
@@ -706,6 +1208,7 @@ function buildStarterVerbEntries() {
       id: "physical-verb-limchotz",
       availability: { translationQuiz: true, sentenceHints: true },
       lemma: "למחוץ",
+      lemma_niqqud: "לִמְחוֹץ",
       root: ["מ", "ח", "ץ"],
       binyan: "paal",
       regularity: "irregular",
@@ -750,6 +1253,7 @@ function buildStarterVerbEntries() {
       id: "starter-verb-leshacharer",
       availability: getStarterVerbAvailability("starter-verb-leshacharer"),
       lemma: "לשחרר",
+      lemma_niqqud: "לְשַׁחְרֵר",
       root: ["ש", "ח", "ר"],
       binyan: "piel",
       regularity: "regular",
@@ -770,15 +1274,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-lekhabot",
       availability: getStarterVerbAvailability("starter-verb-lekhabot"),
       lemma: "לכבות",
+      lemma_niqqud: "לְכַבּוֹת",
       root: ["כ", "ב", "ה"],
       binyan: "piel",
       regularity: "regular",
       conjugation_mode: "curated",
       senses: [makeSense("to turn off", null, true), makeSense("to extinguish", null, true)],
       forms: makeForms(
-        makePresent("מכבה", "מכבה", "מכבים", "מכבות"),
-        makePast("כיביתי", "כיבית", "כיבית", "כיבה", "כיבתה", "כיבינו", "כיביתם", "כיביתן", "כיבו"),
-        makeFuture("אכבה", "תכבה", "תכבי", "יכבה", "תכבה", "נכבה", "תכבו", "יכבו")
+        makePresent(
+          markedForm("מכבה", "מְכַבֶּה"),
+          markedForm("מכבה", "מְכַבָּה"),
+          markedForm("מכבים", "מְכַבִּים"),
+          markedForm("מכבות", "מְכַבּוֹת")
+        ),
+        makePast(
+          markedForm("כיביתי", "כִּבִּיתִי"),
+          markedForm("כיבית", "כִּבִּיתָ"),
+          markedForm("כיבית", "כִּבִּיתְ"),
+          markedForm("כיבה", "כִּבָּה"),
+          markedForm("כיבתה", "כִּבְּתָה"),
+          markedForm("כיבינו", "כִּבִּינוּ"),
+          markedForm("כיביתם", "כִּבִּיתֶם"),
+          markedForm("כיביתן", "כִּבִּיתֶן"),
+          markedForm("כיבו", "כִּבּוּ")
+        ),
+        makeFuture(
+          markedForm("אכבה", "אֲכַבֶּה"),
+          markedForm("תכבה", "תְּכַבֶּה"),
+          markedForm("תכבי", "תְּכַבִּי"),
+          markedForm("יכבה", "יְכַבֶּה"),
+          markedForm("תכבה", "תְּכַבֶּה"),
+          markedForm("נכבה", "נְכַבֶּה"),
+          markedForm("תכבו", "תְּכַבּוּ"),
+          markedForm("יכבו", "יְכַבּוּ")
+        )
       ),
       review_status: "approved",
       notes: "Pi'el of כ-ב-ה. Common everyday verb for turning off lights, electronics, extinguishing fire.",
@@ -790,15 +1319,40 @@ function buildStarterVerbEntries() {
       id: "starter-verb-letzanen",
       availability: getStarterVerbAvailability("starter-verb-letzanen"),
       lemma: "לצנן",
+      lemma_niqqud: "לְצַנֵּן",
       root: ["צ", "נ", "נ"],
       binyan: "piel",
       regularity: "regular",
       conjugation_mode: "curated",
       senses: [makeSense("to chill", null, true), makeSense("to cool down", null, true)],
       forms: makeForms(
-        makePresent("מצנן", "מצננת", "מצננים", "מצננות"),
-        makePast("ציננתי", "ציננת", "ציננת", "צינן", "ציננה", "ציננו", "ציננתם", "ציננתן", "ציננו"),
-        makeFuture("אצנן", "תצנן", "תצנני", "יצנן", "תצנן", "נצנן", "תצננו", "יצננו")
+        makePresent(
+          markedForm("מצנן", "מְצַנֵּן"),
+          markedForm("מצננת", "מְצַנֶּנֶת"),
+          markedForm("מצננים", "מְצַנְּנִים"),
+          markedForm("מצננות", "מְצַנְּנוֹת")
+        ),
+        makePast(
+          markedForm("ציננתי", "צִנַּנְתִּי"),
+          markedForm("ציננת", "צִנַּנְתָּ"),
+          markedForm("ציננת", "צִנַּנְתְּ"),
+          markedForm("צינן", "צִנֵּן"),
+          markedForm("ציננה", "צִנְּנָה"),
+          markedForm("ציננו", "צִנַּנְנוּ"),
+          markedForm("ציננתם", "צִנַּנְתֶּם"),
+          markedForm("ציננתן", "צִנַּנְתֶּן"),
+          markedForm("ציננו", "צִנְּנוּ")
+        ),
+        makeFuture(
+          markedForm("אצנן", "אֲצַנֵּן"),
+          markedForm("תצנן", "תְּצַנֵּן"),
+          markedForm("תצנני", "תְּצַנְּנִי"),
+          markedForm("יצנן", "יְצַנֵּן"),
+          markedForm("תצנן", "תְּצַנֵּן"),
+          markedForm("נצנן", "נְצַנֵּן"),
+          markedForm("תצננו", "תְּצַנְּנוּ"),
+          markedForm("יצננו", "יְצַנְּנוּ")
+        )
       ),
       review_status: "approved",
       difficulty_level: 2,
@@ -893,6 +1447,8 @@ function expandEntryToStudyItems(entry) {
 function buildStudyWord(entry, sense, senseIndex) {
   const usagePattern = sense?.usage_pattern || entry?.usage_pattern || null;
   const multipleSenses = Array.isArray(entry?.senses) && entry.senses.length > 1;
+  const lemmaPlain = String(entry?.lemma || "").trim();
+  const lemmaNiqqud = String(entry?.lemma_niqqud || entry?.lemmaNiqqud || entry?.lemma || "").trim();
   const preferredId = !multipleSenses && Array.isArray(entry?.source_word_ids) && entry.source_word_ids.length === 1
     ? entry.source_word_ids[0]
     : `${String(entry?.id || slugifyHebrewId(entry?.lemma || "verb"))}--sense-${senseIndex + 1}`;
@@ -901,8 +1457,8 @@ function buildStudyWord(entry, sense, senseIndex) {
     id: preferredId,
     category: String(entry?.category || "core_advanced"),
     en: usagePattern ? `${String(sense?.gloss || "").trim()} (${usagePattern})` : String(sense?.gloss || "").trim(),
-    he: usagePattern ? `${String(entry?.lemma || "").trim()} ${usagePattern}` : String(entry?.lemma || "").trim(),
-    heNiqqud: usagePattern ? `${String(entry?.lemma || "").trim()} ${usagePattern}` : String(entry?.lemma || "").trim(),
+    he: usagePattern ? `${lemmaPlain} ${usagePattern}` : lemmaPlain,
+    heNiqqud: usagePattern ? `${lemmaNiqqud} ${usagePattern}` : lemmaNiqqud,
     utility: clampNumber(entry?.personal_priority, 1, 100, 60),
     availability: normalizeAvailability(entry?.availability || AVAILABILITY_DEFAULTS),
     source: String(entry?.source || "hebrew-verb"),
@@ -1078,18 +1634,23 @@ function normalizeFormValue(raw) {
   if (!raw) return null;
 
   if (typeof raw === "string") {
-    const plain = normalizeHebrewSofitForms(normalizeWhitespace(raw));
+    const niqqud = normalizeHebrewSofitForms(normalizeWhitespace(raw));
+    if (!niqqud) return null;
+    const plain = normalizeHebrewSofitForms(stripNiqqud(niqqud));
     if (!plain) return null;
     return {
       plain,
-      niqqud: plain,
+      niqqud,
     };
   }
 
   if (typeof raw === "object") {
-    const plain = normalizeHebrewSofitForms(normalizeWhitespace(raw.plain || raw.valuePlain || raw.he || ""));
+    const rawPlain = normalizeWhitespace(raw.plain || raw.valuePlain || raw.he || "");
+    const rawNiqqud = normalizeWhitespace(raw.niqqud || raw.valueNiqqud || "");
+    const niqqud = normalizeHebrewSofitForms(rawNiqqud || rawPlain);
+    if (!niqqud) return null;
+    const plain = normalizeHebrewSofitForms(stripNiqqud(rawPlain || niqqud));
     if (!plain) return null;
-    const niqqud = normalizeHebrewSofitForms(normalizeWhitespace(raw.niqqud || raw.valueNiqqud || plain));
     return {
       plain,
       niqqud: niqqud || plain,

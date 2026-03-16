@@ -1302,3 +1302,149 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Risks / regressions to check:** This is intentionally narrow, but it is worth eyeballing the Hebrew UI once on desktop and mobile to make sure the fixed LTR board still feels natural inside the otherwise RTL shell.
 
 ---
+
+### 2026-03-15 18:20 — Add another Academy-backed abbreviation niqqud tranche
+
+**Requested:** Add more niqqud to abbreviation expansions, prioritizing authoritative sources, and report what still remains afterward.
+
+**Files changed:**
+- `abbreviation-data.js` — Added exact-source `expansionHeNiqqud` and `expansionHeNiqqudSource` fields for `אג״ח`, `ני״ע`, `דו״ח`, and `מד״א`, using Academy terms pages.
+- `tests/abbreviation-data.test.js` — Added a phase-4 tranche test to keep those new entries tied to Academy source URLs and unvowelized abbreviation tokens.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** When niqqud display is enabled, those four abbreviation expansions now render with marked Hebrew while keeping the abbreviation token itself unchanged.
+
+**Tests run:** `node --test tests/abbreviation-data.test.js` — passed, 7/7. `node --test` — passed, 75/75.
+
+**Risks / regressions to check:** I intentionally left out nearby candidates like `ביהכ״נ` and `ביה״ד` in this pass because their dataset phrases include a definite article while the most direct Academy term pages surface the base construct forms. Those are still good next candidates, but they deserve a more explicit decision about whether we’re comfortable inferring the definite form from the authoritative base term.
+
+---
+
+### 2026-03-15 18:34 — Add a safe conjugation niqqud tranche for starter verbs
+
+**Requested:** Add niqqud for conjugation-game verb forms where it can be done safely, and explain what still remains.
+
+**Files changed:**
+- `hebrew-verbs.js` — Added stored niqqud for the full present/past/future paradigms of `לסגור`, `לפתוח`, `לכתוב`, and `לשמור`, and fixed form normalization so string-backed stored forms preserve separate plain and marked values instead of collapsing them together.
+- `tests/hebrew-verbs.test.js` — Added regressions proving those starter verbs now carry marked Hebrew across all learner-facing forms in the conjugation deck and that string-backed stored forms like `לשחרר` keep distinct plain/niqqud values.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** When inline niqqud is enabled, conjugation cards for those four starter verbs now render marked Hebrew instead of plain consonantal forms, and existing stored marked forms like `לשחרר` now surface correctly in the game instead of being flattened to plain text.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 14/14. `node --test` — passed, 77/77.
+
+**Risks / regressions to check:** I intentionally stopped short of trying to mark the entire conjugation deck in one pass. The deck currently contains 28 study items and 584 visible forms, and while all current items are stored as authoritative in-repo, only a subset had trusted niqqud available immediately. I limited this pass to four fully regular starter verbs that I could verify cleanly from direct conjugation tables rather than guessing my way across all remaining irregular paradigms.
+
+---
+
+### 2026-03-15 18:48 — Extend starter conjugation niqqud to another safe regular tranche
+
+**Requested:** Add more niqqud to conjugation-game verb forms, taking on only what feels safe.
+
+**Files changed:**
+- `hebrew-verbs.js` — Added stored infinitive niqqud plus full present/past/future marked forms for `ללמוד`, `לאכול`, `לעבוד`, and `לגור`, and taught study-word prompts to use a stored marked lemma when one exists.
+- `tests/hebrew-verbs.test.js` — Extended the starter-verb niqqud regression to cover the new four verbs and added a prompt-side regression proving starter infinitives can now expose distinct `heNiqqud`.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** When inline niqqud is enabled, the conjugation deck now shows marked Hebrew across all learner-facing forms for those four additional starter verbs, and the infinitive prompt itself can surface marked Hebrew where a verb entry now stores `lemma_niqqud`.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 15/15. `node --test` — passed, 78/78.
+
+**Risks / regressions to check:** I still kept this pass on the “direct table” side of the line. These four are regular starters I could verify cleanly from Pealim conjugation tables; I intentionally left the irregular starters and the remaining unmarked regular items alone rather than fill them by pattern or memory.
+
+---
+
+### 2026-03-15 19:02 — Add a larger verified conjugation niqqud tranche for starter verbs
+
+**Requested:** Add more conjugation niqqud.
+
+**Files changed:**
+- `hebrew-verbs.js` — Added stored infinitive niqqud plus full present/past/future marked forms for `לשתות`, `לשחק`, `לבוא`, `לקחת`, `לשים`, `ללכת`, `לעמוד`, and `לשבת`.
+- `tests/hebrew-verbs.test.js` — Extended starter-verb niqqud coverage with representative learner-facing forms from each newly marked verb and switched the prompt-side regression to an irregular infinitive (`לבוא`) so both regular and irregular prompt niqqud paths stay covered.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** The conjugation deck now exposes marked Hebrew across all learner-facing forms for eight additional starter verbs, including several high-frequency irregulars, and their infinitive prompts can also surface stored niqqud.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 15/15. `node --test` — passed, 78/78.
+
+**Risks / regressions to check:** This is still a verified-table pass, not a full sweep. I used direct Pealim conjugation tables for each of these verbs and deliberately left the remaining unmarked items alone rather than infer them from memory or pattern.
+
+---
+
+### 2026-03-15 19:14 — Finish learner-facing conjugation niqqud coverage
+
+**Requested:** Add more conjugation niqqud.
+
+**Files changed:**
+- `hebrew-verbs.js` — Added stored infinitive niqqud plus marked present/past/future forms for the remaining learner-facing deck entries: `להיות`, `לראות`, `לתת`, `להגיד`, `לכבות`, and `לצנן`.
+- `tests/hebrew-verbs.test.js` — Extended representative starter-form assertions to the newly marked verbs and added a deck-level regression proving every learner-facing conjugation form now exposes niqqud.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** The full conjugation deck now renders marked Hebrew on every learner-facing form when inline niqqud is enabled, including the remaining irregular starter verbs and the two multi-sense cooking verbs.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 16/16. `node --test` — passed, 79/79.
+
+**Risks / regressions to check:** This pass completes the current deck, but it still depends on the curated verb inventory staying in sync. If we add new conjugation entries later, they will need either stored niqqud or an explicit review step before we can preserve the “full deck is marked” guarantee.
+
+---
+
+### 2026-03-15 19:38 — Anchor quiz feedback below the action row and finish conjugation prompt niqqud
+
+**Requested:** Finish prompt-side niqqud for the remaining conjugation prompts and move quiz feedback into a polished anchored tray below the action buttons, while keeping conjugation free of per-answer feedback.
+
+**Files changed:**
+- `hebrew-verbs.js` — Added stored infinitive niqqud for the remaining plain prompt lemmas: `לסגור`, `לפתוח`, `לכתוב`, `לשמור`, `לשחרר`, `למחוץ`, and `למעוך`.
+- `index.html` — Replaced the old inline feedback paragraph with a structured lesson footer containing the sticky action row plus a dedicated feedback tray, and bumped asset versions to `20260315i`.
+- `app.js` — Updated the build stamp to `20260315i` so the new frontend assets invalidate cleanly.
+- `app/bootstrap-runtime.js` — Registered the new lesson footer and feedback tray DOM nodes.
+- `app/bootstrap-data.js` — Replaced short feedback labels with sentence-based translation, abbreviation, and advanced-conjugation feedback copy in both English and Hebrew.
+- `app/ui.js` — Switched the feedback API from a plain string to `{ tone, sentence, detail }`, routed rendering through the new tray, simplified Hebrew answer display, and made footer visibility depend on actionable buttons or quiz-mode feedback.
+- `styles.css` — Added the anchored feedback tray styling and moved sticky behavior to the shared lesson footer so the button row stays fixed while feedback reveals underneath it.
+- `app/lesson.js` — Converted translation feedback to complete-sentence tray messages.
+- `app/abbreviation.js` — Converted abbreviation feedback to complete-sentence tray messages and added a detail line for expansion text in `en2he`.
+- `app/adv-conj.js` — Converted advanced-conjugation feedback to complete-sentence tray messages.
+- `app/verb-match.js` — Removed feedback-tray usage from conjugation flows so the mode stays quiet and relies on card state plus progression only.
+- `tests/hebrew-verbs.test.js` — Added a deck-level regression proving every conjugation prompt surface now exposes stored infinitive niqqud.
+- `tests/app-progress.test.js` — Added footer-tray, structured-feedback, and no-feedback-in-conjugation regressions and updated existing feedback assertions to the new tray structure.
+
+**Behavior changed:** Translation, Abbreviation, and Advanced Conjugation now reveal complete-sentence feedback in a dedicated tray below the `Submit` / `Next` buttons, so the action row no longer jumps when feedback appears. Conjugation remains feedback-free at the textual layer, while its prompt infinitives now render with niqqud consistently when inline niqqud is enabled.
+
+**Tests run:** `node --test tests/hebrew-verbs.test.js` — passed, 16/16. `node --test tests/app-progress.test.js` — passed, 50/50. `node --test` — passed, 82/82.
+
+**Risks / regressions to check:** The new tray intentionally does not render in conjugation mode. If we later want round-complete messaging there, it should be designed as a separate progression surface rather than reusing per-answer quiz feedback.
+
+---
+
+### 2026-03-15 19:49 — Always show full Hebrew expansions in abbreviation feedback
+
+**Requested:** Make sure abbreviation-game feedback always shows the full Hebrew of the abbreviation.
+
+**Files changed:**
+- `app/bootstrap-data.js` — Updated the shared abbreviation feedback detail copy to explicitly surface the full Hebrew expansion in English and Hebrew UI.
+- `app/abbreviation.js` — Attached the expansion detail line for abbreviation feedback in both `he2en` and `en2he`, while still respecting the niqqud toggle for the Hebrew expansion text.
+- `tests/app-progress.test.js` — Updated existing abbreviation feedback assertions and added a regression proving both directions now include the full Hebrew expansion.
+
+**Behavior changed:** Abbreviation feedback now always includes the full Hebrew expansion below the main sentence, regardless of whether the player was translating from the abbreviation to English or from English back to the abbreviation.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 51/51. `node --test` — passed, 83/83.
+
+**Risks / regressions to check:** This keeps the main abbreviation sentence concise and puts the full Hebrew in the detail line. If we later want even denser feedback, the next step would be to decide whether the expansion should move into the sentence itself or stay as a second line.
+
+---
+
+### 2026-03-15 19:57 — Add colloquial-meaning detail lines to Advanced Conjugation feedback
+
+**Requested:** In Advanced Conjugation, use the second feedback line to explain the colloquial meaning of non-literal expressions.
+
+**Files changed:**
+- `app/bootstrap-data.js` — Added localized detail-line copy for colloquial-meaning feedback in English and Hebrew UI.
+- `app/adv-conj.js` — Stored idiom meaning metadata on generated questions and attached a detail line to quiz feedback only when the idiom is explicitly marked with `showMeaning`.
+- `tests/app-progress.test.js` — Added a regression proving marked idioms surface the colloquial meaning in the feedback detail line and literal-only idioms do not.
+
+**Behavior changed:** Advanced Conjugation feedback now mirrors the abbreviation tray pattern: the main bold sentence still gives the correct answer, and the lighter detail line explains the colloquial meaning for idioms that are marked as needing that extra explanation.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 52/52. `node --test` — passed, 84/84.
+
+**Risks / regressions to check:** This is intentionally driven by the existing `showMeaning` flag, so any idiom that should surface a colloquial explanation but is not marked yet will stay on the single-line feedback path until its data is updated.
+
+---

@@ -90,6 +90,13 @@ const PHASE_THREE_IDS = [
   "abbr-132",
 ];
 
+const PHASE_FOUR_IDS = [
+  "abbr-110",
+  "abbr-111",
+  "abbr-113",
+  "abbr-172",
+];
+
 test("playable abbreviations use geresh or gereshayim and do not overlap exactly", () => {
   const context = loadAbbreviationContext();
   const rows = context.IvriQuestAbbreviations.getAbbreviations();
@@ -173,6 +180,24 @@ test("phase 3 abbreviation expansions stay inside the Academy-backed institution
   const byId = new Map(rows.map((entry) => [entry.id, entry]));
 
   PHASE_THREE_IDS.forEach((entryId) => {
+    const entry = byId.get(entryId);
+    assert.ok(entry, `${entryId} should exist`);
+    assert.ok(String(entry.expansionHeNiqqud || "").trim(), `${entryId} should have expansionHeNiqqud`);
+    assert.match(
+      String(entry.expansionHeNiqqudSource || ""),
+      /^https:\/\/terms\.hebrew-academy\.org\.il\//,
+      `${entryId} should use an Academy terms source`
+    );
+    assert.equal(/[\u0591-\u05C7]/.test(String(entry.abbr || "")), false, `${entryId} abbreviation should not carry niqqud`);
+  });
+});
+
+test("phase 4 abbreviation expansions use exact Academy-backed niqqud for the new finance and health tranche", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+
+  PHASE_FOUR_IDS.forEach((entryId) => {
     const entry = byId.get(entryId);
     assert.ok(entry, `${entryId} should exist`);
     assert.ok(String(entry.expansionHeNiqqud || "").trim(), `${entryId} should have expansionHeNiqqud`);

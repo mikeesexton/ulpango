@@ -356,12 +356,24 @@ abbreviation.applyAbbreviationAnswer = abbreviation.applyAbbreviationAnswer || f
   }
 
   const expansionText = abbreviation.getExpansionText(entry, runtime.state.showNiqqudInline);
-  const expansion = `${expansionText} (${entry.abbr})`;
   h.setFeedback?.(
-    isCorrect
-      ? translate("feedback.abbreviationCorrect", { english: entry.english, expansion })
-      : translate("feedback.abbreviationWrong", { english: entry.english, expansion }),
-    isCorrect
+    question.direction === "he2en"
+      ? {
+          tone: isCorrect ? "success" : "error",
+          sentence: translate(
+            isCorrect ? "feedback.abbreviationCorrectToEnglish" : "feedback.abbreviationWrongToEnglish",
+            { abbr: entry.abbr, english: entry.english }
+          ),
+          detail: translate("feedback.abbreviationExpansionDetail", { expansion: expansionText }),
+        }
+      : {
+          tone: isCorrect ? "success" : "error",
+          sentence: translate(
+            isCorrect ? "feedback.abbreviationCorrectToHebrew" : "feedback.abbreviationWrongToHebrew",
+            { abbr: entry.abbr }
+          ),
+          detail: translate("feedback.abbreviationExpansionDetail", { expansion: expansionText }),
+        }
   );
   h.playAnswerFeedbackSound?.(isCorrect);
 

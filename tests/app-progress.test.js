@@ -486,6 +486,12 @@ function assertAudioLoadLog(audioLoadLog, expectedPatterns) {
   });
 }
 
+function getFeedbackText(document) {
+  const sentence = document.querySelector("#feedbackSentence").textContent;
+  const detail = document.querySelector("#feedbackDetail").textContent;
+  return [sentence, detail].filter(Boolean).join(" ");
+}
+
 test.afterEach(() => {
   activeHarnesses.forEach((harness) => harness.cleanup());
   activeHarnesses.clear();
@@ -625,6 +631,7 @@ test("abbreviation expansions use niqqud only on the full expansion text", () =>
   const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOnHarness.state.showNiqqudInline = true;
   niqqudOnHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
@@ -632,8 +639,8 @@ test("abbreviation expansions use niqqud only on the full expansion text", () =>
   };
   niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
   assert.match(
-    niqqudOnHarness.document.querySelector("#feedback").textContent,
-    /לְדוּגְמָה \(לדוג׳\)/
+    getFeedbackText(niqqudOnHarness.document),
+    /The full Hebrew is לְדוּגְמָה\./
   );
   niqqudOnHarness.state.abbreviation.sessionMistakeIds = ["abbr-1"];
   assert.equal(
@@ -644,14 +651,15 @@ test("abbreviation expansions use niqqud only on the full expansion text", () =>
   const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOffHarness.state.showNiqqudInline = false;
   niqqudOffHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
     locked: false,
   };
   niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
-  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
-  assert.match(plainFeedback, /לדוגמה \(לדוג׳\)/);
+  const plainFeedback = getFeedbackText(niqqudOffHarness.document);
+  assert.match(plainFeedback, /The full Hebrew is לדוגמה\./);
   assert.doesNotMatch(plainFeedback, /לְדוּגְמָה/);
   niqqudOffHarness.state.abbreviation.sessionMistakeIds = ["abbr-1"];
   assert.equal(
@@ -679,6 +687,7 @@ test("phase 2 abbreviation entries keep acronym tokens plain while toggling the 
   const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOnHarness.state.showNiqqudInline = true;
   niqqudOnHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
@@ -686,21 +695,22 @@ test("phase 2 abbreviation entries keep acronym tokens plain while toggling the 
   };
   niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
   assert.match(
-    niqqudOnHarness.document.querySelector("#feedback").textContent,
-    /קִילוֹמֶטֶר \(ק״מ\)/
+    getFeedbackText(niqqudOnHarness.document),
+    /The full Hebrew is קִילוֹמֶטֶר\./
   );
 
   const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOffHarness.state.showNiqqudInline = false;
   niqqudOffHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
     locked: false,
   };
   niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
-  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
-  assert.match(plainFeedback, /קילומטר \(ק״מ\)/);
+  const plainFeedback = getFeedbackText(niqqudOffHarness.document);
+  assert.match(plainFeedback, /The full Hebrew is קילומטר\./);
   assert.doesNotMatch(plainFeedback, /קִילוֹמֶטֶר/);
 });
 
@@ -723,6 +733,7 @@ test("phase 3 abbreviation entries keep institution/legal acronyms plain while t
   const niqqudOnHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOnHarness.state.showNiqqudInline = true;
   niqqudOnHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
@@ -730,22 +741,96 @@ test("phase 3 abbreviation entries keep institution/legal acronyms plain while t
   };
   niqqudOnHarness.applyAbbreviationAnswer(true, "abbr-1");
   assert.match(
-    niqqudOnHarness.document.querySelector("#feedback").textContent,
-    /עוֹרֵךְ דִּין \(עו״ד\)/
+    getFeedbackText(niqqudOnHarness.document),
+    /The full Hebrew is עוֹרֵךְ דִּין\./
   );
 
   const niqqudOffHarness = loadAppHarness(vocabulary, abbreviations);
   niqqudOffHarness.state.showNiqqudInline = false;
   niqqudOffHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
     entry: abbreviations[0],
     options: [{ id: "abbr-1", entry: abbreviations[0] }],
     selectedOptionId: "abbr-1",
     locked: false,
   };
   niqqudOffHarness.applyAbbreviationAnswer(true, "abbr-1");
-  const plainFeedback = niqqudOffHarness.document.querySelector("#feedback").textContent;
-  assert.match(plainFeedback, /עורך דין \(עו״ד\)/);
+  const plainFeedback = getFeedbackText(niqqudOffHarness.document);
+  assert.match(plainFeedback, /The full Hebrew is עורך דין\./);
   assert.doesNotMatch(plainFeedback, /עוֹרֵךְ דִּין/);
+});
+
+test("abbreviation feedback always includes the full Hebrew expansion in both directions", () => {
+  const abbreviations = [
+    {
+      id: "abbr-1",
+      abbr: "ע״מ",
+      expansionHe: "עוסק מורשה",
+      expansionHeNiqqud: "עוֹסֵק מוּרְשֶׁה",
+      english: "licensed/VAT-registered business",
+      bucket: "Civics, Law & Work",
+    },
+  ];
+
+  const heToEnHarness = loadAppHarness([], abbreviations);
+  heToEnHarness.state.abbreviation.currentQuestion = {
+    direction: "he2en",
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  heToEnHarness.applyAbbreviationAnswer(true, "abbr-1");
+  assert.match(getFeedbackText(heToEnHarness.document), /The full Hebrew is עוסק מורשה\./);
+
+  const enToHeHarness = loadAppHarness([], abbreviations);
+  enToHeHarness.state.abbreviation.currentQuestion = {
+    direction: "en2he",
+    entry: abbreviations[0],
+    options: [{ id: "abbr-1", entry: abbreviations[0] }],
+    selectedOptionId: "abbr-1",
+    locked: false,
+  };
+  enToHeHarness.applyAbbreviationAnswer(true, "abbr-1");
+  assert.match(getFeedbackText(enToHeHarness.document), /The full Hebrew is עוסק מורשה\./);
+});
+
+test("advanced conjugation feedback adds colloquial meaning only for marked idioms", () => {
+  const idioms = [
+    {
+      id: "idiom-1",
+      english: "to drive someone up the wall",
+      english_meaning: "to drive someone up the wall",
+      showMeaning: true,
+    },
+    {
+      id: "idiom-2",
+      english: "to open someone's eyes",
+      english_meaning: "to open someone's eyes",
+      showMeaning: false,
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { idioms });
+
+  harness.state.advConj.currentQuestion = {
+    locked: false,
+    idiomId: "idiom-1",
+    correctAnswer: "העלתה לי את הסעיף",
+    options: [{ id: "right", text: "העלתה לי את הסעיף", isCorrect: true }],
+    selectedOptionId: "right",
+  };
+  harness.applyAdvConjAnswer();
+  assert.match(getFeedbackText(harness.document), /Colloquial meaning: "to drive someone up the wall"\./);
+
+  harness.state.advConj.currentQuestion = {
+    locked: false,
+    idiomId: "idiom-2",
+    correctAnswer: "פתחה לי את העיניים",
+    options: [{ id: "right", text: "פתחה לי את העיניים", isCorrect: true }],
+    selectedOptionId: "right",
+  };
+  harness.applyAdvConjAnswer();
+  assert.doesNotMatch(getFeedbackText(harness.document), /Colloquial meaning:/);
 });
 
 test("Hebrew is stripped from English-facing text across translation, abbreviation, and advanced conjugation", () => {
@@ -787,7 +872,7 @@ test("Hebrew is stripped from English-facing text across translation, abbreviati
     selectedOptionId: "beta",
   };
   applyAnswer(false, "beta");
-  assert.equal(document.querySelector("#feedback").textContent.includes("חלוט"), false);
+  assert.equal(getFeedbackText(document).includes("חלוט"), false);
 
   state.mode = "abbreviation";
   state.abbreviation.active = true;
@@ -1095,6 +1180,105 @@ test("starting advanced conjugation resets the game score but preserves the shar
   assert.equal(harness.state.sessionStreak, 3);
   assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x3");
   harness.goHome();
+});
+
+test("lesson footer keeps action buttons above the feedback tray in the markup", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  assert.match(
+    html,
+    /<div id="lessonFooter"[\s\S]*<div id="stickyLessonActions"[\s\S]*<\/div>[\s\S]*<section id="feedbackTray"/
+  );
+});
+
+test("translation feedback uses the tray without moving the action row or echoing the wrong answer", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+    { id: "beta", category: "core_advanced", en: "beta", he: "בטא", heNiqqud: "בֵּטָא", utility: 79, source: "test" },
+  ];
+  const harness = loadAppHarness(vocabulary);
+
+  harness.state.mode = "lesson";
+  harness.state.lesson.active = true;
+  harness.state.currentQuestion = {
+    locked: false,
+    isReview: false,
+    promptIsHebrew: false,
+    optionsAreHebrew: true,
+    word: vocabulary[0],
+    options: [
+      { id: "alpha", word: vocabulary[0] },
+      { id: "beta", word: vocabulary[1] },
+    ],
+    selectedOptionId: "beta",
+  };
+
+  harness.app.ui.renderSessionHeader();
+  const nextBtn = harness.document.querySelector("#nextBtn");
+  assert.equal(nextBtn.classList.contains("hidden"), false);
+  assert.equal(nextBtn.textContent, "Submit");
+
+  harness.applyAnswer(false, "beta");
+
+  assert.equal(nextBtn.classList.contains("hidden"), false);
+  assert.equal(nextBtn.textContent, "Next");
+  assert.equal(harness.document.querySelector("#lessonFooter").classList.contains("hidden"), false);
+  assert.equal(harness.document.querySelector("#feedbackTray").classList.contains("hidden"), false);
+  assert.match(
+    harness.document.querySelector("#feedbackSentence").textContent,
+    /Not quite\. The Hebrew answer is אלפא\./
+  );
+  assert.equal(harness.document.querySelector("#feedbackDetail").textContent, "");
+  assert.equal(getFeedbackText(harness.document).includes("בטא"), false);
+});
+
+test("conjugation never shows the feedback tray during mismatch, match success, or verb completion", async () => {
+  const vocabulary = [
+    { id: "verb-word", category: "core_advanced", en: "to go", he: "ללכת", heNiqqud: "לָלֶכֶת", utility: 80, source: "test" },
+  ];
+  const mismatchDeck = [
+    {
+      id: "verb-1",
+      word: vocabulary[0],
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+        { id: "past_first_person_singular", englishText: "I went", valuePlain: "הלכתי", valueNiqqud: "הָלַכְתִּי" },
+      ],
+    },
+  ];
+
+  const mismatchHarness = loadAppHarness(vocabulary, [], mismatchDeck);
+  mismatchHarness.state.mode = "verbMatch";
+  mismatchHarness.state.match.active = true;
+  mismatchHarness.state.match.verbQueue = [...mismatchDeck];
+  mismatchHarness.loadNextVerbRound();
+  const wrongLeft = mismatchHarness.state.match.leftCards[0];
+  const wrongRight = mismatchHarness.state.match.rightCards.find((card) => card.pairId !== wrongLeft.pairId);
+  mismatchHarness.applyVerbMatchMismatch(wrongLeft, wrongRight);
+  assert.equal(mismatchHarness.document.querySelector("#feedbackTray").classList.contains("hidden"), true);
+  await waitForTimers();
+  assert.equal(mismatchHarness.document.querySelector("#feedbackTray").classList.contains("hidden"), true);
+
+  const successDeck = [
+    {
+      id: "verb-2",
+      word: vocabulary[0],
+      forms: [
+        { id: "present_masculine_singular", englishText: "he goes", valuePlain: "הולך", valueNiqqud: "הוֹלֵךְ" },
+      ],
+    },
+  ];
+  const successHarness = loadAppHarness(vocabulary, [], successDeck);
+  successHarness.state.mode = "verbMatch";
+  successHarness.state.match.active = true;
+  successHarness.state.match.verbQueue = [...successDeck];
+  successHarness.loadNextVerbRound();
+  const left = successHarness.state.match.leftCards[0];
+  const right = successHarness.state.match.rightCards.find((card) => card.pairId === left.pairId);
+  successHarness.applyVerbMatchSuccess(left, right);
+  assert.equal(successHarness.document.querySelector("#feedbackTray").classList.contains("hidden"), true);
+  await waitForTimers();
+  assert.equal(successHarness.document.querySelector("#feedbackTray").classList.contains("hidden"), true);
+  assert.equal(successHarness.document.querySelector("#nextBtn").classList.contains("hidden"), false);
 });
 
 test("translation submit plays the correct answer sound", () => {

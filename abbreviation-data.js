@@ -11,10 +11,13 @@ const ACADEMY_DIRECTOR_GENERAL_URL = "https://terms.hebrew-academy.org.il/munnah
 const ACADEMY_CHAIRPERSON_URL = "https://terms.hebrew-academy.org.il/munnah/70167_2/chairperson";
 const ACADEMY_COURT_URL = "https://terms.hebrew-academy.org.il/munnah/60985_1";
 const ACADEMY_THE_COURT_URL = "https://terms.hebrew-academy.org.il/munnah/84899_2/contempt%20of%20court";
+const ACADEMY_BOND_INDEX_URL = "https://terms.hebrew-academy.org.il/munnah/63963_2/bond%20index";
+const ACADEMY_SECURITIES_AUTHORITY_URL = "https://terms.hebrew-academy.org.il/munnah/61658_2/%D7%A2%D6%B8%D7%9E%D6%B4%D7%99%D7%9C%20%D7%A0%D6%B0%D7%99%D6%B8%D7%A8%D7%95%D6%B9%D7%AA%20%D7%A2%D6%B5%D7%A8%D6%B6%D7%9A";
 const ACADEMY_REPORT_URL = "https://terms.hebrew-academy.org.il/munnah/6123_1/%D7%93%D6%BC%D6%B4%D7%99%D7%9F%20%D7%95%D6%B0%D7%97%D6%B6%D7%A9%D7%81%D6%B0%D7%91%D6%BC%D7%95%D6%B9%D7%9F";
 const ACADEMY_OPINION_URL = "https://terms.hebrew-academy.org.il/munnah/115460_1/%D7%97%D6%B7%D7%95%D6%BC%D6%B7%D7%AA%20%D7%93%D6%BC%D6%B5%D7%A2%D6%B8%D7%94";
 const ACADEMY_ATTORNEY_URL = "https://terms.hebrew-academy.org.il/munnah/115993_1/%D7%A2%D7%95%D6%B9%D7%A8%D6%B5%D7%9A%D6%B0%20%D7%93%D6%BC%D6%B4%D7%99%D7%9F";
 const ACADEMY_ACCOUNTANT_URL = "https://terms.hebrew-academy.org.il/munnah/28182_1/%D7%A8%D7%95%D6%B9%D7%90%D6%B5%D7%94%20%D7%97%D6%B6%D7%A9%D7%81%D6%B0%D7%91%D6%BC%D7%95%D6%B9%D7%9F";
+const ACADEMY_MDA_URL = "https://terms.hebrew-academy.org.il/munnah/120218_1/%D7%9E%D6%B8%D7%92%D6%B5%D7%9F%20%D7%93%D6%BC%D6%B8%D7%95%D6%B4%D7%93%20%D7%90%D6%B8%D7%93%D6%B9%D7%9D";
 const GOV_MAMAD_URL = "https://www.gov.il/he/service/request-assistance-financing-protected-area-residential-properties-north";
 const MR_MAMAK_URL = "https://mr.gov.il/ilgstorefront/he/p/attachment/C586B16EB7FE1EDE81A4D055FC29C143/%D7%9E%D7%A1%D7%9E%D7%9B%D7%99%20%D7%94%D7%9C%D7%99%D7%9A";
 const GOV_MAMAM_URL = "https://www.gov.il/BlobFolder/legalinfo/helters_specifications_regulations/he/sitedocs_shelters_specifications_regulations.pdf";
@@ -1101,6 +1104,8 @@ const ABBREVIATIONS = [
     "id": "abbr-110",
     "abbr": "אג״ח",
     "expansionHe": "אגרות חוב",
+    "expansionHeNiqqud": "אִגְּרוֹת חוֹב",
+    "expansionHeNiqqudSource": ACADEMY_BOND_INDEX_URL,
     "english": "bonds",
     "bucket": "Civics, Law & Work",
     "notes": "",
@@ -1110,6 +1115,8 @@ const ABBREVIATIONS = [
     "id": "abbr-111",
     "abbr": "ני״ע",
     "expansionHe": "ניירות ערך",
+    "expansionHeNiqqud": "נְיָרוֹת עֵרֶךְ",
+    "expansionHeNiqqudSource": ACADEMY_SECURITIES_AUTHORITY_URL,
     "english": "stocks / securities",
     "bucket": "Civics, Law & Work",
     "notes": "",
@@ -1130,6 +1137,8 @@ const ABBREVIATIONS = [
     "id": "abbr-113",
     "abbr": "דו״ח",
     "expansionHe": "דין וחשבון",
+    "expansionHeNiqqud": "דִּין וְחֶשְׁבּוֹן",
+    "expansionHeNiqqudSource": ACADEMY_REPORT_URL,
     "english": "report",
     "bucket": "Civics, Law & Work",
     "notes": "",
@@ -1673,6 +1682,8 @@ const ABBREVIATIONS = [
     "id": "abbr-172",
     "abbr": "מד״א",
     "expansionHe": "מגן דוד אדום",
+    "expansionHeNiqqud": "מָגֵן דָּוִד אָדֹם",
+    "expansionHeNiqqudSource": ACADEMY_MDA_URL,
     "english": "Magen David Adom (EMS)",
     "bucket": "People, Health & Culture",
     "notes": "health org",

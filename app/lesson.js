@@ -303,12 +303,25 @@ lessonMode.applyAnswer = lessonMode.applyAnswer || function applyAnswer(isCorrec
     lessonMode.addMissedWord(runtime.state.currentQuestion.word.id);
   }
 
-  const answerDisplay = h.buildAnswerDisplay?.(word, runtime.state.showNiqqudInline) || "";
+  const hebrewDisplay = h.buildAnswerDisplay?.(word, runtime.state.showNiqqudInline) || "";
+  const promptHebrew = h.getHebrewText?.(word, runtime.state.showNiqqudInline) || "";
+  const question = runtime.state.currentQuestion;
   h.setFeedback?.(
-    isCorrect
-      ? translate("feedback.correct", { answer: answerDisplay })
-      : translate("feedback.wrong", { answer: answerDisplay, english: word.en }),
-    isCorrect
+    question.promptIsHebrew
+      ? {
+          tone: isCorrect ? "success" : "error",
+          sentence: translate(
+            isCorrect ? "feedback.translationCorrectToEnglish" : "feedback.translationWrongToEnglish",
+            { hebrew: promptHebrew, english: word.en }
+          ),
+        }
+      : {
+          tone: isCorrect ? "success" : "error",
+          sentence: translate(
+            isCorrect ? "feedback.translationCorrectToHebrew" : "feedback.translationWrongToHebrew",
+            { answer: hebrewDisplay }
+          ),
+        }
   );
   h.playAnswerFeedbackSound?.(isCorrect);
 
