@@ -219,6 +219,156 @@ test("generated English past labels use irregular forms for keep", () => {
   );
 });
 
+test("curated English past labels use irregular forms for say", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [],
+    entries: [
+      {
+        id: "test-lehagid",
+        lemma: "להגיד",
+        root: ["נ", "ג", "ד"],
+        binyan: "hifil",
+        regularity: "irregular",
+        conjugation_mode: "curated",
+        senses: [sense("to say", null, false)],
+        forms: forms(
+          {
+            masculine_singular: "אומר",
+            feminine_singular: "אומרת",
+            masculine_plural: "אומרים",
+            feminine_plural: "אומרות",
+          },
+          {
+            first_person_singular: "אמרתי",
+            second_person_masculine_singular: "אמרת",
+            second_person_feminine_singular: "אמרת",
+            third_person_masculine_singular: "אמר",
+            third_person_feminine_singular: "אמרה",
+            first_person_plural: "אמרנו",
+            second_person_masculine_plural: "אמרתם",
+            second_person_feminine_plural: "אמרתן",
+            third_person_plural: "אמרו",
+          },
+          {
+            first_person_singular: "אגיד",
+            second_person_masculine_singular: "תגיד",
+            second_person_feminine_singular: "תגידי",
+            third_person_masculine_singular: "יגיד",
+            third_person_feminine_singular: "תגיד",
+            first_person_plural: "נגיד",
+            second_person_plural: "תגידו",
+            third_person_plural: "יגידו",
+          }
+        ),
+        generated_forms: {},
+        review_status: "approved",
+        notes: "",
+        examples: [],
+        difficulty_level: 4,
+        tags: ["test"],
+        personal_priority: 80,
+        category: "core_advanced",
+        source_word_ids: [],
+        source: "test",
+      },
+    ],
+  });
+
+  const item = deck.find((entry) => entry.id.startsWith("test-lehagid"));
+  assert.ok(item);
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_singular")?.englishText,
+    "I said"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_third_person_masculine_singular")?.englishText,
+    "he said"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_plural")?.englishText,
+    "we said"
+  );
+});
+
+test("present English labels use irregular forms for be", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [],
+    entries: [
+      {
+        id: "test-lihyot-present",
+        lemma: "להיות",
+        root: ["ה", "י", "ה"],
+        binyan: "paal",
+        regularity: "irregular",
+        conjugation_mode: "curated",
+        senses: [sense("to be", null, false)],
+        forms: forms(
+          {
+            masculine_singular: "הווה",
+            feminine_singular: "הווה",
+            masculine_plural: "הווים",
+            feminine_plural: "הוות",
+          },
+          {
+            first_person_singular: "הייתי",
+            second_person_masculine_singular: "היית",
+            second_person_feminine_singular: "היית",
+            third_person_masculine_singular: "היה",
+            third_person_feminine_singular: "הייתה",
+            first_person_plural: "היינו",
+            second_person_masculine_plural: "הייתם",
+            second_person_feminine_plural: "הייתן",
+            third_person_plural: "היו",
+          },
+          {
+            first_person_singular: "אהיה",
+            second_person_masculine_singular: "תהיה",
+            second_person_feminine_singular: "תהיי",
+            third_person_masculine_singular: "יהיה",
+            third_person_feminine_singular: "תהיה",
+            first_person_plural: "נהיה",
+            second_person_plural: "תהיו",
+            third_person_plural: "יהיו",
+          }
+        ),
+        generated_forms: {},
+        review_status: "approved",
+        notes: "",
+        examples: [],
+        difficulty_level: 4,
+        tags: ["test"],
+        personal_priority: 80,
+        category: "core_advanced",
+        source_word_ids: [],
+        source: "test",
+      },
+    ],
+  });
+
+  const item = deck.find((entry) => entry.id.startsWith("test-lihyot-present"));
+  assert.ok(item);
+  assert.equal(
+    item.forms.find((form) => form.id === "present_masculine_singular")?.englishText,
+    "he is"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "present_feminine_singular")?.englishText,
+    "she is"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "present_masculine_plural")?.englishText,
+    "they (m.pl.) are"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "present_feminine_plural")?.englishText,
+    "they (f.pl.) are"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_plural")?.englishText,
+    "we were"
+  );
+});
+
 test("starter conjugation verbs can carry stored niqqud across their visible forms", () => {
   const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
   const expected = [
@@ -232,6 +382,7 @@ test("starter conjugation verbs can carry stored niqqud across their visible for
     ["starter-verb-lesachek--sense-1", "past_third_person_masculine_singular", "שִׂיחֵק"],
     ["starter-verb-laavod--sense-1", "future_first_person_singular", "אֶעֱבֹד"],
     ["starter-verb-lagur--sense-1", "future_first_person_singular", "אָגוּר"],
+    ["starter-verb-larutz--sense-1", "future_first_person_singular", "אָרוּץ"],
     ["starter-verb-lavo--sense-1", "future_third_person_plural", "יָבוֹאוּ"],
     ["starter-verb-lihyot--sense-1", "future_first_person_singular", "אֶהְיֶה"],
     ["starter-verb-lirot--sense-1", "present_feminine_singular", "רוֹאָה"],
@@ -244,6 +395,7 @@ test("starter conjugation verbs can carry stored niqqud across their visible for
     ["starter-verb-lashevet--sense-1", "present_masculine_singular", "יוֹשֵׁב"],
     ["starter-verb-lekhabot--sense-1", "present_masculine_singular", "מְכַבֶּה"],
     ["starter-verb-letzanen--sense-1", "future_first_person_singular", "אֲצַנֵּן"],
+    ["starter-verb-letachnen--sense-1", "future_first_person_singular", "אֲתַכְנֵן"],
   ];
 
   expected.forEach(([itemId, formId, expectedNiqqud]) => {
@@ -260,6 +412,68 @@ test("starter conjugation verbs can carry stored niqqud across their visible for
       `${itemId} should expose niqqud on every learner-facing form`
     );
   });
+});
+
+test("starter plan verb appears in conjugation with correct English labels", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const item = deck.find((entry) => entry.id === "starter-verb-letachnen--sense-1");
+
+  assert.ok(item);
+  assert.equal(item.formSource, "authoritative");
+  assert.equal(item.word.he, "לתכנן");
+  assert.equal(item.word.en, "to plan");
+  assert.equal(
+    item.forms.find((form) => form.id === "present_masculine_singular")?.englishText,
+    "he plans"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_singular")?.englishText,
+    "I planned"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "future_first_person_singular")?.englishText,
+    "I will plan"
+  );
+});
+
+test("starter plan verb keeps quadriliteral metadata and formal future plural forms", () => {
+  const seedEntry = verbApi.getSeedVerbEntries().find((entry) => entry.id === "starter-verb-letachnen");
+  assert.ok(seedEntry);
+  assert.deepEqual(seedEntry.root, ["ת", "כ", "נ", "נ"]);
+
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [], formalFuturePlural: true });
+  const item = deck.find((entry) => entry.id === "starter-verb-letachnen--sense-1");
+  assert.ok(item);
+  assert.equal(
+    String(item.forms.find((form) => form.id === "future_second_person_feminine_plural")?.valueNiqqud || "").normalize("NFC"),
+    "תְּתַכְנֵנָּה".normalize("NFC")
+  );
+  assert.equal(
+    String(item.forms.find((form) => form.id === "future_third_person_feminine_plural")?.valueNiqqud || "").normalize("NFC"),
+    "יְתַכְנֵנָּה".normalize("NFC")
+  );
+});
+
+test("starter run verb appears in conjugation with the expected English labels", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const item = deck.find((entry) => entry.id === "starter-verb-larutz--sense-1");
+
+  assert.ok(item);
+  assert.equal(item.formSource, "authoritative");
+  assert.equal(item.word.he, "לרוץ");
+  assert.equal(item.word.en, "to run");
+  assert.equal(
+    item.forms.find((form) => form.id === "present_masculine_singular")?.englishText,
+    "he runs"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_third_person_masculine_singular")?.englishText,
+    "he ran"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "future_first_person_singular")?.englishText,
+    "I will run"
+  );
 });
 
 test("the full conjugation deck now exposes niqqud on every learner-facing form", () => {
@@ -428,6 +642,10 @@ test("starter verb seed entries carry per-mode availability metadata", () => {
   assert.equal(entriesById.get("starter-verb-lalechet--sense-1")?.availability?.sentenceHints, true);
   assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.translationQuiz, false);
   assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.sentenceHints, true);
+  assert.equal(entriesById.get("starter-verb-larutz--sense-1")?.availability?.translationQuiz, false);
+  assert.equal(entriesById.get("starter-verb-larutz--sense-1")?.availability?.sentenceHints, true);
+  assert.equal(entriesById.get("starter-verb-letachnen--sense-1")?.availability?.translationQuiz, false);
+  assert.equal(entriesById.get("starter-verb-letachnen--sense-1")?.availability?.sentenceHints, true);
 });
 
 test("generated-safe verbs may use the limited generator", () => {

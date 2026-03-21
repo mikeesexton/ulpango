@@ -138,6 +138,7 @@ const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
   "starter-verb-lesachek",
   "starter-verb-laavod",
   "starter-verb-lagur",
+  "starter-verb-larutz",
   "starter-verb-lavo",
   "starter-verb-lihyot",
   "starter-verb-lirot",
@@ -151,6 +152,7 @@ const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
   "starter-verb-leechol",
   "starter-verb-lishtot",
   "starter-verb-lichtov",
+  "starter-verb-letachnen",
 ]);
 
 function normalizeAvailability(availability) {
@@ -253,7 +255,7 @@ function createVerbEntry(config) {
     id: String(config?.id || slugifyHebrewId(config?.lemma || config?.gloss || "verb")),
     lemma: String(config?.lemma || "").trim(),
     lemma_niqqud: String(config?.lemma_niqqud || config?.lemmaNiqqud || "").trim(),
-    root: Array.isArray(config?.root) ? config.root.slice(0, 3) : null,
+    root: Array.isArray(config?.root) ? cloneData(config.root) : null,
     binyan: config?.binyan || null,
     regularity: RECOGNIZED_REGULARITY.has(config?.regularity) ? config.regularity : "regular",
     conjugation_mode: RECOGNIZED_CONJUGATION_MODES.has(config?.conjugation_mode) ? config.conjugation_mode : "blocked",
@@ -721,6 +723,51 @@ function buildStarterVerbEntries() {
       difficulty_level: 2,
       tags: ["starter", "seed", "regular"],
       personal_priority: 86,
+    }),
+    createVerbEntry({
+      id: "starter-verb-larutz",
+      availability: getStarterVerbAvailability("starter-verb-larutz"),
+      lemma: "לרוץ",
+      lemma_niqqud: "לָרוּץ",
+      root: ["ר", "ו", "ץ"],
+      binyan: "paal",
+      regularity: "regular",
+      conjugation_mode: "generated",
+      senses: [makeSense("to run", null, true)],
+      forms: makeForms(
+        makePresent(
+          markedForm("רץ", "רָץ"),
+          markedForm("רצה", "רָצָה"),
+          markedForm("רצים", "רָצִים"),
+          markedForm("רצות", "רָצוֹת")
+        ),
+        makePast(
+          markedForm("רצתי", "רַצְתִּי"),
+          markedForm("רצת", "רַצְתָּ"),
+          markedForm("רצת", "רַצְתְּ"),
+          markedForm("רץ", "רָץ"),
+          markedForm("רצה", "רָצָה"),
+          markedForm("רצנו", "רַצְנוּ"),
+          markedForm("רצתם", "רַצְתֶּם"),
+          markedForm("רצתן", "רַצְתֶּן"),
+          markedForm("רצו", "רָצוּ")
+        ),
+        makeFuture(
+          markedForm("ארוץ", "אָרוּץ"),
+          markedForm("תרוץ", "תָּרוּץ"),
+          markedForm("תרוצי", "תָּרוּצִי"),
+          markedForm("ירוץ", "יָרוּץ"),
+          markedForm("תרוץ", "תָּרוּץ"),
+          markedForm("נרוץ", "נָרוּץ"),
+          markedForm("תרוצו", "תָּרוּצוּ"),
+          markedForm("ירוצו", "יָרוּצוּ")
+        )
+      ),
+      review_status: "approved",
+      notes: "Authoritative stored forms cover this hollow pa'al movement verb.",
+      difficulty_level: 2,
+      tags: ["starter", "seed", "regular"],
+      personal_priority: 85,
     }),
     createVerbEntry({
       id: "starter-verb-lavo",
@@ -1359,6 +1406,53 @@ function buildStarterVerbEntries() {
       tags: ["piel", "seed"],
       personal_priority: 72,
     }),
+    createVerbEntry({
+      id: "starter-verb-letachnen",
+      availability: getStarterVerbAvailability("starter-verb-letachnen"),
+      lemma: "לתכנן",
+      lemma_niqqud: "לְתַכְנֵן",
+      root: ["ת", "כ", "נ", "נ"],
+      binyan: "piel",
+      regularity: "regular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to plan", null, true)],
+      forms: makeForms(
+        makePresent(
+          markedForm("מתכנן", "מְתַכְנֵן"),
+          markedForm("מתכננת", "מְתַכְנֶנֶת"),
+          markedForm("מתכננים", "מְתַכְנְנִים"),
+          markedForm("מתכננות", "מְתַכְנְנוֹת")
+        ),
+        makePast(
+          markedForm("תכננתי", "תִּכְנַנְתִּי"),
+          markedForm("תכננת", "תִּכְנַנְתָּ"),
+          markedForm("תכננת", "תִּכְנַנְתְּ"),
+          markedForm("תכנן", "תִּכְנֵן"),
+          markedForm("תכננה", "תִּכְנְנָה"),
+          markedForm("תכננו", "תִּכְנַנְנוּ"),
+          markedForm("תכננתם", "תִּכְנַנְתֶּם"),
+          markedForm("תכננתן", "תִּכְנַנְתֶּן"),
+          markedForm("תכננו", "תִּכְנְנוּ")
+        ),
+        makeFuture(
+          markedForm("אתכנן", "אֲתַכְנֵן"),
+          markedForm("תתכנן", "תְּתַכְנֵן"),
+          markedForm("תתכנני", "תְּתַכְנְנִי"),
+          markedForm("יתכנן", "יְתַכְנֵן"),
+          markedForm("תתכנן", "תְּתַכְנֵן"),
+          markedForm("נתכנן", "נְתַכְנֵן"),
+          markedForm("תתכננו", "תְּתַכְנְנוּ"),
+          markedForm("יתכננו", "יְתַכְנְנוּ"),
+          markedForm("תתכננה", "תְּתַכְנֵנָּה"),
+          markedForm("יתכננה", "יְתַכְנֵנָּה")
+        )
+      ),
+      review_status: "approved",
+      notes: "Pi'el of ת-כ-נ. Stored authoritative forms cover the common everyday verb for planning.",
+      difficulty_level: 2,
+      tags: ["piel", "seed"],
+      personal_priority: 71,
+    }),
   ];
 }
 
@@ -1961,6 +2055,7 @@ function mergeVerbEntries(primaryEntries, secondaryEntries) {
 function buildEnglishFormLabel(gloss, slotId) {
   const base = toVerbBasePhrase(gloss);
   const presentThird = inflectEnglishThirdPerson(base);
+  const presentNonThird = inflectEnglishPresentNonThird(base);
   const past = inflectEnglishPast(base);
   const pastPl = base === "be" ? "were" : past;
   const pastTag = past === base ? " (past)" : "";
@@ -1971,9 +2066,9 @@ function buildEnglishFormLabel(gloss, slotId) {
     case "present_feminine_singular":
       return `she ${presentThird}`;
     case "present_masculine_plural":
-      return `they (m.pl.) ${base}`;
+      return `they (m.pl.) ${presentNonThird}`;
     case "present_feminine_plural":
-      return `they (f.pl.) ${base}`;
+      return `they (f.pl.) ${presentNonThird}`;
     case "past_first_person_singular":
       return `I ${past}${pastTag}`;
     case "past_second_person_masculine_singular":
@@ -2023,6 +2118,73 @@ function toVerbBasePhrase(englishInfinitive) {
   return raw.replace(/^to\s+/, "").trim() || "do";
 }
 
+const ENGLISH_PRESENT_THIRD_PERSON_IRREGULARS = new Map([
+  ["be", "is"],
+  ["do", "does"],
+  ["have", "has"],
+]);
+
+const ENGLISH_PRESENT_NON_THIRD_IRREGULARS = new Map([
+  ["be", "are"],
+]);
+
+const ENGLISH_PAST_IRREGULARS = new Map([
+  ["be", "was"],
+  ["become", "became"],
+  ["begin", "began"],
+  ["break", "broke"],
+  ["bring", "brought"],
+  ["build", "built"],
+  ["buy", "bought"],
+  ["catch", "caught"],
+  ["choose", "chose"],
+  ["come", "came"],
+  ["cut", "cut"],
+  ["do", "did"],
+  ["drink", "drank"],
+  ["drive", "drove"],
+  ["eat", "ate"],
+  ["fall", "fell"],
+  ["feel", "felt"],
+  ["find", "found"],
+  ["fly", "flew"],
+  ["forget", "forgot"],
+  ["get", "got"],
+  ["give", "gave"],
+  ["go", "went"],
+  ["grow", "grew"],
+  ["have", "had"],
+  ["hear", "heard"],
+  ["keep", "kept"],
+  ["know", "knew"],
+  ["leave", "left"],
+  ["make", "made"],
+  ["meet", "met"],
+  ["pay", "paid"],
+  ["plan", "planned"],
+  ["put", "put"],
+  ["read", "read"],
+  ["run", "ran"],
+  ["say", "said"],
+  ["see", "saw"],
+  ["sell", "sold"],
+  ["send", "sent"],
+  ["sing", "sang"],
+  ["sit", "sat"],
+  ["sleep", "slept"],
+  ["speak", "spoke"],
+  ["spend", "spent"],
+  ["stand", "stood"],
+  ["take", "took"],
+  ["teach", "taught"],
+  ["tell", "told"],
+  ["think", "thought"],
+  ["understand", "understood"],
+  ["wear", "wore"],
+  ["win", "won"],
+  ["write", "wrote"],
+]);
+
 function splitVerbPhrase(phrase) {
   const parts = String(phrase || "").trim().split(/\s+/).filter(Boolean);
   if (!parts.length) {
@@ -2038,37 +2200,28 @@ function joinVerbPhrase(head, tail) {
   return tail ? `${head} ${tail}` : head;
 }
 
+function inflectEnglishPresentNonThird(basePhrase) {
+  const parts = splitVerbPhrase(basePhrase);
+  const verb = ENGLISH_PRESENT_NON_THIRD_IRREGULARS.get(parts.head) || parts.head;
+  return joinVerbPhrase(verb, parts.tail);
+}
+
 function inflectEnglishThirdPerson(basePhrase) {
   const parts = splitVerbPhrase(basePhrase);
-  let verb = parts.head;
-  if (/(s|x|z|sh|ch|o)$/.test(verb)) {
-    verb = `${verb}es`;
-  } else if (/[^aeiou]y$/.test(verb)) {
-    verb = `${verb.slice(0, -1)}ies`;
-  } else {
-    verb = `${verb}s`;
+  let verb = ENGLISH_PRESENT_THIRD_PERSON_IRREGULARS.get(parts.head);
+  if (!verb && /(s|x|z|sh|ch|o)$/.test(parts.head)) {
+    verb = `${parts.head}es`;
+  } else if (!verb && /[^aeiou]y$/.test(parts.head)) {
+    verb = `${parts.head.slice(0, -1)}ies`;
+  } else if (!verb) {
+    verb = `${parts.head}s`;
   }
   return joinVerbPhrase(verb, parts.tail);
 }
 
 function inflectEnglishPast(basePhrase) {
-  const irregular = new Map([
-    ["be", "was"],
-    ["come", "came"],
-    ["drink", "drank"],
-    ["eat", "ate"],
-    ["give", "gave"],
-    ["go", "went"],
-    ["keep", "kept"],
-    ["put", "put"],
-    ["see", "saw"],
-    ["sit", "sat"],
-    ["stand", "stood"],
-    ["take", "took"],
-    ["write", "wrote"],
-  ]);
   const parts = splitVerbPhrase(basePhrase);
-  let verb = irregular.get(parts.head);
+  let verb = ENGLISH_PAST_IRREGULARS.get(parts.head);
   if (!verb) {
     if (/e$/.test(parts.head)) {
       verb = `${parts.head}d`;
