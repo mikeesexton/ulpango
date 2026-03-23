@@ -265,23 +265,53 @@ verbMatch.selectVerbRoundPairs = verbMatch.selectVerbRoundPairs || function sele
   const ordered = forms.filter((item) => runtime.matchFormOrder.includes(item.id));
   const byId = new Map(ordered.map((item) => [item.id, item]));
   const deduped = [];
-  const seenHebrew = new Set();
-  const seenEnglish = new Set();
+  const seenHebrew = new Map();
+  const seenEnglish = new Map();
+
+  function getHebrewKey(item) {
+    if (!item) return "";
+    return String(
+      runtime.state.showNiqqudInline
+        ? (item.valueNiqqud || item.valuePlain || "")
+        : (item.valuePlain || "")
+    ).trim();
+  }
+
+  function isImperative(item) {
+    return Boolean(item?.id && String(item.id).startsWith("imperative_"));
+  }
+
+  function replacePair(index, item, previousEnglishKey, nextEnglishKey) {
+    deduped[index] = item;
+    if (previousEnglishKey) {
+      seenEnglish.delete(previousEnglishKey);
+    }
+    if (nextEnglishKey) {
+      seenEnglish.set(nextEnglishKey, index);
+    }
+  }
 
   runtime.matchFormOrder.forEach((id) => {
     const item = byId.get(id);
     if (!item) return;
-    const hebrewKey = String(item.valuePlain || "").trim();
+    const hebrewKey = getHebrewKey(item);
     const englishKey = sanitizeEnglishText(item.englishText);
-    if (!hebrewKey || !englishKey || seenHebrew.has(hebrewKey) || seenEnglish.has(englishKey)) return;
-    seenHebrew.add(hebrewKey);
-    seenEnglish.add(englishKey);
+    if (!hebrewKey || !englishKey || seenEnglish.has(englishKey)) return;
+
+    const existingHebrewIndex = seenHebrew.get(hebrewKey);
+    if (existingHebrewIndex !== undefined) {
+      const existing = deduped[existingHebrewIndex];
+      if (!isImperative(existing) && isImperative(item)) {
+        replacePair(existingHebrewIndex, item, sanitizeEnglishText(existing?.englishText), englishKey);
+      }
+      return;
+    }
+
+    seenHebrew.set(hebrewKey, deduped.length);
+    seenEnglish.set(englishKey, deduped.length);
     deduped.push(item);
   });
 
-  if (deduped.length > runtime.constants.MATCH_MAX_PAIRS) {
-    return deduped.slice(0, runtime.constants.MATCH_MAX_PAIRS);
-  }
   return deduped;
 };
 

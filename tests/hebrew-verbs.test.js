@@ -3,6 +3,12 @@ const assert = require("node:assert/strict");
 
 const verbApi = require("../hebrew-verbs.js");
 
+const MODERN_IMPERATIVE_IDS = [
+  "imperative_second_person_masculine_singular",
+  "imperative_second_person_feminine_singular",
+  "imperative_second_person_plural",
+];
+
 function sense(gloss, usagePattern, safeForGeneration) {
   return {
     gloss,
@@ -11,11 +17,12 @@ function sense(gloss, usagePattern, safeForGeneration) {
   };
 }
 
-function forms(present, past, future) {
+function forms(present, past, future, imperative) {
   const result = {};
   if (present) result.present = present;
   if (past) result.past = past;
   if (future) result.future = future;
+  if (imperative) result.imperative = imperative;
   return result;
 }
 
@@ -476,6 +483,103 @@ test("starter run verb appears in conjugation with the expected English labels",
   );
 });
 
+test("verified starter and curated verbs expose stored imperative forms in the conjugation deck", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const expected = [
+    ["starter-verb-lisgor--sense-1", "סְגֹר"],
+    ["starter-verb-liftoach--sense-1", "פְּתַח"],
+    ["starter-verb-lichtov--sense-1", "כְּתֹב"],
+    ["starter-verb-lishmor--sense-1", "שְׁמֹר"],
+    ["starter-verb-lilmod--sense-1", "לְמַד"],
+    ["starter-verb-leechol--sense-1", "אֱכֹל"],
+    ["starter-verb-lishtot--sense-1", "שְׁתֵה"],
+    ["starter-verb-lesachek--sense-1", "שַׂחֵק"],
+    ["starter-verb-laavod--sense-1", "עֲבֹד"],
+    ["starter-verb-lagur--sense-1", "גּוּר"],
+    ["starter-verb-larutz--sense-1", "רוּץ"],
+    ["starter-verb-lavo--sense-1", "בּוֹא"],
+    ["starter-verb-lihyot--sense-1", "הֱיֵה"],
+    ["starter-verb-lirot--sense-1", "רְאֵה"],
+    ["starter-verb-lakachat--sense-1", "קַח"],
+    ["starter-verb-lasim--sense-1", "שִׂים"],
+    ["starter-verb-latet--sense-1", "תֵּן"],
+    ["starter-verb-lalechet--sense-1", "לֵךְ"],
+    ["starter-verb-lehagid--sense-1", "הַגֵּד"],
+    ["starter-verb-laamod--sense-1", "עֲמֹד"],
+    ["starter-verb-lashevet--sense-1", "שֵׁב"],
+    ["cooking-verb-lamoach--sense-1", "מְעַךְ"],
+    ["physical-verb-limchotz--sense-1", "מְחַץ"],
+    ["starter-verb-leshacharer--sense-1", "שַׁחְרֵר"],
+    ["starter-verb-lekhabot--sense-1", "כַּבֵּה"],
+    ["starter-verb-letzanen--sense-1", "צַנֵּן"],
+    ["starter-verb-letachnen--sense-1", "תַּכְנֵן"],
+  ];
+
+  expected.forEach(([itemId, expectedNiqqud]) => {
+    const item = deck.find((entry) => entry.id === itemId);
+    assert.ok(item, `${itemId} should appear in the conjugation deck`);
+    assert.equal(
+      String(item.forms.find((form) => form.id === "imperative_second_person_masculine_singular")?.valueNiqqud || "").normalize("NFC"),
+      expectedNiqqud.normalize("NFC")
+    );
+  });
+});
+
+test("imperative slots flatten with learner-facing labels for stored authoritative forms", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const expected = [
+    ["starter-verb-lishtot--sense-1", "imperative_second_person_feminine_singular", "שְׁתִי", "drink! (f.s.)"],
+    ["starter-verb-lasim--sense-1", "imperative_second_person_plural", "שִׂימוּ", "put! (pl.)"],
+    ["starter-verb-lihyot--sense-1", "imperative_second_person_plural", "הֱיוּ", "be! (pl.)"],
+    ["starter-verb-lakachat--sense-1", "imperative_second_person_plural", "קְחוּ", "take! (pl.)"],
+    ["starter-verb-letachnen--sense-1", "imperative_second_person_plural", "תַּכְנְנוּ", "plan! (pl.)"],
+  ];
+
+  expected.forEach(([itemId, formId, expectedNiqqud, expectedEnglish]) => {
+    const item = deck.find((entry) => entry.id === itemId);
+    assert.ok(item, `${itemId} should appear in the conjugation deck`);
+    const form = item.forms.find((entry) => entry.id === formId);
+    assert.ok(form, `${itemId} should expose ${formId}`);
+    assert.equal(String(form.valueNiqqud || "").normalize("NFC"), expectedNiqqud.normalize("NFC"));
+    assert.equal(form.englishText, expectedEnglish);
+  });
+
+  assert.equal(
+    deck.every((item) => item.forms.every((form) => form.id !== "imperative_second_person_feminine_plural")),
+    true
+  );
+});
+
+test("every imperative-enabled conjugation verb exposes the full modern imperative set", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [
+      { id: "cook-fold", category: "cooking_verbs", en: "to fold", he: "לקפל", heNiqqud: "לְקַפֵּל", utility: 80, source: "test" },
+      { id: "cook-season", category: "cooking_verbs", en: "to season", he: "לתבל", heNiqqud: "לְתַבֵּל", utility: 84, source: "test" },
+      { id: "cook-boil", category: "cooking_verbs", en: "to boil", he: "להרתיח", heNiqqud: "לְהַרְתִּיחַ", utility: 79, source: "test" },
+      { id: "cook-thicken", category: "cooking_verbs", en: "to thicken", he: "להסמיך", heNiqqud: "לְהַסְמִיךְ", utility: 70, source: "test" },
+      { id: "cook-dilute", category: "cooking_verbs", en: "to dilute", he: "לדלל", heNiqqud: "לְדַלֵּל", utility: 74, source: "test" },
+      { id: "cook-strain", category: "cooking_verbs", en: "to strain", he: "לסנן", heNiqqud: "לְסַנֵּן", utility: 78, source: "test" },
+      { id: "cook-refrigerate", category: "cooking_verbs", en: "to refrigerate", he: "לקרר", heNiqqud: "לְקָרֵר", utility: 73, source: "test" },
+      { id: "cook-garnish", category: "cooking_verbs", en: "to garnish", he: "לקשט", heNiqqud: "לְקַשֵּׁט", utility: 76, source: "test" },
+    ],
+  });
+
+  const imperativeEnabled = deck.filter((item) => item.forms.some((form) => form.id.startsWith("imperative_")));
+  assert.ok(imperativeEnabled.length > 0);
+
+  imperativeEnabled.forEach((item) => {
+    const imperativeIds = item.forms
+      .filter((form) => form.id.startsWith("imperative_"))
+      .map((form) => form.id);
+    const imperativeEnglish = item.forms
+      .filter((form) => form.id.startsWith("imperative_"))
+      .map((form) => form.englishText);
+
+    assert.deepEqual(imperativeIds, MODERN_IMPERATIVE_IDS, `${item.id} should expose all modern imperative slots`);
+    assert.equal(new Set(imperativeEnglish).size, MODERN_IMPERATIVE_IDS.length, `${item.id} should keep distinct imperative labels`);
+  });
+});
+
 test("the full conjugation deck now exposes niqqud on every learner-facing form", () => {
   const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
 
@@ -510,6 +614,14 @@ test("string-backed stored verb forms preserve separate plain and niqqud values"
   assert.equal(
     String(present.valueNiqqud || "").normalize("NFC"),
     "מְשַׁחְרֵר".normalize("NFC")
+  );
+
+  const imperative = item.forms.find((form) => form.id === "imperative_second_person_masculine_singular");
+  assert.ok(imperative);
+  assert.equal(imperative.valuePlain, "שחרר");
+  assert.equal(
+    String(imperative.valueNiqqud || "").normalize("NFC"),
+    "שַׁחְרֵר".normalize("NFC")
   );
 });
 
@@ -677,6 +789,50 @@ test("generated-safe verbs may use the limited generator", () => {
   assert.equal(result.forms.future.first_person_singular.plain, "אתבל");
 });
 
+test("generated-safe verbs can overlay stored modern imperative forms onto generated tenses", () => {
+  const result = verbApi.resolveLearnerFacingForms(
+    {
+      id: "test-letabel",
+      lemma: "לתבל",
+      root: ["ת", "ב", "ל"],
+      binyan: "piel",
+      regularity: "regular",
+      conjugation_mode: "generated",
+      senses: [sense("to season", null, true)],
+      forms: forms(
+        null,
+        null,
+        null,
+        {
+          second_person_masculine_singular: { plain: "תבל", niqqud: "תַּבֵּל" },
+          second_person_feminine_singular: { plain: "תבלי", niqqud: "תַּבְּלִי" },
+          second_person_plural: { plain: "תבלו", niqqud: "תַּבְּלוּ" },
+        }
+      ),
+      generated_forms: {},
+      review_status: "approved",
+      notes: "",
+      examples: [],
+      difficulty_level: 2,
+      tags: ["test"],
+      personal_priority: 75,
+    },
+    sense("to season", null, true),
+    {}
+  );
+
+  assert.ok(result);
+  assert.equal(result.source, "generated");
+  assert.equal(result.forms.present.masculine_singular.plain, "מתבל");
+  assert.equal(result.forms.future.first_person_singular.plain, "אתבל");
+  assert.equal(result.forms.imperative.second_person_masculine_singular.plain, "תבל");
+  assert.equal(
+    String(result.forms.imperative.second_person_masculine_singular.niqqud || "").normalize("NFC"),
+    "תַּבֵּל".normalize("NFC")
+  );
+  assert.equal(result.forms.imperative.second_person_plural.plain, "תבלו");
+});
+
 test("generated forms normalize final-letter variants at token end", () => {
   const result = verbApi.resolveLearnerFacingForms(
     {
@@ -705,6 +861,49 @@ test("generated forms normalize final-letter variants at token end", () => {
   assert.equal(result.forms.present.masculine_singular.plain, "מסמיך");
   assert.equal(result.forms.past.third_person_masculine_singular.plain, "הסמיך");
   assert.equal(result.forms.future.first_person_singular.plain, "אסמיך");
+});
+
+test("migrated generated-safe verbs expose verified modern imperative forms in conjugation mode", () => {
+  const deck = verbApi.buildVerbConjugationDeck({
+    vocabulary: [
+      { id: "cook-fold", category: "cooking_verbs", en: "to fold", he: "לקפל", heNiqqud: "לְקַפֵּל", utility: 80, source: "test" },
+      { id: "cook-season", category: "cooking_verbs", en: "to season", he: "לתבל", heNiqqud: "לְתַבֵּל", utility: 84, source: "test" },
+      { id: "cook-boil", category: "cooking_verbs", en: "to boil", he: "להרתיח", heNiqqud: "לְהַרְתִּיחַ", utility: 79, source: "test" },
+      { id: "cook-thicken", category: "cooking_verbs", en: "to thicken", he: "להסמיך", heNiqqud: "לְהַסְמִיךְ", utility: 70, source: "test" },
+      { id: "cook-dilute", category: "cooking_verbs", en: "to dilute", he: "לדלל", heNiqqud: "לְדַלֵּל", utility: 74, source: "test" },
+      { id: "cook-strain", category: "cooking_verbs", en: "to strain", he: "לסנן", heNiqqud: "לְסַנֵּן", utility: 78, source: "test" },
+      { id: "cook-refrigerate", category: "cooking_verbs", en: "to refrigerate", he: "לקרר", heNiqqud: "לְקָרֵר", utility: 73, source: "test" },
+      { id: "cook-garnish", category: "cooking_verbs", en: "to garnish", he: "לקשט", heNiqqud: "לְקַשֵּׁט", utility: 76, source: "test" },
+    ],
+  });
+
+  const expectations = [
+    ["cook-fold", "imperative_second_person_masculine_singular", "קפל", "קַפֵּל", "fold! (m.s.)"],
+    ["cook-season", "imperative_second_person_masculine_singular", "תבל", "תַּבֵּל", "season! (m.s.)"],
+    ["cook-boil", "imperative_second_person_feminine_singular", "הרתיחי", "הַרְתִּיחִי", "boil! (f.s.)"],
+    ["cook-thicken", "imperative_second_person_plural", "הסמיכו", "הַסְמִיכוּ", "thicken! (pl.)"],
+    ["cook-dilute", "imperative_second_person_masculine_singular", "דלל", "דַּלֵּל", "dilute! (m.s.)"],
+    ["cook-strain", "imperative_second_person_feminine_singular", "סנני", "סַנְּנִי", "strain! (f.s.)"],
+    ["cook-refrigerate", "imperative_second_person_plural", "קררו", "קָרְרוּ", "refrigerate! (pl.)"],
+    ["cook-garnish", "imperative_second_person_masculine_singular", "קשט", "קַשֵּׁט", "garnish! (m.s.)"],
+  ];
+
+  expectations.forEach(([id, formId, expectedPlain, expectedNiqqud, expectedEnglish]) => {
+    const item = deck.find((entry) => entry.id === id);
+    assert.ok(item, `expected conjugation deck entry for ${id}`);
+    assert.equal(item.formSource, "generated");
+
+    const form = item.forms.find((candidate) => candidate.id === formId);
+    assert.ok(form, `expected ${formId} form for ${id}`);
+    assert.equal(form.valuePlain, expectedPlain);
+    assert.equal(String(form.valueNiqqud || "").normalize("NFC"), String(expectedNiqqud).normalize("NFC"));
+    assert.equal(form.englishText, expectedEnglish);
+  });
+
+  assert.equal(
+    deck.every((item) => item.forms.every((form) => form.id !== "imperative_second_person_feminine_plural")),
+    true
+  );
 });
 
 test("authoritative forms always override generated forms", () => {

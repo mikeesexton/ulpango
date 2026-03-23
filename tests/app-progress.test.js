@@ -4,11 +4,19 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+const verbApi = require("../hebrew-verbs.js");
+
 const nativeSetTimeout = global.setTimeout;
 const nativeClearTimeout = global.clearTimeout;
 const nativeSetInterval = global.setInterval;
 const nativeClearInterval = global.clearInterval;
 const activeHarnesses = new Set();
+
+const MODERN_IMPERATIVE_IDS = [
+  "imperative_second_person_masculine_singular",
+  "imperative_second_person_feminine_singular",
+  "imperative_second_person_plural",
+];
 
 class FakeClassList {
   constructor() {
@@ -406,11 +414,29 @@ globalThis.__appTestExports = {
     IvriQuestHebrewVerbs: {
       MATCH_FORM_ORDER: [
         "present_masculine_singular",
-        "present_feminine_singular",
         "past_first_person_singular",
         "future_first_person_singular",
+        "present_feminine_singular",
+        "past_third_person_masculine_singular",
+        "future_third_person_masculine_singular",
         "present_masculine_plural",
+        "past_third_person_feminine_singular",
+        "future_third_person_feminine_singular",
         "present_feminine_plural",
+        "past_first_person_plural",
+        "future_first_person_plural",
+        "past_second_person_masculine_singular",
+        "future_second_person_masculine_singular",
+        "past_second_person_feminine_singular",
+        "future_second_person_feminine_singular",
+        "past_second_person_masculine_plural",
+        "future_second_person_plural",
+        "past_second_person_feminine_plural",
+        "past_third_person_plural",
+        "future_third_person_plural",
+        "imperative_second_person_masculine_singular",
+        "imperative_second_person_feminine_singular",
+        "imperative_second_person_plural",
       ],
       getSeedVocabularyEntries() {
         return [];
@@ -1044,6 +1070,106 @@ test("verb match rounds dedupe identical visible English cards", () => {
   harness.loadNextVerbRound();
   const englishCards = harness.state.match.leftCards.map((card) => card.englishText);
   assert.equal(new Set(englishCards).size, englishCards.length);
+});
+
+test("verb match rounds keep all available deduped forms for a verb", () => {
+  const vocabulary = [
+    { id: "verb-run", category: "core_advanced", en: "to run", he: "לרוץ", heNiqqud: "לָרוּץ", utility: 80, source: "test" },
+  ];
+  const verbDeck = [
+    {
+      word: { id: "verb-run", en: "to run", he: "לרוץ", heNiqqud: "לָרוּץ" },
+      formSource: "validated",
+      forms: [
+        { id: "present_masculine_singular", englishText: "he runs", valuePlain: "רץ", valueNiqqud: "רָץ" },
+        { id: "past_first_person_singular", englishText: "I ran", valuePlain: "רצתי", valueNiqqud: "רַצְתִּי" },
+        { id: "future_first_person_singular", englishText: "I will run", valuePlain: "ארוץ", valueNiqqud: "אָרוּץ" },
+        { id: "present_feminine_singular", englishText: "she runs", valuePlain: "רצה", valueNiqqud: "רָצָה" },
+        { id: "past_third_person_masculine_singular", englishText: "he ran", valuePlain: "רץ", valueNiqqud: "רָץ" },
+        { id: "future_third_person_masculine_singular", englishText: "he will run", valuePlain: "ירוץ", valueNiqqud: "יָרוּץ" },
+        { id: "present_masculine_plural", englishText: "they (m.pl.) run", valuePlain: "רצים", valueNiqqud: "רָצִים" },
+        { id: "past_third_person_feminine_singular", englishText: "she ran", valuePlain: "רצה", valueNiqqud: "רָצָה" },
+        { id: "future_third_person_feminine_singular", englishText: "she will run", valuePlain: "תרוץ", valueNiqqud: "תָּרוּץ" },
+        { id: "present_feminine_plural", englishText: "they (f.pl.) run", valuePlain: "רצות", valueNiqqud: "רָצוֹת" },
+        { id: "past_first_person_plural", englishText: "we ran", valuePlain: "רצנו", valueNiqqud: "רַצְנוּ" },
+        { id: "future_first_person_plural", englishText: "we will run", valuePlain: "נרוץ", valueNiqqud: "נָרוּץ" },
+        { id: "imperative_second_person_masculine_singular", englishText: "run! (m.s.)", valuePlain: "רוץ", valueNiqqud: "רוּץ" },
+        { id: "imperative_second_person_feminine_singular", englishText: "run! (f.s.)", valuePlain: "רוצי", valueNiqqud: "רוּצִי" },
+        { id: "imperative_second_person_plural", englishText: "run! (pl.)", valuePlain: "רוצו", valueNiqqud: "רוּצוּ" },
+      ],
+    },
+  ];
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+
+  harness.state.mode = "verbMatch";
+  harness.state.match.active = true;
+  harness.state.match.verbQueue = [...verbDeck];
+  harness.loadNextVerbRound();
+
+  assert.equal(harness.state.match.pairs.length, 13);
+  assert.deepEqual(
+    Array.from(harness.state.match.pairs
+      .filter((pair) => pair.id.startsWith("imperative_"))
+      .map((pair) => pair.id)),
+    [
+      "imperative_second_person_masculine_singular",
+      "imperative_second_person_feminine_singular",
+      "imperative_second_person_plural",
+    ]
+  );
+  assert.deepEqual(
+    Array.from(harness.state.match.pairs.map((pair) => pair.id)),
+    [
+      "present_masculine_singular",
+      "past_first_person_singular",
+      "future_first_person_singular",
+      "present_feminine_singular",
+      "future_third_person_masculine_singular",
+      "present_masculine_plural",
+      "future_third_person_feminine_singular",
+      "present_feminine_plural",
+      "past_first_person_plural",
+      "future_first_person_plural",
+      "imperative_second_person_masculine_singular",
+      "imperative_second_person_feminine_singular",
+      "imperative_second_person_plural",
+    ]
+  );
+});
+
+test("verb match rounds preserve all modern imperative forms for every imperative-enabled deck verb", () => {
+  const vocabulary = [
+    { id: "cook-fold", category: "cooking_verbs", en: "to fold", he: "לקפל", heNiqqud: "לְקַפֵּל", utility: 80, source: "test" },
+    { id: "cook-season", category: "cooking_verbs", en: "to season", he: "לתבל", heNiqqud: "לְתַבֵּל", utility: 84, source: "test" },
+    { id: "cook-boil", category: "cooking_verbs", en: "to boil", he: "להרתיח", heNiqqud: "לְהַרְתִּיחַ", utility: 79, source: "test" },
+    { id: "cook-thicken", category: "cooking_verbs", en: "to thicken", he: "להסמיך", heNiqqud: "לְהַסְמִיךְ", utility: 70, source: "test" },
+    { id: "cook-dilute", category: "cooking_verbs", en: "to dilute", he: "לדלל", heNiqqud: "לְדַלֵּל", utility: 74, source: "test" },
+    { id: "cook-strain", category: "cooking_verbs", en: "to strain", he: "לסנן", heNiqqud: "לְסַנֵּן", utility: 78, source: "test" },
+    { id: "cook-refrigerate", category: "cooking_verbs", en: "to refrigerate", he: "לקרר", heNiqqud: "לְקָרֵר", utility: 73, source: "test" },
+    { id: "cook-garnish", category: "cooking_verbs", en: "to garnish", he: "לקשט", heNiqqud: "לְקַשֵּׁט", utility: 76, source: "test" },
+  ];
+  const verbDeck = verbApi.buildVerbConjugationDeck({ vocabulary });
+  const imperativeEnabled = verbDeck.filter((item) => item.forms.some((form) => form.id.startsWith("imperative_")));
+  const harness = loadAppHarness(vocabulary, [], verbDeck);
+
+  assert.ok(imperativeEnabled.length > 0);
+
+  imperativeEnabled.forEach((item) => {
+    harness.state.mode = "verbMatch";
+    harness.state.match.active = true;
+    harness.state.match.verbQueue = [item];
+    harness.state.match.currentVerb = null;
+    harness.state.match.currentVerbIndex = 0;
+    harness.loadNextVerbRound();
+
+    const imperativeIds = Array.from(
+      harness.state.match.pairs
+        .filter((pair) => pair.id.startsWith("imperative_"))
+        .map((pair) => pair.id)
+    ).sort((left, right) => MODERN_IMPERATIVE_IDS.indexOf(left) - MODERN_IMPERATIVE_IDS.indexOf(right));
+
+    assert.deepEqual(imperativeIds, MODERN_IMPERATIVE_IDS, `${item.id} should keep all modern imperative pairs in rounds`);
+  });
 });
 
 test("sound preference defaults to disabled and toggle persists to localStorage", () => {

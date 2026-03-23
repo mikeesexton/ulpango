@@ -140,6 +140,9 @@ contentSources.fallbackVerbApi = contentSources.fallbackVerbApi || {
     "past_second_person_feminine_plural",
     "past_third_person_plural",
     "future_third_person_plural",
+    "imperative_second_person_masculine_singular",
+    "imperative_second_person_feminine_singular",
+    "imperative_second_person_plural",
   ],
   getSeedVocabularyEntries() {
     return [];

@@ -24,6 +24,7 @@ if (root) {
  *   present?: Record<string, string | {plain: string, niqqud?: string}>,
  *   past?: Record<string, string | {plain: string, niqqud?: string}>,
  *   future?: Record<string, string | {plain: string, niqqud?: string}>,
+ *   imperative?: Record<string, string | {plain: string, niqqud?: string}>,
  * }} VerbFormSet
  *
  * @typedef {{
@@ -81,6 +82,13 @@ const FORMAL_FUTURE_FORM_ORDER = [
   { id: "future_third_person_feminine_plural", tense: "future", slot: "third_person_feminine_plural" },
 ];
 
+// Modern learner-facing imperative drills collapse plural gender to the shared plural form.
+const IMPERATIVE_FORM_ORDER = [
+  { id: "imperative_second_person_masculine_singular", tense: "imperative", slot: "second_person_masculine_singular" },
+  { id: "imperative_second_person_feminine_singular", tense: "imperative", slot: "second_person_feminine_singular" },
+  { id: "imperative_second_person_plural", tense: "imperative", slot: "second_person_plural" },
+];
+
 const AVAILABILITY_DEFAULTS = Object.freeze({
   translationQuiz: true,
   sentenceHints: true,
@@ -120,15 +128,87 @@ const KNOWN_CURATED_LEMMAS = new Map([
 ]);
 
 const SAFE_GENERATION_OVERRIDES = new Map([
-  ["לתבל", { root: ["ת", "ב", "ל"], binyan: "piel", personal_priority: 85 }],
-  ["לקפל", { root: ["ק", "פ", "ל"], binyan: "piel", personal_priority: 80 }],
-  ["לקשט", { root: ["ק", "ש", "ט"], binyan: "piel", personal_priority: 76 }],
-  ["לדלל", { root: ["ד", "ל", "ל"], binyan: "piel", personal_priority: 74 }],
-  ["לסנן", { root: ["ס", "נ", "נ"], binyan: "piel", personal_priority: 78 }],
-  ["לקרר", { root: ["ק", "ר", "ר"], binyan: "piel", personal_priority: 73 }],
+  ["לתבל", {
+    root: ["ת", "ב", "ל"],
+    binyan: "piel",
+    personal_priority: 85,
+    imperative: makeImperative(
+      markedForm("תבל", "תַּבֵּל"),
+      markedForm("תבלי", "תַּבְּלִי"),
+      markedForm("תבלו", "תַּבְּלוּ")
+    ),
+  }],
+  ["לקפל", {
+    root: ["ק", "פ", "ל"],
+    binyan: "piel",
+    personal_priority: 80,
+    imperative: makeImperative(
+      markedForm("קפל", "קַפֵּל"),
+      markedForm("קפלי", "קַפְּלִי"),
+      markedForm("קפלו", "קַפְּלוּ")
+    ),
+  }],
+  ["לקשט", {
+    root: ["ק", "ש", "ט"],
+    binyan: "piel",
+    personal_priority: 76,
+    imperative: makeImperative(
+      markedForm("קשט", "קַשֵּׁט"),
+      markedForm("קשטי", "קַשְּׁטִי"),
+      markedForm("קשטו", "קַשְּׁטוּ")
+    ),
+  }],
+  ["לדלל", {
+    root: ["ד", "ל", "ל"],
+    binyan: "piel",
+    personal_priority: 74,
+    imperative: makeImperative(
+      markedForm("דלל", "דַּלֵּל"),
+      markedForm("דללי", "דַּלְּלִי"),
+      markedForm("דללו", "דַּלְּלוּ")
+    ),
+  }],
+  ["לסנן", {
+    root: ["ס", "נ", "נ"],
+    binyan: "piel",
+    personal_priority: 78,
+    imperative: makeImperative(
+      markedForm("סנן", "סַנֵּן"),
+      markedForm("סנני", "סַנְּנִי"),
+      markedForm("סננו", "סַנְּנוּ")
+    ),
+  }],
+  ["לקרר", {
+    root: ["ק", "ר", "ר"],
+    binyan: "piel",
+    personal_priority: 73,
+    imperative: makeImperative(
+      markedForm("קרר", "קָרֵר"),
+      markedForm("קררי", "קָרְרִי"),
+      markedForm("קררו", "קָרְרוּ")
+    ),
+  }],
   ["לרפד", { root: ["ר", "פ", "ד"], binyan: "piel", personal_priority: 71 }],
-  ["להסמיך", { root: ["ס", "מ", "כ"], binyan: "hifil", personal_priority: 70 }],
-  ["להרתיח", { root: ["ר", "ת", "ח"], binyan: "hifil", personal_priority: 79 }],
+  ["להסמיך", {
+    root: ["ס", "מ", "כ"],
+    binyan: "hifil",
+    personal_priority: 70,
+    imperative: makeImperative(
+      markedForm("הסמך", "הַסְמֵךְ"),
+      markedForm("הסמיכי", "הַסְמִיכִי"),
+      markedForm("הסמיכו", "הַסְמִיכוּ")
+    ),
+  }],
+  ["להרתיח", {
+    root: ["ר", "ת", "ח"],
+    binyan: "hifil",
+    personal_priority: 79,
+    imperative: makeImperative(
+      markedForm("הרתח", "הַרְתֵּחַ"),
+      markedForm("הרתיחי", "הַרְתִּיחִי"),
+      markedForm("הרתיחו", "הַרְתִּיחוּ")
+    ),
+  }],
 ]);
 
 const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
@@ -222,15 +302,24 @@ function makeFuture(firstPersonSingular, secondMasculineSingular, secondFeminine
   return future;
 }
 
+function makeImperative(secondMasculineSingular, secondFeminineSingular, secondPersonPlural) {
+  return {
+    second_person_masculine_singular: secondMasculineSingular,
+    second_person_feminine_singular: secondFeminineSingular,
+    second_person_plural: secondPersonPlural,
+  };
+}
+
 function markedForm(plain, niqqud) {
   return { plain, niqqud };
 }
 
-function makeForms(present, past, future) {
+function makeForms(present, past, future, imperative) {
   const forms = {};
   if (present) forms.present = present;
   if (past) forms.past = past;
   if (future) forms.future = future;
+  if (imperative) forms.imperative = imperative;
   return forms;
 }
 
@@ -318,6 +407,12 @@ function buildStarterVerbEntries() {
           markedForm("נסגור", "נִסְגּוֹר"),
           markedForm("תסגרו", "תִּסְגְּרוּ"),
           markedForm("יסגרו", "יִסְגְּרוּ")
+        ),
+        makeImperative(
+          markedForm("סגר", "סְגֹר"),
+          markedForm("סגרי", "סִגְרִי"),
+          markedForm("סגרו", "סִגְרוּ"),
+          markedForm("סגרנה", "סְגֹרְנָה")
         )
       ),
       review_status: "approved",
@@ -364,6 +459,12 @@ function buildStarterVerbEntries() {
           markedForm("נפתח", "נִפְתַּח"),
           markedForm("תפתחו", "תִּפְתְּחוּ"),
           markedForm("יפתחו", "יִפְתְּחוּ")
+        ),
+        makeImperative(
+          markedForm("פתח", "פְּתַח"),
+          markedForm("פתחי", "פִּתְחִי"),
+          markedForm("פתחו", "פִּתְחוּ"),
+          markedForm("פתחנה", "פְּתַחְנָה")
         )
       ),
       review_status: "approved",
@@ -408,6 +509,12 @@ function buildStarterVerbEntries() {
           markedForm("נכתוב", "נִכְתֹּב"),
           markedForm("תכתבו", "תִּכְתְּבוּ"),
           markedForm("יכתבו", "יִכְתְּבוּ")
+        ),
+        makeImperative(
+          markedForm("כתב", "כְּתֹב"),
+          markedForm("כתבי", "כִּתְבִי"),
+          markedForm("כתבו", "כִּתְבוּ"),
+          markedForm("כתבנה", "כְּתֹבְנָה")
         )
       ),
       review_status: "approved",
@@ -452,6 +559,12 @@ function buildStarterVerbEntries() {
           markedForm("נשמור", "נִשְׁמֹר"),
           markedForm("תשמרו", "תִּשְׁמְרוּ"),
           markedForm("ישמרו", "יִשְׁמְרוּ")
+        ),
+        makeImperative(
+          markedForm("שמר", "שְׁמֹר"),
+          markedForm("שמרי", "שִׁמְרִי"),
+          markedForm("שמרו", "שִׁמְרוּ"),
+          markedForm("שמרנה", "שְׁמֹרְנָה")
         )
       ),
       review_status: "approved",
@@ -497,6 +610,12 @@ function buildStarterVerbEntries() {
           markedForm("נלמד", "נִלְמַד"),
           markedForm("תלמדו", "תִּלְמְדוּ"),
           markedForm("ילמדו", "יִלְמְדוּ")
+        ),
+        makeImperative(
+          markedForm("למד", "לְמַד"),
+          markedForm("למדי", "לִמְדִי"),
+          markedForm("למדו", "לִמְדוּ"),
+          markedForm("למדנה", "לְמַדְנָה")
         )
       ),
       review_status: "approved",
@@ -541,6 +660,12 @@ function buildStarterVerbEntries() {
           markedForm("נאכל", "נֹאכַל"),
           markedForm("תאכלו", "תֹּאכְלוּ"),
           markedForm("יאכלו", "יֹאכְלוּ")
+        ),
+        makeImperative(
+          markedForm("אכל", "אֱכֹל"),
+          markedForm("אכלי", "אִכְלִי"),
+          markedForm("אכלו", "אִכְלוּ"),
+          markedForm("אכלנה", "אֱכֹלְנָה")
         )
       ),
       review_status: "approved",
@@ -585,6 +710,12 @@ function buildStarterVerbEntries() {
           markedForm("נשתה", "נִשְׁתֶּה"),
           markedForm("תשתו", "תִּשְׁתּוּ"),
           markedForm("ישתו", "יִשְׁתּוּ")
+        ),
+        makeImperative(
+          markedForm("שתה", "שְׁתֵה"),
+          markedForm("שתי", "שְׁתִי"),
+          markedForm("שתו", "שְׁתוּ"),
+          markedForm("שתינה", "שְׁתֶינָה")
         )
       ),
       review_status: "approved",
@@ -629,6 +760,12 @@ function buildStarterVerbEntries() {
           markedForm("נשחק", "נְשַׂחֵק"),
           markedForm("תשחקו", "תְּשַׂחֲקוּ"),
           markedForm("ישחקו", "יְשַׂחֲקוּ")
+        ),
+        makeImperative(
+          markedForm("שחק", "שַׂחֵק"),
+          markedForm("שחקי", "שַׂחֲקִי"),
+          markedForm("שחקו", "שַׂחֲקוּ"),
+          markedForm("שחקנה", "שַׂחֵקְנָה")
         )
       ),
       review_status: "approved",
@@ -673,6 +810,12 @@ function buildStarterVerbEntries() {
           markedForm("נעבוד", "נַעֲבֹד"),
           markedForm("תעבדו", "תַּעַבְדוּ"),
           markedForm("יעבדו", "יַעַבְדוּ")
+        ),
+        makeImperative(
+          markedForm("עבד", "עֲבֹד"),
+          markedForm("עבדי", "עִבְדִי"),
+          markedForm("עבדו", "עִבְדוּ"),
+          markedForm("עבדנה", "עֲבֹדְנָה")
         )
       ),
       review_status: "approved",
@@ -717,6 +860,12 @@ function buildStarterVerbEntries() {
           markedForm("נגור", "נָגוּר"),
           markedForm("תגורו", "תָּגוּרוּ"),
           markedForm("יגורו", "יָגוּרוּ")
+        ),
+        makeImperative(
+          markedForm("גור", "גּוּר"),
+          markedForm("גורי", "גּוּרִי"),
+          markedForm("גורו", "גּוּרוּ"),
+          markedForm("גרנה", "גֹּרְנָה")
         )
       ),
       review_status: "approved",
@@ -761,6 +910,12 @@ function buildStarterVerbEntries() {
           markedForm("נרוץ", "נָרוּץ"),
           markedForm("תרוצו", "תָּרוּצוּ"),
           markedForm("ירוצו", "יָרוּצוּ")
+        ),
+        makeImperative(
+          markedForm("רוץ", "רוּץ"),
+          markedForm("רוצי", "רוּצִי"),
+          markedForm("רוצו", "רוּצוּ"),
+          markedForm("רצנה", "רֹצְנָה")
         )
       ),
       review_status: "approved",
@@ -806,6 +961,12 @@ function buildStarterVerbEntries() {
           markedForm("נבוא", "נָבוֹא"),
           markedForm("תבואו", "תָּבוֹאוּ"),
           markedForm("יבואו", "יָבוֹאוּ")
+        ),
+        makeImperative(
+          markedForm("בוא", "בּוֹא"),
+          markedForm("בואי", "בּוֹאִי"),
+          markedForm("בואו", "בּוֹאוּ"),
+          markedForm("באנה", "בֹּאְנָה")
         )
       ),
       review_status: "approved",
@@ -845,6 +1006,12 @@ function buildStarterVerbEntries() {
           markedForm("נהיה", "נִהְיֶה"),
           markedForm("תהיו", "תִּהְיוּ"),
           markedForm("יהיו", "יִהְיוּ")
+        ),
+        makeImperative(
+          markedForm("היה", "הֱיֵה"),
+          markedForm("היי", "הֱיִי"),
+          markedForm("היו", "הֱיוּ"),
+          markedForm("היינה", "הֱיֶינָה")
         )
       ),
       review_status: "approved",
@@ -890,6 +1057,12 @@ function buildStarterVerbEntries() {
           markedForm("נראה", "נִרְאֶה"),
           markedForm("תראו", "תִּרְאוּ"),
           markedForm("יראו", "יִרְאוּ")
+        ),
+        makeImperative(
+          markedForm("ראה", "רְאֵה"),
+          markedForm("ראי", "רְאִי"),
+          markedForm("ראו", "רְאוּ"),
+          markedForm("ראינה", "רְאֶינָה")
         )
       ),
       review_status: "approved",
@@ -934,6 +1107,12 @@ function buildStarterVerbEntries() {
           markedForm("ניקח", "נִקַּח"),
           markedForm("תיקחו", "תִּקְחוּ"),
           markedForm("ייקחו", "יִקְחוּ")
+        ),
+        makeImperative(
+          markedForm("קח", "קַח"),
+          markedForm("קחי", "קְחִי"),
+          markedForm("קחו", "קְחוּ"),
+          markedForm("קחנה", "קַחְנָה")
         )
       ),
       review_status: "approved",
@@ -978,6 +1157,12 @@ function buildStarterVerbEntries() {
           markedForm("נשים", "נָשִׂים"),
           markedForm("תשימו", "תָּשִׂימוּ"),
           markedForm("ישימו", "יָשִׂימוּ")
+        ),
+        makeImperative(
+          markedForm("שים", "שִׂים"),
+          markedForm("שימי", "שִׂימִי"),
+          markedForm("שימו", "שִׂימוּ"),
+          markedForm("שמנה", "שֵׂמְנָה")
         )
       ),
       review_status: "approved",
@@ -1022,6 +1207,12 @@ function buildStarterVerbEntries() {
           markedForm("ניתן", "נִתֵּן"),
           markedForm("תיתנו", "תִּתְּנוּ"),
           markedForm("ייתנו", "יִתְּנוּ")
+        ),
+        makeImperative(
+          markedForm("תן", "תֵּן"),
+          markedForm("תני", "תְּנִי"),
+          markedForm("תנו", "תְּנוּ"),
+          markedForm("תנה", "תֵּנָּה")
         )
       ),
       review_status: "approved",
@@ -1066,6 +1257,12 @@ function buildStarterVerbEntries() {
           markedForm("נלך", "נֵלֵךְ"),
           markedForm("תלכו", "תֵּלְכוּ"),
           markedForm("ילכו", "יֵלְכוּ")
+        ),
+        makeImperative(
+          markedForm("לך", "לֵךְ"),
+          markedForm("לכי", "לְכִי"),
+          markedForm("לכו", "לְכוּ"),
+          markedForm("לכנה", "לֵכְנָה")
         )
       ),
       review_status: "approved",
@@ -1110,6 +1307,12 @@ function buildStarterVerbEntries() {
           markedForm("נגיד", "נַגִּיד"),
           markedForm("תגידו", "תַּגִּידוּ"),
           markedForm("יגידו", "יַגִּידוּ")
+        ),
+        makeImperative(
+          markedForm("הגד", "הַגֵּד"),
+          markedForm("הגידי", "הַגִּידִי"),
+          markedForm("הגידו", "הַגִּידוּ"),
+          markedForm("הגדנה", "הַגֵּדְנָה")
         )
       ),
       review_status: "approved",
@@ -1155,6 +1358,12 @@ function buildStarterVerbEntries() {
           markedForm("נעמוד", "נַעֲמֹד"),
           markedForm("תעמדו", "תַּעַמְדוּ"),
           markedForm("יעמדו", "יַעַמְדוּ")
+        ),
+        makeImperative(
+          markedForm("עמד", "עֲמֹד"),
+          markedForm("עמדי", "עִמְדִי"),
+          markedForm("עמדו", "עִמְדוּ"),
+          markedForm("עמדנה", "עֲמֹדְנָה")
         )
       ),
       review_status: "approved",
@@ -1199,6 +1408,12 @@ function buildStarterVerbEntries() {
           markedForm("נשב", "נֵשֵׁב"),
           markedForm("תשבו", "תֵּשְׁבוּ"),
           markedForm("ישבו", "יֵשְׁבוּ")
+        ),
+        makeImperative(
+          markedForm("שב", "שֵׁב"),
+          markedForm("שבי", "שְׁבִי"),
+          markedForm("שבו", "שְׁבוּ"),
+          markedForm("שבנה", "שֵׁבְנָה")
         )
       ),
       review_status: "approved",
@@ -1243,6 +1458,12 @@ function buildStarterVerbEntries() {
           {plain: "נמעך", niqqud: "נִמְעַךְ"},
           {plain: "תמעכו", niqqud: "תִּמְעֲכוּ"},
           {plain: "ימעכו", niqqud: "יִמְעֲכוּ"}
+        ),
+        makeImperative(
+          {plain: "מעך", niqqud: "מְעַךְ"},
+          {plain: "מעכי", niqqud: "מַעֲכִי"},
+          {plain: "מעכו", niqqud: "מַעֲכוּ"},
+          {plain: "מעכנה", niqqud: "מְעַכְנָה"}
         )
       ),
       review_status: "approved",
@@ -1288,6 +1509,12 @@ function buildStarterVerbEntries() {
           {plain: "נמחץ", niqqud: "נִמְחַץ"},
           {plain: "תמחצו", niqqud: "תִּמְחֲצוּ"},
           {plain: "ימחצו", niqqud: "יִמְחֲצוּ"}
+        ),
+        makeImperative(
+          {plain: "מחץ", niqqud: "מְחַץ"},
+          {plain: "מחצי", niqqud: "מַחֲצִי"},
+          {plain: "מחצו", niqqud: "מַחֲצוּ"},
+          {plain: "מחצנה", niqqud: "מְחַצְנָה"}
         )
       ),
       review_status: "approved",
@@ -1309,7 +1536,8 @@ function buildStarterVerbEntries() {
       forms: makeForms(
         makePresent("מְשַׁחְרֵר", "מְשַׁחְרֶרֶת", "מְשַׁחְרְרִים", "מְשַׁחְרְרוֹת"),
         makePast("שִׁחְרַרְתִּי", "שִׁחְרַרְתָּ", "שִׁחְרַרְתְּ", "שִׁחְרֵר", "שִׁחְרְרָה", "שִׁחְרַרְנוּ", "שִׁחְרַרְתֶּם", "שִׁחְרַרְתֶּן", "שִׁחְרְרוּ"),
-        makeFuture("אֲשַׁחְרֵר", "תְּשַׁחְרֵר", "תְּשַׁחְרְרִי", "יְשַׁחְרֵר", "תְּשַׁחְרֵר", "נְשַׁחְרֵר", "תְּשַׁחְרְרוּ", "יְשַׁחְרְרוּ")
+        makeFuture("אֲשַׁחְרֵר", "תְּשַׁחְרֵר", "תְּשַׁחְרְרִי", "יְשַׁחְרֵר", "תְּשַׁחְרֵר", "נְשַׁחְרֵר", "תְּשַׁחְרְרוּ", "יְשַׁחְרְרוּ"),
+        makeImperative("שַׁחְרֵר", "שַׁחְרְרִי", "שַׁחְרְרוּ", "שַׁחְרֵרְנָה")
       ),
       review_status: "approved",
       notes: "Pi'el of ש-ח-ר with geminate resh. Gloss covers 'to free' (individuals) and 'to liberate' (peoples/nations).",
@@ -1354,6 +1582,12 @@ function buildStarterVerbEntries() {
           markedForm("נכבה", "נְכַבֶּה"),
           markedForm("תכבו", "תְּכַבּוּ"),
           markedForm("יכבו", "יְכַבּוּ")
+        ),
+        makeImperative(
+          markedForm("כבה", "כַּבֵּה"),
+          markedForm("כבי", "כַּבִּי"),
+          markedForm("כבו", "כַּבּוּ"),
+          markedForm("כבינה", "כַּבֶּינָה")
         )
       ),
       review_status: "approved",
@@ -1399,6 +1633,12 @@ function buildStarterVerbEntries() {
           markedForm("נצנן", "נְצַנֵּן"),
           markedForm("תצננו", "תְּצַנְּנוּ"),
           markedForm("יצננו", "יְצַנְּנוּ")
+        ),
+        makeImperative(
+          markedForm("צנן", "צַנֵּן"),
+          markedForm("צנני", "צַנְּנִי"),
+          markedForm("צננו", "צַנְּנוּ"),
+          markedForm("צננה", "צַנֵּנָּה")
         )
       ),
       review_status: "approved",
@@ -1445,6 +1685,12 @@ function buildStarterVerbEntries() {
           markedForm("יתכננו", "יְתַכְנְנוּ"),
           markedForm("תתכננה", "תְּתַכְנֵנָּה"),
           markedForm("יתכננה", "יְתַכְנֵנָּה")
+        ),
+        makeImperative(
+          markedForm("תכנן", "תַּכְנֵן"),
+          markedForm("תכנני", "תַּכְנְנִי"),
+          markedForm("תכננו", "תַּכְנְנוּ"),
+          markedForm("תכננה", "תַּכְנֵנָּה")
         )
       ),
       review_status: "approved",
@@ -1573,6 +1819,12 @@ function resolveLearnerFacingForms(entry, sense, options) {
     };
   }
 
+  const authoritativeSlots = normalizeFormSetSlots(entry?.forms, {
+    generated: false,
+    formalFuturePlural: Boolean(options?.formalFuturePlural),
+    lemma: entry?.lemma,
+  });
+
   if (!canGenerateForms(entry, sense)) {
     return null;
   }
@@ -1585,6 +1837,13 @@ function resolveLearnerFacingForms(entry, sense, options) {
   });
   if (!generated) {
     return null;
+  }
+
+  if (authoritativeSlots) {
+    return {
+      source: "generated",
+      forms: mergeNormalizedFormSets(generated, authoritativeSlots),
+    };
   }
 
   return {
@@ -1688,6 +1947,15 @@ function flattenVerbForms(forms, gloss, options) {
 }
 
 function normalizeAndValidateFormSet(formSet, options) {
+  const output = normalizeFormSetSlots(formSet, options);
+  if (!output) return null;
+  const flattened = flattenVerbForms(output, "to do", { formalFuturePlural: Boolean(options?.formalFuturePlural) });
+  if (flattened.length < 4) return null;
+
+  return output;
+}
+
+function normalizeFormSetSlots(formSet, options) {
   if (!formSet || typeof formSet !== "object") return null;
 
   const output = {};
@@ -1714,14 +1982,27 @@ function normalizeAndValidateFormSet(formSet, options) {
     output[slotMeta.tense][slotMeta.slot] = normalized;
   });
 
-  if (hasInvalidProvidedSlot) {
+  if (hasInvalidProvidedSlot || !Object.keys(output).length) {
     return null;
   }
 
-  const flattened = flattenVerbForms(output, "to do", { formalFuturePlural: Boolean(options?.formalFuturePlural) });
-  if (flattened.length < 4) return null;
-
   return output;
+}
+
+function mergeNormalizedFormSets(base, overrides) {
+  if (!base) return overrides ? cloneData(overrides) : null;
+  if (!overrides) return cloneData(base);
+
+  const merged = cloneData(base);
+  Object.keys(overrides).forEach((tense) => {
+    if (!merged[tense]) {
+      merged[tense] = {};
+    }
+    Object.keys(overrides[tense] || {}).forEach((slot) => {
+      merged[tense][slot] = cloneData(overrides[tense][slot]);
+    });
+  });
+  return merged;
 }
 
 function normalizeFormValue(raw) {
@@ -1939,7 +2220,7 @@ function migrateVerbGroup(group) {
       regularity: "regular",
       conjugation_mode: "generated",
       senses: [makeSense(primaryGloss, null, true)],
-      forms: {},
+      forms: generatedOverride.imperative ? makeForms(null, null, null, generatedOverride.imperative) : {},
       generated_forms: {},
       review_status: "unreviewed",
       notes: `${notesPrefix} Explicitly whitelisted as safe for limited generation.`,
@@ -2107,6 +2388,12 @@ function buildEnglishFormLabel(gloss, slotId) {
       return `you (f.pl.) will ${base}`;
     case "future_third_person_feminine_plural":
       return `they (f.pl.) will ${base}`;
+    case "imperative_second_person_masculine_singular":
+      return `${base}! (m.s.)`;
+    case "imperative_second_person_feminine_singular":
+      return `${base}! (f.s.)`;
+    case "imperative_second_person_plural":
+      return `${base}! (pl.)`;
     default:
       return base;
   }
@@ -2235,9 +2522,10 @@ function inflectEnglishPast(basePhrase) {
 }
 
 function getFormSlots(includeFormalFuturePlural) {
+  const baseSlots = MODERN_MATCH_FORM_ORDER.concat(IMPERATIVE_FORM_ORDER);
   return includeFormalFuturePlural
-    ? MODERN_MATCH_FORM_ORDER.concat(FORMAL_FUTURE_FORM_ORDER)
-    : MODERN_MATCH_FORM_ORDER;
+    ? baseSlots.concat(FORMAL_FUTURE_FORM_ORDER)
+    : baseSlots;
 }
 
 function normalizeRoot(root) {
@@ -2329,8 +2617,9 @@ function cloneData(value) {
 }
 
 return {
-  MATCH_FORM_ORDER: MODERN_MATCH_FORM_ORDER.map((slot) => slot.id),
+  MATCH_FORM_ORDER: MODERN_MATCH_FORM_ORDER.concat(IMPERATIVE_FORM_ORDER).map((slot) => slot.id),
   FORMAL_FUTURE_FORM_ORDER: FORMAL_FUTURE_FORM_ORDER.map((slot) => slot.id),
+  IMPERATIVE_FORM_ORDER: IMPERATIVE_FORM_ORDER.map((slot) => slot.id),
   getSeedVerbEntries,
   getSeedVocabularyEntries,
   buildVerbConjugationDeck,
