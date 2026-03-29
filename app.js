@@ -1,6 +1,6 @@
 (function initIvriQuestApp(global) {
 "use strict";
-const APP_BUILD = "20260315o";
+const APP_BUILD = "20260329a";
 
 if (global.__ivriquestAppInitialized === APP_BUILD) {
   return;
@@ -23,6 +23,7 @@ const i18nModule = appFoundation.i18n || {};
 const uiModule = appFoundation.ui || {};
 const dataModule = appFoundation.data || {};
 const lessonModule = appFoundation.lessonMode || {};
+const sentenceBankModule = appFoundation.sentenceBank || {};
 const abbreviationModule = appFoundation.abbreviation || {};
 const advConjModule = appFoundation.advConj || {};
 const verbMatchModule = appFoundation.verbMatch || {};
@@ -75,11 +76,14 @@ const resolvedContentApis = resolveContentApis ? resolveContentApis(global) : {}
 
 const {
   verbApi,
+  sentenceBankApi,
   fallbackVerbApi,
   usingFallbackVocab,
   usingFallbackAbbreviations,
+  usingFallbackSentenceBank,
   getBaseVocabularyFn,
   getAbbreviationsFn,
+  getSentenceBankFn,
   expansionTrackCount,
 } = resolvedContentApis;
 
@@ -112,6 +116,7 @@ const hasSeenWelcomeModal = persistenceModule.hasSeenWelcomeModal;
 const markWelcomeModalSeen = persistenceModule.markWelcomeModalSeen;
 const applySurveyLinks = persistenceModule.applySurveyLinks;
 const saveProgress = persistenceModule.saveProgress;
+const saveSentenceProgress = persistenceModule.saveSentenceProgress;
 const persistUiState = persistenceModule.persistUiState;
 const persistSessionState = persistenceModule.persistSessionState;
 
@@ -146,6 +151,7 @@ const endSessionAndNavigate = sessionModule.endSessionAndNavigate;
 const goHome = sessionModule.goHome;
 const showSessionSummary = sessionModule.showSessionSummary;
 const finishLesson = sessionModule.finishLesson;
+const finishSentenceBank = sessionModule.finishSentenceBank;
 const finishAbbreviation = sessionModule.finishAbbreviation;
 const clearAbbreviationIntro = sessionModule.clearAbbreviationIntro;
 const startAbbreviationTimer = sessionModule.startAbbreviationTimer;
@@ -155,9 +161,12 @@ const clearAdvConjIntro = sessionModule.clearAdvConjIntro;
 const finishAdvConj = sessionModule.finishAdvConj;
 const clearLessonStartIntro = sessionModule.clearLessonStartIntro;
 const clearSecondChanceIntro = sessionModule.clearSecondChanceIntro;
+const clearSentenceBankIntro = sessionModule.clearSentenceBankIntro;
 const clearVerbMatchIntro = sessionModule.clearVerbMatchIntro;
 const startVerbMatchTimer = sessionModule.startVerbMatchTimer;
 const stopVerbMatchTimer = sessionModule.stopVerbMatchTimer;
+const startSentenceBankTimer = sessionModule.startSentenceBankTimer;
+const stopSentenceBankTimer = sessionModule.stopSentenceBankTimer;
 const startLessonTimer = sessionModule.startLessonTimer;
 const stopLessonTimer = sessionModule.stopLessonTimer;
 
@@ -258,6 +267,29 @@ const pickQuestionMode = lessonModule.pickQuestionMode;
 const rememberOptionHistory = lessonModule.rememberOptionHistory;
 const tryStartReviewPhase = lessonModule.tryStartReviewPhase;
 
+const prepareSentenceBankDeck = sentenceBankModule.prepareSentenceBankDeck;
+const getSentenceBankPromptSpeechPayload = sentenceBankModule.getSentenceBankPromptSpeechPayload;
+const cloneSentenceBankQuestionSnapshot = sentenceBankModule.cloneSentenceBankQuestionSnapshot;
+const buildSentenceBankMistakeSummary = sentenceBankModule.buildSentenceBankMistakeSummary;
+const getSentenceBankRoundTarget = sentenceBankModule.getRoundTarget;
+const resetSentenceBankState = sentenceBankModule.resetSentenceBankState;
+const renderSentenceBankIdleState = sentenceBankModule.renderSentenceBankIdleState;
+const startSentenceBank = sentenceBankModule.startSentenceBank;
+const playSentenceBankIntro = sentenceBankModule.playSentenceBankIntro;
+const beginSentenceBankFromIntro = sentenceBankModule.beginSentenceBankFromIntro;
+const buildSentenceBankQuestion = sentenceBankModule.buildSentenceBankQuestion;
+const buildSentenceBankReviewQuestion = sentenceBankModule.buildSentenceBankReviewQuestion;
+const tryStartSentenceBankReviewPhase = sentenceBankModule.tryStartReviewPhase;
+const nextSentenceBankQuestion = sentenceBankModule.nextSentenceBankQuestion;
+const canSubmitSentenceBankQuestion = sentenceBankModule.canSubmitCurrentQuestion;
+const renderSentenceBankQuestion = sentenceBankModule.renderSentenceBankQuestion;
+const renderSentenceBankBoard = sentenceBankModule.renderSentenceBankBoard;
+const selectSentenceBankToken = sentenceBankModule.selectBankToken;
+const removeSentenceBankToken = sentenceBankModule.removePlacedToken;
+const clearSentenceBankAnswer = sentenceBankModule.clearAnswer;
+const toggleSentenceBankHint = sentenceBankModule.toggleHint;
+const applySentenceBankAnswer = sentenceBankModule.applySentenceBankAnswer;
+
 const getAbbreviationRoundTarget = abbreviationModule.getAbbreviationRoundTarget;
 const cloneAbbreviationQuestionSnapshot = abbreviationModule.cloneAbbreviationQuestionSnapshot;
 const prepareAbbreviationDeck = abbreviationModule.prepareAbbreviationDeck;
@@ -341,9 +373,11 @@ if (
   !stripNiqqud ||
   !resolveContentApis ||
   !verbApi ||
+  !sentenceBankApi ||
   !fallbackVerbApi ||
   !getBaseVocabularyFn ||
   !getAbbreviationsFn ||
+  !getSentenceBankFn ||
   !createElementRegistry ||
   !createInitialState ||
   !buildAudioCueSources ||
@@ -373,6 +407,7 @@ if (
   !markWelcomeModalSeen ||
   !applySurveyLinks ||
   !saveProgress ||
+  !saveSentenceProgress ||
   !persistUiState ||
   !persistSessionState ||
   !applyLanguage ||
@@ -405,6 +440,7 @@ if (
   !goHome ||
   !showSessionSummary ||
   !finishLesson ||
+  !finishSentenceBank ||
   !finishAbbreviation ||
   !clearAbbreviationIntro ||
   !startAbbreviationTimer ||
@@ -414,9 +450,12 @@ if (
   !finishAdvConj ||
   !clearLessonStartIntro ||
   !clearSecondChanceIntro ||
+  !clearSentenceBankIntro ||
   !clearVerbMatchIntro ||
   !startVerbMatchTimer ||
   !stopVerbMatchTimer ||
+  !startSentenceBankTimer ||
+  !stopSentenceBankTimer ||
   !startLessonTimer ||
   !stopLessonTimer ||
   !isUiLocked ||
@@ -513,6 +552,28 @@ if (
   !pickQuestionMode ||
   !rememberOptionHistory ||
   !tryStartReviewPhase ||
+  !prepareSentenceBankDeck ||
+  !getSentenceBankPromptSpeechPayload ||
+  !cloneSentenceBankQuestionSnapshot ||
+  !buildSentenceBankMistakeSummary ||
+  !getSentenceBankRoundTarget ||
+  !resetSentenceBankState ||
+  !renderSentenceBankIdleState ||
+  !startSentenceBank ||
+  !playSentenceBankIntro ||
+  !beginSentenceBankFromIntro ||
+  !buildSentenceBankQuestion ||
+  !buildSentenceBankReviewQuestion ||
+  !tryStartSentenceBankReviewPhase ||
+  !nextSentenceBankQuestion ||
+  !canSubmitSentenceBankQuestion ||
+  !renderSentenceBankQuestion ||
+  !renderSentenceBankBoard ||
+  !selectSentenceBankToken ||
+  !removeSentenceBankToken ||
+  !clearSentenceBankAnswer ||
+  !toggleSentenceBankHint ||
+  !applySentenceBankAnswer ||
   !getAbbreviationRoundTarget ||
   !cloneAbbreviationQuestionSnapshot ||
   !prepareAbbreviationDeck ||
@@ -605,23 +666,28 @@ const baseVocabulary = prepareVocabulary([
   ...getBaseVocabularyFn(),
   ...(typeof verbApi.getSeedVocabularyEntries === "function" ? verbApi.getSeedVocabularyEntries() : []),
 ]);
+const sentenceBankDeck = prepareSentenceBankDeck(typeof getSentenceBankFn === "function" ? getSentenceBankFn() : []);
 const abbreviationDeck = prepareAbbreviationDeck(getAbbreviationsFn());
 const abbreviationIdSet = new Set(abbreviationDeck.map((entry) => entry.id));
 const verbFormDeck = typeof verbApi.buildVerbConjugationDeck === "function"
   ? verbApi.buildVerbConjugationDeck({ vocabulary: baseVocabulary })
   : [];
 appRuntime.baseVocabulary = baseVocabulary;
+appRuntime.sentenceBankDeck = sentenceBankDeck;
 appRuntime.abbreviationDeck = abbreviationDeck;
 appRuntime.abbreviationIdSet = abbreviationIdSet;
 appRuntime.verbFormDeck = verbFormDeck;
 appRuntime.verbApi = verbApi;
+appRuntime.sentenceBankApi = sentenceBankApi;
 appRuntime.getBaseVocabularyFn = getBaseVocabularyFn;
 appRuntime.getAbbreviationsFn = getAbbreviationsFn;
+appRuntime.getSentenceBankFn = getSentenceBankFn;
 appRuntime.performanceDomains = PERFORMANCE_DOMAINS;
 appRuntime.domainByCategory = DOMAIN_BY_CATEGORY;
 appRuntime.fallbackDomainId = FALLBACK_DOMAIN_ID;
 appRuntime.usingFallbackVocab = usingFallbackVocab;
 appRuntime.usingFallbackAbbreviations = usingFallbackAbbreviations;
+appRuntime.usingFallbackSentenceBank = usingFallbackSentenceBank;
 
 const el = createElementRegistry(document);
 appRuntime.el = el;
@@ -655,28 +721,37 @@ if (usingFallbackAbbreviations) {
   console.warn("IvritElite: using fallback abbreviations because abbreviation-data.js was unavailable.");
 }
 
+if (usingFallbackSentenceBank) {
+  console.warn("IvritElite: using fallback sentence bank because sentence-bank-data.js was unavailable.");
+}
+
 appRuntime.helpers = {
   buildAbbreviationMistakeSummary,
   buildAdvConjMistakeSummary,
   buildAnswerDisplay,
   buildLessonMistakeSummary,
+  buildSentenceBankMistakeSummary,
   clearAbbreviationIntro,
   clearAdvConjIntro,
   clearFeedback,
   clearLessonStartIntro,
+  clearSentenceBankIntro,
   clearSecondChanceIntro,
   clearSummaryState,
   clearVerbMatchIntro,
   cloneAbbreviationQuestionSnapshot,
   cloneLessonQuestionSnapshot,
+  cloneSentenceBankQuestionSnapshot,
   closeMasteredModal,
   finishAbbreviation,
   finishAdvConj,
   finishLesson,
+  finishSentenceBank,
   getAbbreviationRoundTarget,
   getDueWords,
   getLanguageToggleLabel,
   getHebrewText,
+  getSentenceBankRoundTarget,
   isUiLocked,
   getVisibleVerbMatchRows,
   goHome,
@@ -690,10 +765,12 @@ appRuntime.helpers = {
   navigateTo,
   nextAbbreviationQuestion,
   nextQuestion,
+  nextSentenceBankQuestion,
   playAbbreviationIntro,
   playAdvConjIntro,
   playAnswerFeedbackSound,
   playLessonStartIntro,
+  playSentenceBankIntro,
   playSecondChanceIntro,
   playVerbMatchIntro,
   pickLeastSeenLessonDomainId,
@@ -710,15 +787,18 @@ appRuntime.helpers = {
   renderPromptText,
   renderPromptHint,
   renderQuestion,
+  renderSentenceBankQuestion,
   renderSpeechToggle,
   renderSessionHeader,
   renderVerbMatchRound,
   requestGoHome,
   resetAdvConjState,
   resetAbbreviationState,
+  resetSentenceBankState,
   resetSessionCounters,
   resetSessionScore,
   resetVerbMatchState,
+  saveSentenceProgress,
   scheduleIntroAutoAdvance,
   speakSpeechPayload,
   cancelSpeech,
@@ -728,9 +808,11 @@ appRuntime.helpers = {
   showBlockingOverlay,
   showSessionSummary,
   startAbbreviationTimer,
+  startSentenceBankTimer,
   startLessonTimer,
   startVerbMatchTimer,
   stopAbbreviationTimer,
+  stopSentenceBankTimer,
   stopLessonTimer,
   stopVerbMatchTimer,
   t,

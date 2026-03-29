@@ -105,6 +105,7 @@ data.calculateDomainStats = data.calculateDomainStats || function calculateDomai
 data.calculateGameModeStats = data.calculateGameModeStats || function calculateGameModeStats() {
   const runtime = getRuntime();
   const modeStats = {
+    sentenceBank: { attempts: 0, correct: 0, wrong: 0 },
     conjugation: { attempts: 0, correct: 0, wrong: 0 },
     abbreviation: { attempts: 0, correct: 0, wrong: 0 },
   };
@@ -123,8 +124,16 @@ data.calculateGameModeStats = data.calculateGameModeStats || function calculateG
     modeStats.conjugation.correct += conjugationCorrect;
   });
 
+  Object.values(runtime.state.sentenceProgress || {}).forEach((rec) => {
+    const attempts = Math.max(0, Number(rec?.attempts || 0));
+    const correct = Math.max(0, Math.min(attempts, Number(rec?.correct || 0)));
+    modeStats.sentenceBank.attempts += attempts;
+    modeStats.sentenceBank.correct += correct;
+  });
+
   modeStats.abbreviation.wrong = Math.max(0, modeStats.abbreviation.attempts - modeStats.abbreviation.correct);
   modeStats.conjugation.wrong = Math.max(0, modeStats.conjugation.attempts - modeStats.conjugation.correct);
+  modeStats.sentenceBank.wrong = Math.max(0, modeStats.sentenceBank.attempts - modeStats.sentenceBank.correct);
 
   const advConjStored = runtime.storageApi.loadJson(runtime.constants.STORAGE_KEYS.advConjStats, { attempts: 0, correct: 0 });
   modeStats.conjugation.attempts += Math.max(0, advConjStored.attempts);

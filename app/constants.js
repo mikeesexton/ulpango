@@ -6,6 +6,7 @@ const constants = app.constants = app.constants || {};
 
 constants.STORAGE_KEYS = constants.STORAGE_KEYS || Object.freeze({
   progress: "ivriquest-progress-v1",
+  sentenceProgress: "ivriquest-sentence-progress-v1",
   language: "ivriquest-language-v1",
   theme: "ivriquest-theme-v1",
   sound: "ivriquest-sound-v1",

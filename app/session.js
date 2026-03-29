@@ -18,6 +18,8 @@ session.hasActiveLearnSession = session.hasActiveLearnSession || function hasAct
     runtime.state?.lesson?.active ||
       runtime.state?.lesson?.lessonStartIntroActive ||
       runtime.state?.lesson?.secondChanceIntroActive ||
+      runtime.state?.sentenceBank?.active ||
+      runtime.state?.sentenceBank?.introActive ||
       runtime.state?.abbreviation?.active ||
       runtime.state?.abbreviation?.introActive ||
       runtime.state?.advConj?.active ||
@@ -34,6 +36,9 @@ session.isModeSessionActive = session.isModeSessionActive || function isModeSess
   }
   if (mode === "abbreviation") {
     return Boolean(runtime.state?.abbreviation?.active || runtime.state?.abbreviation?.introActive);
+  }
+  if (mode === "sentenceBank") {
+    return Boolean(runtime.state?.sentenceBank?.active || runtime.state?.sentenceBank?.introActive);
   }
   if (mode === "advConj") {
     return Boolean(runtime.state?.advConj?.active || runtime.state?.advConj?.introActive);
@@ -113,6 +118,31 @@ session.restoreSessionState = session.restoreSessionState || function restoreSes
     });
   }
 
+  if (snapshot.sentenceBank) {
+    Object.assign(runtime.state.sentenceBank, {
+      active: Boolean(snapshot.sentenceBank.active),
+      introActive: Boolean(snapshot.sentenceBank.introActive),
+      inReview: Boolean(snapshot.sentenceBank.inReview),
+      currentRound: Math.max(0, Number(snapshot.sentenceBank.currentRound || 0)),
+      secondChanceCurrent: Math.max(0, Number(snapshot.sentenceBank.secondChanceCurrent || 0)),
+      secondChanceTotal: Math.max(0, Number(snapshot.sentenceBank.secondChanceTotal || 0)),
+      startMs: Math.max(0, Number(snapshot.sentenceBank.startMs || 0)),
+      elapsedSeconds: Math.max(0, Number(snapshot.sentenceBank.elapsedSeconds || 0)),
+      askedSentenceIds: Array.isArray(snapshot.sentenceBank.askedSentenceIds) ? snapshot.sentenceBank.askedSentenceIds : [],
+      reviewQueue: Array.isArray(snapshot.sentenceBank.reviewQueue) ? snapshot.sentenceBank.reviewQueue : [],
+      currentQuestion: snapshot.sentenceBank.currentQuestion
+        ? h.cloneSentenceBankQuestionSnapshot?.(snapshot.sentenceBank.currentQuestion) || snapshot.sentenceBank.currentQuestion
+        : null,
+      wrongAnswers: Math.max(0, Number(snapshot.sentenceBank.wrongAnswers || 0)),
+      sessionMistakeKeys: Array.isArray(snapshot.sentenceBank.sessionMistakeKeys) ? snapshot.sentenceBank.sessionMistakeKeys : [],
+      availableScore: Math.max(0, Number(snapshot.sentenceBank.availableScore || 0)),
+      timerId: null,
+    });
+    if (runtime.state.sentenceBank.currentQuestion) {
+      runtime.state.sentenceBank.currentQuestion.locked = Boolean(snapshot.sentenceBank.currentQuestion?.locked);
+    }
+  }
+
   if (snapshot.abbreviation) {
     Object.assign(runtime.state.abbreviation, {
       active: Boolean(snapshot.abbreviation.active),
@@ -184,6 +214,8 @@ session.restorePendingOverlays = session.restorePendingOverlays || function rest
     h.playSecondChanceIntro?.();
   } else if (runtime.state?.lesson?.lessonStartIntroActive) {
     h.playLessonStartIntro?.();
+  } else if (runtime.state?.sentenceBank?.introActive) {
+    h.playSentenceBankIntro?.();
   } else if (runtime.state?.abbreviation?.introActive) {
     h.playAbbreviationIntro?.();
   } else if (runtime.state?.match?.verbIntroActive) {
@@ -200,6 +232,10 @@ session.resumeActiveTimers = session.resumeActiveTimers || function resumeActive
   if (runtime.state?.lesson?.active && runtime.state.lesson.startMs && !runtime.state.lesson.lessonStartIntroActive && !runtime.state.lesson.secondChanceIntroActive) {
     runtime.state.lesson.elapsedSeconds = Math.max(0, Math.floor((Date.now() - runtime.state.lesson.startMs) / 1000));
     session.startLessonTimer();
+  }
+  if (runtime.state?.sentenceBank?.active && runtime.state.sentenceBank.startMs && !runtime.state.sentenceBank.introActive) {
+    runtime.state.sentenceBank.elapsedSeconds = Math.max(0, Math.floor((Date.now() - runtime.state.sentenceBank.startMs) / 1000));
+    session.startSentenceBankTimer();
   }
   if (runtime.state?.abbreviation?.active && runtime.state.abbreviation.startMs && !runtime.state.abbreviation.introActive) {
     runtime.state.abbreviation.elapsedSeconds = Math.max(0, Math.floor((Date.now() - runtime.state.abbreviation.startMs) / 1000));
@@ -289,20 +325,26 @@ session.endSessionAndNavigate = session.endSessionAndNavigate || function endSes
 
   session.stopVerbMatchTimer();
   session.stopLessonTimer();
+  session.stopSentenceBankTimer();
   session.stopAbbreviationTimer();
   session.closeLeaveSessionConfirm();
   h.closeMasteredModal?.();
   session.clearLessonStartIntro();
   session.clearSecondChanceIntro();
+  session.clearSentenceBankIntro?.();
   session.clearVerbMatchIntro();
   session.clearAbbreviationIntro();
   session.clearAdvConjIntro();
   h.resetSessionCounters?.();
+  h.resetSentenceBankState?.();
   h.resetVerbMatchState?.();
   h.resetAbbreviationState?.();
   session.resetAdvConjState();
   runtime.state.lesson.active = false;
   runtime.state.lesson.inReview = false;
+  runtime.state.sentenceBank.active = false;
+  runtime.state.sentenceBank.inReview = false;
+  runtime.state.sentenceBank.currentQuestion = null;
   runtime.state.currentQuestion = null;
   session.clearSummaryState();
   runtime.state.mode = "home";
@@ -322,16 +364,21 @@ session.showSessionSummary = session.showSessionSummary || function showSessionS
 
   session.stopVerbMatchTimer();
   session.stopLessonTimer();
+  session.stopSentenceBankTimer();
   session.stopAbbreviationTimer();
   session.closeLeaveSessionConfirm();
   session.clearLessonStartIntro();
   session.clearSecondChanceIntro();
+  session.clearSentenceBankIntro?.();
   session.clearVerbMatchIntro();
   session.clearAbbreviationIntro();
   session.clearAdvConjIntro();
   runtime.state.lesson.active = false;
   runtime.state.lesson.inReview = false;
   runtime.state.currentQuestion = null;
+  runtime.state.sentenceBank.active = false;
+  runtime.state.sentenceBank.inReview = false;
+  runtime.state.sentenceBank.currentQuestion = null;
   runtime.state.match.active = false;
   runtime.state.abbreviation.active = false;
   runtime.state.abbreviation.currentQuestion = null;
@@ -384,6 +431,39 @@ session.finishLesson = session.finishLesson || function finishLesson() {
     incorrectCount: runtime.state.lesson.wrongAnswers,
     elapsedSeconds: runtime.state.lesson.elapsedSeconds,
     mistakes: h.buildLessonMistakeSummary?.() || [],
+  });
+};
+
+session.finishSentenceBank = session.finishSentenceBank || function finishSentenceBank() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+
+  session.stopSentenceBankTimer();
+  session.clearSentenceBankIntro?.();
+  runtime.state.sentenceBank.active = false;
+  runtime.state.sentenceBank.currentQuestion = null;
+  const reviewRounds = runtime.state.sentenceBank.secondChanceTotal;
+  runtime.state.sentenceBank.inReview = false;
+  runtime.state.sentenceBank.secondChanceCurrent = 0;
+  runtime.state.sentenceBank.secondChanceTotal = 0;
+
+  session.showSessionSummary({
+    game: "sentenceBank",
+    titleKey: "summary.sentenceBankTitle",
+    scoreKey: "summary.score",
+    scoreVars: {
+      score: runtime.state.sessionScore,
+      total: runtime.state.sentenceBank.availableScore,
+    },
+    noteKey: reviewRounds > 0 ? "summary.lessonNote" : "summary.lessonNoteNone",
+    noteVars: reviewRounds > 0 ? { count: reviewRounds } : {},
+    correctCount: Math.max(
+      0,
+      runtime.constants.LESSON_ROUNDS + reviewRounds - runtime.state.sentenceBank.wrongAnswers
+    ),
+    incorrectCount: runtime.state.sentenceBank.wrongAnswers,
+    elapsedSeconds: runtime.state.sentenceBank.elapsedSeconds,
+    mistakes: h.buildSentenceBankMistakeSummary?.() || [],
   });
 };
 
@@ -512,6 +592,13 @@ session.clearLessonStartIntro = session.clearLessonStartIntro || function clearL
   getHelpers().hideBlockingOverlay?.(runtime.el.lessonStartIntro);
 };
 
+session.clearSentenceBankIntro = session.clearSentenceBankIntro || function clearSentenceBankIntro() {
+  const runtime = getRuntime();
+  runtime.state.sentenceBank.introActive = false;
+  session.clearIntroAutoAdvance();
+  getHelpers().hideBlockingOverlay?.(runtime.el.sentenceBankIntro);
+};
+
 session.clearSecondChanceIntro = session.clearSecondChanceIntro || function clearSecondChanceIntro() {
   const runtime = getRuntime();
   runtime.state.lesson.secondChanceIntroActive = false;
@@ -544,6 +631,26 @@ session.stopVerbMatchTimer = session.stopVerbMatchTimer || function stopVerbMatc
   if (!runtime.state.match.timerId) return;
   runtime.global.clearInterval(runtime.state.match.timerId);
   runtime.state.match.timerId = null;
+};
+
+session.startSentenceBankTimer = session.startSentenceBankTimer || function startSentenceBankTimer() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  session.stopSentenceBankTimer();
+  runtime.state.sentenceBank.timerId = runtime.global.setInterval(() => {
+    if (!runtime.state.sentenceBank.active) return;
+    runtime.state.sentenceBank.elapsedSeconds = Math.max(0, Math.floor((Date.now() - runtime.state.sentenceBank.startMs) / 1000));
+    if (runtime.state.mode === "sentenceBank") {
+      h.renderSessionHeader?.();
+    }
+  }, 1000);
+};
+
+session.stopSentenceBankTimer = session.stopSentenceBankTimer || function stopSentenceBankTimer() {
+  const runtime = getRuntime();
+  if (!runtime.state.sentenceBank.timerId) return;
+  runtime.global.clearInterval(runtime.state.sentenceBank.timerId);
+  runtime.state.sentenceBank.timerId = null;
 };
 
 session.startLessonTimer = session.startLessonTimer || function startLessonTimer() {

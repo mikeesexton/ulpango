@@ -143,6 +143,11 @@ persistence.saveProgress = persistence.saveProgress || function saveProgress() {
   runtime.storageApi.saveJson(runtime.constants.STORAGE_KEYS.progress, runtime.state.progress);
 };
 
+persistence.saveSentenceProgress = persistence.saveSentenceProgress || function saveSentenceProgress() {
+  const runtime = getRuntime();
+  runtime.storageApi.saveJson(runtime.constants.STORAGE_KEYS.sentenceProgress, runtime.state.sentenceProgress);
+};
+
 persistence.persistUiState = persistence.persistUiState || function persistUiState() {
   const runtime = getRuntime();
   runtime.storageApi.saveJson(runtime.constants.STORAGE_KEYS.ui, {
@@ -193,6 +198,24 @@ persistence.persistSessionState = persistence.persistSessionState || function pe
       optionHistory: runtime.state.lesson.optionHistory,
       wrongAnswers: runtime.state.lesson.wrongAnswers,
       sessionMistakeIds: runtime.state.lesson.sessionMistakeIds,
+    },
+    sentenceBank: {
+      active: runtime.state.sentenceBank.active,
+      introActive: runtime.state.sentenceBank.introActive,
+      inReview: runtime.state.sentenceBank.inReview,
+      currentRound: runtime.state.sentenceBank.currentRound,
+      secondChanceCurrent: runtime.state.sentenceBank.secondChanceCurrent,
+      secondChanceTotal: runtime.state.sentenceBank.secondChanceTotal,
+      startMs: runtime.state.sentenceBank.startMs,
+      elapsedSeconds: runtime.state.sentenceBank.elapsedSeconds,
+      askedSentenceIds: runtime.state.sentenceBank.askedSentenceIds,
+      reviewQueue: runtime.state.sentenceBank.reviewQueue,
+      currentQuestion: runtime.state.sentenceBank.currentQuestion
+        ? h.cloneSentenceBankQuestionSnapshot?.(runtime.state.sentenceBank.currentQuestion)
+        : null,
+      wrongAnswers: runtime.state.sentenceBank.wrongAnswers,
+      sessionMistakeKeys: runtime.state.sentenceBank.sessionMistakeKeys,
+      availableScore: runtime.state.sentenceBank.availableScore,
     },
     abbreviation: {
       active: runtime.state.abbreviation.active,

@@ -390,6 +390,7 @@ test("starter conjugation verbs can carry stored niqqud across their visible for
     ["starter-verb-laavod--sense-1", "future_first_person_singular", "אֶעֱבֹד"],
     ["starter-verb-lagur--sense-1", "future_first_person_singular", "אָגוּר"],
     ["starter-verb-larutz--sense-1", "future_first_person_singular", "אָרוּץ"],
+    ["starter-verb-lirkhosh--sense-1", "future_first_person_singular", "אֶרְכּוֹשׁ"],
     ["starter-verb-lavo--sense-1", "future_third_person_plural", "יָבוֹאוּ"],
     ["starter-verb-lihyot--sense-1", "future_first_person_singular", "אֶהְיֶה"],
     ["starter-verb-lirot--sense-1", "present_feminine_singular", "רוֹאָה"],
@@ -483,6 +484,28 @@ test("starter run verb appears in conjugation with the expected English labels",
   );
 });
 
+test("starter purchase verb appears in conjugation with the expected English labels", () => {
+  const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
+  const item = deck.find((entry) => entry.id === "starter-verb-lirkhosh--sense-1");
+
+  assert.ok(item);
+  assert.equal(item.formSource, "authoritative");
+  assert.equal(item.word.he, "לרכוש");
+  assert.equal(item.word.en, "to purchase");
+  assert.equal(
+    item.forms.find((form) => form.id === "present_masculine_singular")?.englishText,
+    "he purchases"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "past_first_person_singular")?.englishText,
+    "I purchased"
+  );
+  assert.equal(
+    item.forms.find((form) => form.id === "future_first_person_singular")?.englishText,
+    "I will purchase"
+  );
+});
+
 test("verified starter and curated verbs expose stored imperative forms in the conjugation deck", () => {
   const deck = verbApi.buildVerbConjugationDeck({ vocabulary: [] });
   const expected = [
@@ -497,6 +520,7 @@ test("verified starter and curated verbs expose stored imperative forms in the c
     ["starter-verb-laavod--sense-1", "עֲבֹד"],
     ["starter-verb-lagur--sense-1", "גּוּר"],
     ["starter-verb-larutz--sense-1", "רוּץ"],
+    ["starter-verb-lirkhosh--sense-1", "רְכוֹשׁ"],
     ["starter-verb-lavo--sense-1", "בּוֹא"],
     ["starter-verb-lihyot--sense-1", "הֱיֵה"],
     ["starter-verb-lirot--sense-1", "רְאֵה"],
@@ -530,6 +554,7 @@ test("imperative slots flatten with learner-facing labels for stored authoritati
   const expected = [
     ["starter-verb-lishtot--sense-1", "imperative_second_person_feminine_singular", "שְׁתִי", "drink! (f.s.)"],
     ["starter-verb-lasim--sense-1", "imperative_second_person_plural", "שִׂימוּ", "put! (pl.)"],
+    ["starter-verb-lirkhosh--sense-1", "imperative_second_person_plural", "רִכְשׁוּ", "purchase! (pl.)"],
     ["starter-verb-lihyot--sense-1", "imperative_second_person_plural", "הֱיוּ", "be! (pl.)"],
     ["starter-verb-lakachat--sense-1", "imperative_second_person_plural", "קְחוּ", "take! (pl.)"],
     ["starter-verb-letachnen--sense-1", "imperative_second_person_plural", "תַּכְנְנוּ", "plan! (pl.)"],
@@ -756,6 +781,8 @@ test("starter verb seed entries carry per-mode availability metadata", () => {
   assert.equal(entriesById.get("starter-verb-lichtov--sense-1")?.availability?.sentenceHints, true);
   assert.equal(entriesById.get("starter-verb-larutz--sense-1")?.availability?.translationQuiz, false);
   assert.equal(entriesById.get("starter-verb-larutz--sense-1")?.availability?.sentenceHints, true);
+  assert.equal(entriesById.get("starter-verb-lirkhosh--sense-1")?.availability?.translationQuiz, false);
+  assert.equal(entriesById.get("starter-verb-lirkhosh--sense-1")?.availability?.sentenceHints, true);
   assert.equal(entriesById.get("starter-verb-letachnen--sense-1")?.availability?.translationQuiz, false);
   assert.equal(entriesById.get("starter-verb-letachnen--sense-1")?.availability?.sentenceHints, true);
 });

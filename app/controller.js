@@ -16,6 +16,14 @@ function getSession() {
   return app.session || {};
 }
 
+function getDesktopHubPanels(runtime) {
+  return [
+    { card: runtime.el?.mostMissedCard, toggle: runtime.el?.mostMissedToggle },
+    { card: runtime.el?.reviewAnalyticsCard, toggle: runtime.el?.reviewAnalyticsToggle },
+    { card: runtime.el?.settingsCard, toggle: runtime.el?.settingsToggle },
+  ];
+}
+
 controller.bindUi = controller.bindUi || function bindUi() {
   const runtime = getRuntime();
   const h = getHelpers();
@@ -25,6 +33,7 @@ controller.bindUi = controller.bindUi || function bindUi() {
     button.addEventListener("click", () => controller.handleRouteButtonPress(button.dataset.route || "home"));
   });
   runtime.el.homeLessonBtn?.addEventListener("click", () => controller.openHomeLesson("lesson"));
+  runtime.el.homeSentenceBankBtn?.addEventListener("click", () => controller.openHomeLesson("sentenceBank"));
   runtime.el.homeVerbMatchBtn?.addEventListener("click", () => controller.openHomeLesson("verbMatch"));
   runtime.el.homeAbbreviationBtn?.addEventListener("click", () => controller.openHomeLesson("abbreviation"));
   runtime.el.homeAdvConjBtn?.addEventListener("click", () => controller.openHomeLesson("advConj"));
@@ -33,6 +42,11 @@ controller.bindUi = controller.bindUi || function bindUi() {
     runtime.state.lastPlayedMode = "lesson";
     runtime.state.mode = "lesson";
     app.lessonMode?.startLesson?.();
+  });
+  runtime.el.sentenceBankBtn?.addEventListener("click", () => {
+    runtime.state.lastPlayedMode = "sentenceBank";
+    runtime.state.mode = "sentenceBank";
+    app.sentenceBank?.startSentenceBank?.();
   });
   runtime.el.verbMatchBtn?.addEventListener("click", () => {
     runtime.state.lastPlayedMode = "verbMatch";
@@ -56,6 +70,10 @@ controller.bindUi = controller.bindUi || function bindUi() {
   runtime.el.themeToggle?.addEventListener("click", () => app.i18n?.toggleTheme?.());
   runtime.el.soundToggle?.addEventListener("click", () => app.i18n?.toggleSoundPreference?.());
   runtime.el.speechToggle?.addEventListener("click", () => app.i18n?.toggleSpeechPreference?.());
+  getDesktopHubPanels(runtime).forEach(({ card, toggle }) => {
+    if (!card || !toggle) return;
+    toggle.addEventListener("click", () => controller.toggleDesktopHubPanel(card, toggle));
+  });
   runtime.el.resultsContinueBtn?.addEventListener("click", () => controller.continueFromResults());
   runtime.el.resultsReviewBtn?.addEventListener("click", () => controller.leaveSummaryAndNavigate("review"));
   runtime.el.resultsHomeBtn?.addEventListener("click", () => controller.leaveSummaryAndNavigate("home"));
@@ -83,8 +101,9 @@ controller.bindUi = controller.bindUi || function bindUi() {
       app.ui?.closeMasteredModal?.();
     }
   });
+  global.addEventListener("resize", controller.handleViewportResize);
 
-  [runtime.el.lessonStartIntro, runtime.el.secondChanceIntro, runtime.el.verbMatchIntro, runtime.el.abbreviationIntro].forEach((overlay) => {
+  [runtime.el.lessonStartIntro, runtime.el.secondChanceIntro, runtime.el.sentenceBankIntro, runtime.el.verbMatchIntro, runtime.el.abbreviationIntro].forEach((overlay) => {
     overlay?.addEventListener("pointerdown", controller.stopIntroOverlayInteraction);
     overlay?.addEventListener("click", controller.stopIntroOverlayInteraction);
   });
@@ -98,17 +117,59 @@ controller.bindUi = controller.bindUi || function bindUi() {
     if (!ok) return;
 
     runtime.state.progress = {};
+    runtime.state.sentenceProgress = {};
     runtime.state.masteredSelection = new Set();
     runtime.state.match.eligibleMasterWordId = "";
     h.resetSessionCounters?.();
+    h.resetSentenceBankState?.();
     h.resetAbbreviationState?.();
     app.persistence?.saveProgress?.();
+    app.persistence?.saveSentenceProgress?.();
     h.renderMostMissed?.();
     h.renderMasteredModal?.();
     h.renderAll?.();
     if (runtime.state.mode === "lesson" && runtime.state.lesson.active) {
       app.lessonMode?.nextQuestion?.();
     }
+  });
+  controller.syncDesktopHubPanels();
+};
+
+controller.handleViewportResize = controller.handleViewportResize || function handleViewportResize() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+  if (runtime.viewportResizeTimer) {
+    runtime.global.clearTimeout?.(runtime.viewportResizeTimer);
+  }
+  runtime.viewportResizeTimer = runtime.global.setTimeout?.(() => {
+    runtime.viewportResizeTimer = null;
+    h.renderAll?.();
+    controller.syncDesktopHubPanels();
+  }, 60);
+};
+
+controller.toggleDesktopHubPanel = controller.toggleDesktopHubPanel || function toggleDesktopHubPanel(card, toggle) {
+  const runtime = getRuntime();
+  const desktopHubActive = runtime.global.document.body?.getAttribute("data-desktop-hub-layout") === "true";
+  if (!desktopHubActive || !card || !toggle) return;
+
+  const nextCollapsed = card.getAttribute("data-collapsed") !== "true";
+  card.setAttribute("data-collapsed", nextCollapsed ? "true" : "false");
+  toggle.setAttribute("aria-expanded", String(!nextCollapsed));
+};
+
+controller.syncDesktopHubPanels = controller.syncDesktopHubPanels || function syncDesktopHubPanels() {
+  const runtime = getRuntime();
+  const desktopHubActive = runtime.global.document.body?.getAttribute("data-desktop-hub-layout") === "true";
+
+  getDesktopHubPanels(runtime).forEach(({ card, toggle }) => {
+    if (!card || !toggle) return;
+    if (card.getAttribute("data-collapsed") !== "true" && card.getAttribute("data-collapsed") !== "false") {
+      card.setAttribute("data-collapsed", "false");
+    }
+    const expanded = card.getAttribute("data-collapsed") !== "true";
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-disabled", desktopHubActive ? "false" : "true");
   });
 };
 
@@ -156,6 +217,13 @@ controller.openHomeLesson = controller.openHomeLesson || function openHomeLesson
     return;
   }
 
+  if (mode === "sentenceBank") {
+    runtime.state.lastPlayedMode = "sentenceBank";
+    runtime.state.mode = "sentenceBank";
+    app.sentenceBank?.startSentenceBank?.();
+    return;
+  }
+
   if (mode === "advConj") {
     runtime.state.lastPlayedMode = "advConj";
     runtime.state.mode = "advConj";
@@ -172,6 +240,10 @@ controller.continueFromResults = controller.continueFromResults || function cont
   const runtime = getRuntime();
   if (runtime.state.summary.game === "verbMatch") {
     app.verbMatch?.startVerbMatch?.();
+    return;
+  }
+  if (runtime.state.summary.game === "sentenceBank") {
+    app.sentenceBank?.startSentenceBank?.();
     return;
   }
   if (runtime.state.summary.game === "abbreviation") {
@@ -246,6 +318,20 @@ controller.handleNextAction = controller.handleNextAction || function handleNext
         runtime.state.abbreviation.currentQuestion.selectedOptionId === runtime.state.abbreviation.currentQuestion.entry.id,
         runtime.state.abbreviation.currentQuestion.selectedOptionId
       );
+    }
+    return;
+  }
+
+  if (runtime.state.mode === "sentenceBank") {
+    if (!runtime.state.sentenceBank.active || !runtime.state.sentenceBank.currentQuestion) {
+      return;
+    }
+    if (runtime.state.sentenceBank.currentQuestion.locked) {
+      app.sentenceBank?.nextSentenceBankQuestion?.();
+      return;
+    }
+    if (app.sentenceBank?.canSubmitCurrentQuestion?.(runtime.state.sentenceBank.currentQuestion)) {
+      app.sentenceBank?.applySentenceBankAnswer?.();
     }
     return;
   }
