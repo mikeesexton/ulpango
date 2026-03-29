@@ -37,6 +37,7 @@ jobs:
           cp -r app dist/
           cp vocab-data.js dist/
           cp abbreviation-data.js dist/
+          cp sentence-bank-data.js dist/
           cp hebrew-verbs.js dist/
           cp hebrew-idioms.js dist/
           cp .nojekyll dist/
