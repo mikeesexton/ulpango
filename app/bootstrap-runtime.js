@@ -12,6 +12,7 @@ bootstrapRuntime.createElementRegistry = bootstrapRuntime.createElementRegistry 
     shellGameplayPill: document.querySelector("#shellGameplayPill"),
     shellGameplayTime: document.querySelector("#shellGameplayTime"),
     shellGameplayCombo: document.querySelector("#shellGameplayCombo"),
+    shellHomeBtn: document.querySelector("#shellHomeBtn"),
     routeButtons: Array.from(document.querySelectorAll("[data-route]")),
     homeView: document.querySelector("#homeView"),
     homeDashboard: document.querySelector("#homeDashboard"),

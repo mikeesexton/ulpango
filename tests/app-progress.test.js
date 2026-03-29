@@ -963,8 +963,8 @@ test("sentence builder base layout trims prompt, board, and feedback spacing wit
   const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
 
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-card\s*\{[^}]*padding:\s*0\.18rem 0\.58rem 0\.24rem;[^}]*gap:\s*0\.2rem;/s);
-  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*clamp\(3\.35rem,\s*5\.8vw,\s*4rem\);[^}]*padding-inline:\s*0\.16rem;/s);
-  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.16rem 2\.72rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*clamp\(3\.35rem,\s*5\.8vw,\s*4rem\);[^}]*padding-left:\s*0\.16rem;[^}]*padding-right:\s*0\.16rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-left:\s*0\.16rem;[^}]*padding-right:\s*2\.72rem;/s);
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*36ch\);[^}]*font-size:\s*clamp\(1\.36rem,\s*3\.7vw,\s*1\.86rem\);[^}]*line-height:\s*1\.18;/s);
   assert.match(styles, /\.sentence-builder\s*\{[^}]*gap:\s*0\.68rem;/s);
   assert.match(styles, /\.sentence-answer-line\s*\{[^}]*min-height:\s*2\.9rem;[^}]*line-height:\s*1\.68;/s);
@@ -982,8 +982,8 @@ test("sentence builder mobile breakpoint uses smaller sentence tokens and a tigh
   assert.ok(mobileSentenceToken);
   assert.ok(Number(mobileSentenceToken[1]) < Number(mobileChoiceBtn[1]));
   assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.progress-strip\s*\{[^}]*height:\s*11px;/s);
-  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*3\.08rem;[^}]*padding-inline:\s*0\.04rem;/s);
-  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.04rem 2\.04rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*3\.08rem;[^}]*padding-left:\s*0\.04rem;[^}]*padding-right:\s*0\.04rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-left:\s*0\.04rem;[^}]*padding-right:\s*2\.04rem;/s);
   assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*34ch\);[^}]*font-size:\s*clamp\(1\.34rem,\s*5\.9vw,\s*1\.66rem\);/s);
   assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.lesson-footer\s*\{[^}]*bottom:\s*calc\(4\.05rem \+ env\(safe-area-inset-bottom\)\);[^}]*gap:\s*0\.34rem;/s);
   assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.feedback-tray\s*\{[^}]*padding:\s*0\.52rem 0\.66rem 0\.58rem;/s);
@@ -993,8 +993,8 @@ test("sentence builder mobile breakpoint uses smaller sentence tokens and a tigh
 test("sentence builder short mobile breakpoint adds an extra compaction step", () => {
   const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
 
-  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*2\.9rem;[^}]*padding-inline:\s*0\.02rem;/s);
-  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.02rem 1\.9rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*2\.9rem;[^}]*padding-left:\s*0\.02rem;[^}]*padding-right:\s*0\.02rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-left:\s*0\.02rem;[^}]*padding-right:\s*1\.9rem;/s);
   assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*32ch\);[^}]*font-size:\s*clamp\(1\.24rem,\s*5\.3vw,\s*1\.48rem\);/s);
   assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.sentence-token\s*\{[^}]*min-height:\s*36px;[^}]*padding:\s*0\.28rem 0\.56rem;[^}]*border-radius:\s*11px;[^}]*font-size:\s*0\.86rem;/s);
   assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.feedback-tray\s*\{[^}]*padding:\s*0\.46rem 0\.6rem 0\.5rem;/s);
@@ -1003,7 +1003,12 @@ test("sentence builder short mobile breakpoint adds an extra compaction step", (
 
 test("gameplay header styling uses a warm progress bar and a top-right status pill", () => {
   const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const markup = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 
+  assert.match(markup, /class="shell-topbar-actions"[\s\S]*id="shellGameplayPill"[\s\S]*id="shellHomeBtn"/s);
+  assert.match(styles, /\.shell-topbar-actions\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*flex-end;[^}]*direction:\s*ltr;/s);
+  assert.match(styles, /\.shell-topbar-home\s*\{[^}]*min-width:\s*2\.62rem;[^}]*min-height:\s*2\.62rem;[^}]*font-size:\s*1\.05rem;/s);
+  assert.match(styles, /body\[data-ui-lang="he"\] \.shell-topbar-actions\s*\{[^}]*flex-direction:\s*row-reverse;/s);
   assert.match(styles, /\.shell-gameplay-pill\s*\{[^}]*padding:\s*0\.46rem 0\.78rem;[^}]*border-radius:\s*999px;/s);
   assert.match(styles, /\.progress-strip\s*\{[^}]*height:\s*13px;[^}]*border:\s*1px solid rgba\(240,\s*171,\s*49,\s*0\.2\);/s);
   assert.match(styles, /\.progress-fill\s*\{[^}]*background:\s*linear-gradient\(90deg,\s*#7d1812 0%,\s*#b72a14 34%,\s*#e05a18 68%,\s*#f2a22d 88%,\s*#f6d15d 100%\);/s);
@@ -1020,8 +1025,10 @@ test("desktop layout uses three live columns and drops the old sidebar", () => {
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-ui-lang="he"\]\[data-desktop-hub-layout="true"\] \.page-stack\s*\{[^}]*grid-template-columns:\s*minmax\(290px,\s*0\.74fr\) minmax\(0,\s*1fr\) minmax\(0,\s*1fr\);/s);
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #reviewView\s*\{[^}]*order:\s*1;/s);
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #homeView\s*\{[^}]*order:\s*2;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #resultsView\s*\{[^}]*order:\s*2;/s);
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #settingsView\s*\{[^}]*order:\s*3;/s);
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] \.review-grid\s*\{[^}]*grid-template-columns:\s*1fr;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #resultsView\.active\s*\{[^}]*grid-column:\s*auto;/s);
 });
 
 test("desktop review and settings cards use centered collapsible headers", () => {
@@ -1745,6 +1752,43 @@ test("sentence builder wrong answers enqueue review in the same direction withou
   assert.equal(state.sentenceProgress["sb-review::he2en"].attempts, 2);
   assert.equal(state.sentenceProgress["sb-review::he2en"].correct, 1);
   assert.equal(state.sentenceProgress["sb-review::he2en"].misses, 1);
+});
+
+test("sentence builder accepts an alternate Hebrew speaker-gender form when the English leaves it unspecified", () => {
+  const sentenceBank = [
+    {
+      id: "sb-gender-alt",
+      category: "colloquial",
+      difficulty: 3,
+      english: "She did something shady to me, I don't trust her anymore.",
+      hebrew: "היא עשתה לי קטע מסריח, אני לא סומך עליה יותר.",
+      hebrew_alternates: [
+        {
+          text: "היא עשתה לי קטע מסריח, אני לא סומכת עליה יותר.",
+          tokens: ["היא", "עשתה", "לי", "קטע", "מסריח", "אני", "לא", "סומכת", "עליה", "יותר"],
+        },
+      ],
+      english_tokens: ["She", "did", "something", "shady", "to", "me", "I", "don't", "trust", "her", "anymore"],
+      hebrew_tokens: ["היא", "עשתה", "לי", "קטע", "מסריח", "אני", "לא", "סומך", "עליה", "יותר"],
+      english_distractors: ["he", "him", "nice"],
+      hebrew_distractors: ["הוא", "עשה", "סומכת"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  fillSentenceAnswerByTap(document, ["היא", "עשתה", "לי", "קטע", "מסריח", "אני", "לא", "סומכת", "עליה", "יותר"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 4);
+  assert.match(getFeedbackText(document), /^Correct\. The Hebrew sentence is היא עשתה לי קטע מסריח, אני לא סומכת עליה יותר\./);
+  assert.ok(getSentenceSlots(document).every((slot) => slot.classList.contains("correct") && !slot.classList.contains("wrong")));
 });
 
 test("sentence builder removes and moves placed words without collapsing the slot layout", () => {
@@ -2595,7 +2639,7 @@ test("active gameplay shows the top-right time and combo pill and hides it outsi
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
   ];
-  const harness = loadAppHarness(vocabulary);
+  const harness = loadAppHarness(vocabulary, [], [], { innerWidth: 1280 });
 
   harness.state.route = "home";
   harness.state.mode = "lesson";
@@ -2608,6 +2652,7 @@ test("active gameplay shows the top-right time and combo pill and hides it outsi
   assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "true");
   assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
   assert.equal(harness.document.querySelector("#shellGameplayPill").classList.contains("hidden"), false);
+  assert.equal(harness.document.querySelector("#shellHomeBtn").classList.contains("hidden"), false);
   assert.equal(harness.document.querySelector("#shellGameplayTime").textContent, "298s");
   assert.equal(harness.document.querySelector("#shellGameplayCombo").textContent, "x3");
   assert.match(harness.document.querySelector("#shellGameplayPill").getAttribute("aria-label"), /Time: 298s • Combo x3/);
@@ -2621,9 +2666,17 @@ test("active gameplay shows the top-right time and combo pill and hides it outsi
   assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "false");
   assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
   assert.equal(harness.document.querySelector("#shellGameplayPill").classList.contains("hidden"), true);
+  assert.equal(harness.document.querySelector("#shellHomeBtn").classList.contains("hidden"), true);
+
+  harness.state.route = "results";
+  harness.state.summary.active = true;
+  harness.app.ui.renderShellChrome();
+
+  assert.equal(harness.document.querySelector("#shellGameplayPill").classList.contains("hidden"), true);
+  assert.equal(harness.document.querySelector("#shellHomeBtn").classList.contains("hidden"), false);
 });
 
-test("desktop widths show home, review, and settings together while results still take over the stack", () => {
+test("desktop widths keep review and settings visible even on results", () => {
   const harness = loadAppHarness([], [], [], { innerWidth: 1280 });
 
   harness.state.route = "review";
@@ -2640,10 +2693,10 @@ test("desktop widths show home, review, and settings together while results stil
   harness.state.summary.active = true;
   harness.app.ui.renderRouteVisibility();
 
-  assert.equal(harness.document.body.getAttribute("data-desktop-hub-layout"), "false");
+  assert.equal(harness.document.body.getAttribute("data-desktop-hub-layout"), "true");
   assert.equal(harness.document.querySelector("#homeView").classList.contains("active"), false);
-  assert.equal(harness.document.querySelector("#reviewView").classList.contains("active"), false);
-  assert.equal(harness.document.querySelector("#settingsView").classList.contains("active"), false);
+  assert.equal(harness.document.querySelector("#reviewView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#settingsView").classList.contains("active"), true);
   assert.equal(harness.document.querySelector("#resultsView").classList.contains("active"), true);
 });
 

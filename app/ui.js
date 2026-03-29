@@ -91,11 +91,17 @@ ui.hideBlockingOverlay = ui.hideBlockingOverlay || function hideBlockingOverlay(
 
 ui.renderHomeButton = ui.renderHomeButton || function renderHomeButton() {
   const runtime = getRuntime();
-  if (!runtime.el?.homeBtn) return;
   const label = translate("session.backHome");
-  runtime.el.homeBtn.textContent = "🏠";
-  runtime.el.homeBtn.setAttribute("aria-label", label);
-  runtime.el.homeBtn.setAttribute("title", label);
+  if (runtime.el?.homeBtn) {
+    runtime.el.homeBtn.textContent = "🏠";
+    runtime.el.homeBtn.setAttribute("aria-label", label);
+    runtime.el.homeBtn.setAttribute("title", label);
+  }
+  if (runtime.el?.shellHomeBtn) {
+    runtime.el.shellHomeBtn.textContent = "🏠";
+    runtime.el.shellHomeBtn.setAttribute("aria-label", label);
+    runtime.el.shellHomeBtn.setAttribute("title", label);
+  }
 };
 
 ui.renderNiqqudToggle = ui.renderNiqqudToggle || function renderNiqqudToggle() {
@@ -152,14 +158,17 @@ ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisib
   const viewportWidth = Math.max(0, Number(runtime.global?.innerWidth || 0));
   const desktopHubLayout = viewportWidth >= 1024;
   const showResults = runtime.state.route === "results" && runtime.state.summary.active;
-  const showDesktopHub = desktopHubLayout && !showResults;
+  const showDesktopHub = desktopHubLayout;
+  const showHome = (showDesktopHub && !showResults) || (!showDesktopHub && runtime.state.route === "home");
+  const showReview = showDesktopHub || runtime.state.route === "review";
+  const showSettings = showDesktopHub || runtime.state.route === "settings";
 
   runtime.global.document.body?.setAttribute("data-desktop-hub-layout", showDesktopHub ? "true" : "false");
 
-  runtime.el?.homeView?.classList.toggle("active", showDesktopHub || runtime.state.route === "home");
+  runtime.el?.homeView?.classList.toggle("active", showHome);
   runtime.el?.resultsView?.classList.toggle("active", showResults);
-  runtime.el?.reviewView?.classList.toggle("active", showDesktopHub || runtime.state.route === "review");
-  runtime.el?.settingsView?.classList.toggle("active", showDesktopHub || runtime.state.route === "settings");
+  runtime.el?.reviewView?.classList.toggle("active", showReview);
+  runtime.el?.settingsView?.classList.toggle("active", showSettings);
   app.controller?.syncDesktopHubPanels?.();
 };
 
@@ -261,6 +270,8 @@ ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
   const runtime = getRuntime();
   const routeKey = `nav.${runtime.state.route}`;
   const { gameplayActive } = ui.getGameplayHeaderMeta();
+  const viewportWidth = Math.max(0, Number(runtime.global?.innerWidth || 0));
+  const showShellHomeButton = viewportWidth >= 1024 && (gameplayActive || (runtime.state.route === "results" && runtime.state.summary.active));
   runtime.global.document.body?.setAttribute("data-gameplay-active", gameplayActive ? "true" : "false");
   if (runtime.el?.shellTopbar) {
     runtime.el.shellTopbar.classList.toggle("gameplay-active", gameplayActive);
@@ -270,7 +281,12 @@ ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
     runtime.el.shellTopTitle.textContent = appTitleText;
     runtime.el.shellTopTitle.setAttribute("aria-label", appTitleText);
   }
+  ui.renderHomeButton();
   ui.renderGameplayPill();
+  if (runtime.el?.shellHomeBtn) {
+    runtime.el.shellHomeBtn.classList.toggle("hidden", !showShellHomeButton);
+    runtime.el.shellHomeBtn.setAttribute("aria-hidden", showShellHomeButton ? "false" : "true");
+  }
   if (runtime.el?.shellRouteChip) {
     runtime.el.shellRouteChip.textContent = translate(routeKey);
   }

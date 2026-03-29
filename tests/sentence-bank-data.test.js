@@ -420,6 +420,17 @@ test("sentence bank data keeps meal expressions as single Hebrew chips", () => {
   assert.equal(entry.hebrew_distractors.some((token) => token.includes("_")), false);
 });
 
+test("sentence bank data can mark alternate Hebrew answers for gender-ambiguous English prompts", () => {
+  const byId = new Map(loadSentenceBankApi().getSentenceBank().map((entry) => [entry.id, entry]));
+  const entry = byId.get("colloquial_09");
+
+  assert.ok(entry);
+  assert.ok(Array.isArray(entry.hebrew_alternates));
+  assert.equal(entry.hebrew_alternates.length, 1);
+  assert.equal(entry.hebrew_alternates[0].text, "היא עשתה לי קטע מסריח, אני לא סומכת עליה יותר.");
+  assert.deepEqual(Array.from(entry.hebrew_alternates[0].tokens), ["היא", "עשתה", "לי", "קטע", "מסריח", "אני", "לא", "סומכת", "עליה", "יותר"]);
+});
+
 test("sentence bank data preserves visible English or note cues for audited Hebrew nuance markers", () => {
   const byId = new Map(loadSentenceBankApi().getSentenceBank().map((entry) => [entry.id, entry]));
 

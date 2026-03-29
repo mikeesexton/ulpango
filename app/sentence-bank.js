@@ -32,6 +32,33 @@ function sanitizeTokenList(tokens) {
     .filter(Boolean);
 }
 
+function sanitizeAnswerVariants(variants, targetTokens) {
+  const targetLength = sanitizeTokenList(targetTokens).length;
+  const seen = new Set();
+
+  return (Array.isArray(variants) ? variants : [])
+    .map((variant) => {
+      if (Array.isArray(variant)) {
+        const tokens = sanitizeTokenList(variant);
+        return tokens.length ? { text: "", tokens } : null;
+      }
+      if (!variant || typeof variant !== "object") return null;
+      const tokens = sanitizeTokenList(variant.tokens || variant.tokenList);
+      if (!tokens.length) return null;
+      return {
+        text: String(variant.text || "").trim(),
+        tokens,
+      };
+    })
+    .filter((variant) => variant && variant.tokens.length === targetLength)
+    .filter((variant) => {
+      const key = JSON.stringify(variant.tokens);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
 const NON_DISTINCT_DISTRACTOR_GROUPS = [
   ["איך", "כיצד"],
   ["אך", "אבל"],
@@ -688,14 +715,40 @@ function isAnswerComplete(question) {
   return Boolean(question) && getFilledSlotCount(question) === (question.targetTokens || []).length;
 }
 
-function isPlacedAnswerCorrect(question) {
-  const expected = (question?.targetTokens || []).map((token) => String(token || "").trim());
-  const actual = getPlacedAnswerTokens(question);
-  return isEquivalentSentenceTokenOrder(expected, actual);
+function getAcceptedAnswerVariants(question) {
+  if (!question) return [];
+  const primaryTokens = sanitizeTokenList(question.targetTokens);
+  const primaryText = question.direction === "en2he"
+    ? String(question?.sentence?.hebrew || "").trim()
+    : String(question?.sentence?.english || "").trim();
+  const alternates = question.direction === "en2he"
+    ? question?.sentence?.hebrewAlternates
+    : question?.sentence?.englishAlternates;
+
+  return [
+    { text: primaryText, tokens: primaryTokens },
+    ...(Array.isArray(alternates) ? alternates : []),
+  ].filter((variant) => Array.isArray(variant?.tokens) && variant.tokens.length === primaryTokens.length);
 }
 
-function getCorrectAnswerText(question) {
+function findMatchingAcceptedAnswerVariant(question, actualTokens = getPlacedAnswerTokens(question)) {
+  const actual = sanitizeTokenList(actualTokens);
+  if (!actual.length) return null;
+  return getAcceptedAnswerVariants(question).find((variant) => (
+    isEquivalentSentenceTokenOrder(variant.tokens, actual)
+  )) || null;
+}
+
+function isPlacedAnswerCorrect(question) {
+  return Boolean(findMatchingAcceptedAnswerVariant(question));
+}
+
+function getCorrectAnswerText(question, options = {}) {
   if (!question?.sentence) return "";
+  const matchedVariant = options.matchingVariant || findMatchingAcceptedAnswerVariant(question, options.actualTokens);
+  if (matchedVariant?.text) {
+    return matchedVariant.text;
+  }
   return question.direction === "en2he" ? question.sentence.hebrew : question.sentence.english;
 }
 
@@ -772,6 +825,8 @@ sentenceBank.prepareSentenceBankDeck = sentenceBank.prepareSentenceBankDeck || f
       hebrew,
       englishTokens,
       hebrewTokens,
+      englishAlternates: sanitizeAnswerVariants(entry?.english_alternates || entry?.englishAlternates, englishTokens),
+      hebrewAlternates: sanitizeAnswerVariants(entry?.hebrew_alternates || entry?.hebrewAlternates, hebrewTokens),
       englishDistractors: sanitizeDistractors(entry?.english_distractors || entry?.englishDistractors, englishTokens),
       hebrewDistractors: sanitizeDistractors(entry?.hebrew_distractors || entry?.hebrewDistractors, hebrewTokens),
       notes: String(entry?.notes || "").trim(),
@@ -1060,7 +1115,14 @@ sentenceBank.renderSentenceBankBoard = sentenceBank.renderSentenceBankBoard || f
   const runtime = getRuntime();
   normalizeQuestionState(question);
   runtime.el.choiceContainer.innerHTML = "";
-  const sentenceFrame = buildSentenceFrame(getCorrectAnswerText(question), question.targetTokens);
+  const acceptedVariant = question.locked && question.wasLastAnswerCorrect
+    ? findMatchingAcceptedAnswerVariant(question)
+    : null;
+  const displayTargetTokens = acceptedVariant?.tokens || question.targetTokens;
+  const sentenceFrame = buildSentenceFrame(
+    getCorrectAnswerText(question, { matchingVariant: acceptedVariant }),
+    displayTargetTokens
+  );
   const slotTokenIds = getQuestionSlotTokenIds(question);
   const slottedTokens = getSlottedTokens(question);
 
@@ -1449,8 +1511,10 @@ sentenceBank.applySentenceBankAnswer = sentenceBank.applySentenceBankAnswer || f
   const question = normalizeQuestionState(runtime.state.sentenceBank.currentQuestion);
   if (!question || question.locked || !isAnswerComplete(question)) return;
 
-  const isCorrect = isPlacedAnswerCorrect(question);
-  const correctAnswer = getCorrectAnswerText(question);
+  const placedTokens = getPlacedAnswerTokens(question);
+  const matchedVariant = findMatchingAcceptedAnswerVariant(question, placedTokens);
+  const isCorrect = Boolean(matchedVariant);
+  const correctAnswer = getCorrectAnswerText(question, { matchingVariant: matchedVariant, actualTokens: placedTokens });
   const questionKey = getQuestionKey(question);
 
   app.speech?.cancel?.();

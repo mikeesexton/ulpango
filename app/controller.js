@@ -60,6 +60,7 @@ controller.bindUi = controller.bindUi || function bindUi() {
   runtime.el.nextBtn.addEventListener("click", () => controller.handleNextAction());
   runtime.el.masterVerbBtn?.addEventListener("click", () => app.verbMatch?.moveEligibleVerbToMastered?.());
   runtime.el.homeBtn?.addEventListener("click", () => session.requestGoHome?.());
+  runtime.el.shellHomeBtn?.addEventListener("click", () => session.requestGoHome?.());
   runtime.el.homeLangToggle?.addEventListener("click", () => app.i18n?.toggleLanguage?.());
   runtime.el.homeThemeToggle?.addEventListener("click", () => app.i18n?.toggleTheme?.());
   runtime.el.homeNiqqudToggle?.addEventListener("click", () => app.i18n?.toggleNiqqudPreference?.());

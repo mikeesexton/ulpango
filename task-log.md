@@ -7,6 +7,29 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-29 17:35 — Keep desktop side panels visible on results and polish sentence-builder prompt/answer behavior
+
+**Requested:** Keep the desktop `Review` and `Settings` panels visible on the game-end/results screen, add a desktop topbar home button next to the time/combo pill with Hebrew mirroring, fix a Hebrew sentence-builder prompt overlap where the speaker button collided with centered text, and accept alternate Hebrew speaker-gender sentence-builder answers when the English prompt does not specify the speaker’s gender.
+
+**Files changed:**
+- `index.html` — Added a shared topbar action cluster with a desktop-only home emoji button and bumped frontend asset versions so the newer shell/runtime files invalidate correctly.
+- `app/bootstrap-runtime.js` — Registered the new topbar home button in the shared element registry.
+- `app/controller.js` — Bound the new topbar home button to the existing leave-home/session-exit flow.
+- `app/ui.js` — Changed desktop route visibility so results render in the center column while `Review` and `Settings` stay live on desktop, and updated shell chrome to show the topbar home button during gameplay/results at desktop widths.
+- `styles.css` — Added styling for the topbar action cluster/home button, changed desktop results from full-width takeover to center-column behavior inside the three-column hub, and fixed sentence-builder prompt spacing by reserving right-side speaker-button space explicitly instead of using logical inline padding that flipped in Hebrew.
+- `app/sentence-bank.js` — Added support for alternate accepted sentence-builder answers, wired answer validation to accept any configured alternate token sequence, and made locked success rendering/feedback use the matched alternate answer text when appropriate.
+- `sentence-bank-data.js` — Added a feminine-speaker alternate Hebrew answer for `colloquial_09` so `סומכת` is accepted when the English prompt leaves the speaker’s gender unspecified.
+- `tests/app-progress.test.js` — Added/updated regressions for desktop results keeping the side panels visible, the desktop topbar home button behavior, the Hebrew prompt-spacing fix, and acceptance of alternate Hebrew gender variants in Sentence Builder.
+- `tests/sentence-bank-data.test.js` — Added a data regression covering alternate Hebrew answers for gender-ambiguous English prompts.
+
+**Behavior changed:** On desktop, results no longer wipe out the side rails; the summary now occupies the center column while `Review` and `Settings` remain visible and collapsible beside it. The topbar also gets a desktop home emoji button next to the gameplay pill, mirrored appropriately in Hebrew. In Sentence Builder, centered Hebrew prompts no longer overlap the speaker button, and entries like `אני לא סומכת עליה יותר` now count as correct when the English sentence does not force a masculine speaker.
+
+**Tests run:** `node --test tests/app-progress.test.js tests/sentence-bank-data.test.js` — passed, 108/108. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** Manual QA should confirm the desktop center-column results layout still feels balanced at widths near the three-column breakpoint and that the topbar home button remains desktop-only. For the new sentence-builder alternate-answer path, the main thing to watch is that only explicitly configured alternates are accepted, so we don’t accidentally loosen validation for unrelated sentences.
+
+---
+
 ### 2026-03-29 16:46 — Combine desktop review cards into one collapsible panel
 
 **Requested:** Replace the separate `Most Missed` and `Category Analytics` desktop boxes with one unified collapsible review box, then publish the update to GitHub.
