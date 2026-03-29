@@ -1028,10 +1028,14 @@ test("desktop review and settings cards use centered collapsible headers", () =>
   const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
   const markup = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 
-  assert.match(markup, /id="mostMissedToggle"[\s\S]*aria-controls="mostMissedPanel"/s);
-  assert.match(markup, /id="reviewAnalyticsToggle"[\s\S]*aria-controls="reviewAnalyticsPanel"/s);
+  assert.match(markup, /id="reviewPanelToggle"[\s\S]*aria-controls="reviewPanel"/s);
+  assert.doesNotMatch(markup, /id="mostMissedToggle"/);
+  assert.doesNotMatch(markup, /id="reviewAnalyticsToggle"/);
   assert.match(markup, /id="settingsToggle"[\s\S]*aria-controls="settingsPanel"/s);
+  assert.match(markup, /class="review-section-title"[^>]*data-i18n="missed.title"/s);
+  assert.match(markup, /class="review-section-title"[^>]*data-i18n="review.analyticsEyebrow"/s);
   assert.match(styles, /\.collapsible-toggle\s*\{[^}]*width:\s*100%;[^}]*text-align:\s*center;/s);
+  assert.match(styles, /\.review-section-title\s*\{[^}]*text-align:\s*center;/s);
   assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] \.collapsible-card\[data-collapsed="true"\] \.collapsible-content\s*\{[^}]*display:\s*none;/s);
 });
 
@@ -2645,8 +2649,8 @@ test("desktop widths show home, review, and settings together while results stil
 
 test("desktop hub cards collapse on desktop but stay expanded on mobile", () => {
   const desktopHarness = loadAppHarness([], [], [], { innerWidth: 1280 });
-  const desktopCard = desktopHarness.document.querySelector("#mostMissedCard");
-  const desktopToggle = desktopHarness.document.querySelector("#mostMissedToggle");
+  const desktopCard = desktopHarness.document.querySelector("#reviewPanelCard");
+  const desktopToggle = desktopHarness.document.querySelector("#reviewPanelToggle");
 
   assert.equal(desktopHarness.document.body.getAttribute("data-desktop-hub-layout"), "true");
   assert.equal(desktopCard.getAttribute("data-collapsed"), "false");
@@ -2661,8 +2665,8 @@ test("desktop hub cards collapse on desktop but stay expanded on mobile", () => 
   assert.equal(desktopToggle.getAttribute("aria-expanded"), "true");
 
   const mobileHarness = loadAppHarness([], [], [], { innerWidth: 400 });
-  const mobileCard = mobileHarness.document.querySelector("#mostMissedCard");
-  const mobileToggle = mobileHarness.document.querySelector("#mostMissedToggle");
+  const mobileCard = mobileHarness.document.querySelector("#reviewPanelCard");
+  const mobileToggle = mobileHarness.document.querySelector("#reviewPanelToggle");
 
   assert.equal(mobileHarness.document.body.getAttribute("data-desktop-hub-layout"), "false");
   assert.equal(mobileCard.getAttribute("data-collapsed"), "false");

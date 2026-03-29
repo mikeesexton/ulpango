@@ -18,8 +18,7 @@ function getSession() {
 
 function getDesktopHubPanels(runtime) {
   return [
-    { card: runtime.el?.mostMissedCard, toggle: runtime.el?.mostMissedToggle },
-    { card: runtime.el?.reviewAnalyticsCard, toggle: runtime.el?.reviewAnalyticsToggle },
+    { card: runtime.el?.reviewPanelCard, toggle: runtime.el?.reviewPanelToggle },
     { card: runtime.el?.settingsCard, toggle: runtime.el?.settingsToggle },
   ];
 }

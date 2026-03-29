@@ -7,6 +7,25 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-29 16:46 — Combine desktop review cards into one collapsible panel
+
+**Requested:** Replace the separate `Most Missed` and `Category Analytics` desktop boxes with one unified collapsible review box, then publish the update to GitHub.
+
+**Files changed:**
+- `index.html` — Replaced the two separate review-side articles with one `Review` collapsible card containing `Most Missed` and `Category Analytics` as internal sections, and bumped the cache-busting asset versions for the updated shell files.
+- `app/bootstrap-runtime.js` — Swapped the old separate review-card element lookups for the new unified review-panel card and toggle.
+- `app/controller.js` — Retargeted the desktop-hub collapse wiring so it manages the new unified review panel instead of two separate review cards.
+- `styles.css` — Added internal review-section styling and divider treatment so the unified review box still reads as two clear subsections while collapsing as one card.
+- `tests/app-progress.test.js` — Updated the desktop layout/collapse regressions to expect a single review toggle and a unified review card rather than separate `Most Missed` and `Category Analytics` toggles.
+
+**Behavior changed:** On desktop, the left rail now has a single collapsible `Review` box instead of two separate collapsible cards. Expanding it shows `Most Missed` and `Category Analytics` as subsections inside the same panel, which reduces visual fragmentation while keeping all the same information available.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 97/97. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main manual QA item is just checking the spacing/balance of the internal divider on desktop in both themes, especially in Hebrew where the centered subsection headings and dense analytics cards share the same panel.
+
+---
+
 ### 2026-03-29 16:38 — Fix English prompt punctuation order inside Hebrew UI
 
 **Requested:** Investigate a Hebrew-UI bug where an English sentence-builder prompt showed its final period on the wrong side of the sentence.

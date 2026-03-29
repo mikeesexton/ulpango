@@ -1811,9 +1811,33 @@ body[data-theme="light"] .feedback-tray.error .feedback-detail {
   align-items: start;
 }
 
+.review-panel-card {
+  gap: 0.82rem;
+}
+
+.review-panel-content {
+  gap: 0.98rem;
+}
+
+.review-section {
+  display: grid;
+  gap: 0.68rem;
+}
+
+.review-section-title {
+  margin: 0;
+  color: var(--brand);
+  font-family: "Alegreya", serif;
+  font-size: 1.08rem;
+  line-height: 1.1;
+  text-align: center;
+}
+
 .review-analytics-card {
   align-self: start;
   gap: 0.65rem;
+  padding-top: 0.94rem;
+  border-top: 1px solid rgba(166, 186, 214, 0.16);
 }
 
 .review-analytics-card .domain-grid,
@@ -2251,6 +2275,10 @@ body[data-ui-lang="he"] #reviewView .section-head {
 
 body[data-ui-lang="he"] #reviewView .section-head h2 {
   width: 100%;
+  text-align: center;
+}
+
+body[data-ui-lang="he"] #reviewView .review-section-title {
   text-align: center;
 }
 
