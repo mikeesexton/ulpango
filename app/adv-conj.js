@@ -326,6 +326,7 @@ advConj.renderAdvConjQuestion = advConj.renderAdvConjQuestion || function render
     runtime.el.promptText.textContent = question.promptText;
     runtime.el.promptText.classList.remove("hidden");
     runtime.el.promptText.classList.toggle("hebrew", question.promptIsHebrew);
+    runtime.el.promptText.classList.toggle("english-prompt", !question.promptIsHebrew);
   }
   advConj.renderAdvConjChoices(question);
   h.renderNiqqudToggle?.();

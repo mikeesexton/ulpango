@@ -32,6 +32,7 @@ ui.isUiLocked = ui.isUiLocked || function isUiLocked() {
     runtime.state?.welcomeModalOpen ||
       runtime.state?.lesson?.lessonStartIntroActive ||
       runtime.state?.lesson?.secondChanceIntroActive ||
+      runtime.state?.sentenceBank?.introActive ||
       runtime.state?.abbreviation?.introActive ||
       runtime.state?.match?.verbIntroActive ||
       runtime.state?.leaveConfirmOpen ||
@@ -148,10 +149,18 @@ ui.setPromptCardVisibility = ui.setPromptCardVisibility || function setPromptCar
 
 ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisibility() {
   const runtime = getRuntime();
-  runtime.el?.homeView?.classList.toggle("active", runtime.state.route === "home");
-  runtime.el?.resultsView?.classList.toggle("active", runtime.state.route === "results" && runtime.state.summary.active);
-  runtime.el?.reviewView?.classList.toggle("active", runtime.state.route === "review");
-  runtime.el?.settingsView?.classList.toggle("active", runtime.state.route === "settings");
+  const viewportWidth = Math.max(0, Number(runtime.global?.innerWidth || 0));
+  const desktopHubLayout = viewportWidth >= 1024;
+  const showResults = runtime.state.route === "results" && runtime.state.summary.active;
+  const showDesktopHub = desktopHubLayout && !showResults;
+
+  runtime.global.document.body?.setAttribute("data-desktop-hub-layout", showDesktopHub ? "true" : "false");
+
+  runtime.el?.homeView?.classList.toggle("active", showDesktopHub || runtime.state.route === "home");
+  runtime.el?.resultsView?.classList.toggle("active", showResults);
+  runtime.el?.reviewView?.classList.toggle("active", showDesktopHub || runtime.state.route === "review");
+  runtime.el?.settingsView?.classList.toggle("active", showDesktopHub || runtime.state.route === "settings");
+  app.controller?.syncDesktopHubPanels?.();
 };
 
 ui.isGameplayRouteActive = ui.isGameplayRouteActive || function isGameplayRouteActive() {
@@ -159,28 +168,99 @@ ui.isGameplayRouteActive = ui.isGameplayRouteActive || function isGameplayRouteA
   return runtime.state.route === "home" && !runtime.state.summary.active && (app.session?.hasActiveLearnSession?.() || false);
 };
 
-ui.getShellGameTitleKey = ui.getShellGameTitleKey || function getShellGameTitleKey() {
+ui.formatCompactElapsedSeconds = ui.formatCompactElapsedSeconds || function formatCompactElapsedSeconds(seconds) {
+  return `${Math.max(0, Number(seconds || 0))}s`;
+};
+
+ui.getGameplayHeaderMeta = ui.getGameplayHeaderMeta || function getGameplayHeaderMeta() {
   const runtime = getRuntime();
-  if (!ui.isGameplayRouteActive()) {
-    return "";
+  const gameplayActive = ui.isGameplayRouteActive();
+  const comboCount = Math.max(0, Number(runtime.state.sessionStreak || 0));
+  let progressText = "";
+  let timeSeconds = 0;
+
+  if (gameplayActive) {
+    if (runtime.state.mode === "verbMatch") {
+      const hasMatch = runtime.state.match.active && runtime.state.match.currentVerb;
+      progressText = hasMatch
+        ? translate("match.progress", { current: runtime.state.match.matchedCount, total: runtime.state.match.totalPairs })
+        : translate("match.progress", { current: 0, total: 0 });
+      timeSeconds = runtime.state.match.elapsedSeconds;
+    } else if (runtime.state.mode === "abbreviation") {
+      const targetRounds = app.abbreviation?.getAbbreviationRoundTarget?.() || runtime.constants.ABBREVIATION_ROUNDS;
+      progressText = translate("session.round", {
+        current: runtime.state.abbreviation.currentRound,
+        total: targetRounds,
+      });
+      timeSeconds = runtime.state.abbreviation.elapsedSeconds;
+    } else if (runtime.state.mode === "sentenceBank") {
+      const inReview = Boolean(runtime.state.sentenceBank.inReview);
+      const totalRounds = app.sentenceBank?.getRoundTarget?.() || runtime.constants.LESSON_ROUNDS;
+      progressText = inReview
+        ? translate("session.secondChanceProgress", {
+            current: runtime.state.sentenceBank.secondChanceCurrent,
+            total: runtime.state.sentenceBank.secondChanceTotal,
+          })
+        : translate("session.round", {
+            current: runtime.state.sentenceBank.currentRound,
+            total: totalRounds,
+          });
+      timeSeconds = runtime.state.sentenceBank.elapsedSeconds;
+    } else if (runtime.state.mode === "advConj") {
+      progressText = translate("session.round", {
+        current: runtime.state.advConj.currentRound,
+        total: runtime.constants.ADV_CONJ_ROUNDS,
+      });
+      timeSeconds = runtime.state.advConj.elapsedSeconds;
+    } else {
+      const inSecondChance = Boolean(runtime.state.lesson.inReview);
+      progressText = inSecondChance
+        ? translate("session.secondChanceProgress", {
+            current: runtime.state.lesson.secondChanceCurrent,
+            total: runtime.state.lesson.secondChanceTotal,
+          })
+        : translate("session.round", {
+            current: runtime.state.lesson.currentRound,
+            total: runtime.constants.LESSON_ROUNDS,
+          });
+      timeSeconds = runtime.state.lesson.elapsedSeconds;
+    }
   }
-  if (runtime.state.mode === "verbMatch") {
-    return "game.conjugationName";
+
+  return {
+    gameplayActive,
+    progressText,
+    timeSeconds,
+    timeText: ui.formatCompactElapsedSeconds(timeSeconds),
+    comboCount,
+    comboText: `x${comboCount}`,
+    timeAriaText: translate("session.timer", { seconds: timeSeconds }),
+    comboAriaText: translate("session.combo", { count: comboCount }),
+  };
+};
+
+ui.renderGameplayPill = ui.renderGameplayPill || function renderGameplayPill() {
+  const runtime = getRuntime();
+  const meta = ui.getGameplayHeaderMeta();
+  if (!runtime.el?.shellGameplayPill) return;
+  const shouldShow = meta.gameplayActive;
+
+  if (runtime.el.shellGameplayTime) {
+    runtime.el.shellGameplayTime.textContent = meta.timeText;
   }
-  if (runtime.state.mode === "abbreviation") {
-    return "game.abbreviationName";
+  if (runtime.el.shellGameplayCombo) {
+    runtime.el.shellGameplayCombo.textContent = meta.comboText;
   }
-  if (runtime.state.mode === "advConj") {
-    return "game.advConjName";
-  }
-  return "game.translationName";
+
+  runtime.el.shellGameplayPill.classList.toggle("hidden", !shouldShow);
+  runtime.el.shellGameplayPill.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+  runtime.el.shellGameplayPill.setAttribute("aria-label", `${meta.timeAriaText} • ${meta.comboAriaText}`);
 };
 
 ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
   const runtime = getRuntime();
   const routeKey = `nav.${runtime.state.route}`;
-  const shellGameTitleKey = ui.getShellGameTitleKey();
-  const gameplayActive = ui.isGameplayRouteActive();
+  const { gameplayActive } = ui.getGameplayHeaderMeta();
   runtime.global.document.body?.setAttribute("data-gameplay-active", gameplayActive ? "true" : "false");
   if (runtime.el?.shellTopbar) {
     runtime.el.shellTopbar.classList.toggle("gameplay-active", gameplayActive);
@@ -190,12 +270,7 @@ ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
     runtime.el.shellTopTitle.textContent = appTitleText;
     runtime.el.shellTopTitle.setAttribute("aria-label", appTitleText);
   }
-  if (runtime.el?.shellGameTitle) {
-    const gameTitleText = shellGameTitleKey ? translate(shellGameTitleKey) : "";
-    runtime.el.shellGameTitle.textContent = gameTitleText;
-    runtime.el.shellGameTitle.classList.toggle("hidden", !gameplayActive || !gameTitleText);
-    runtime.el.shellGameTitle.setAttribute("aria-hidden", gameplayActive && gameTitleText ? "false" : "true");
-  }
+  ui.renderGameplayPill();
   if (runtime.el?.shellRouteChip) {
     runtime.el.shellRouteChip.textContent = translate(routeKey);
   }
@@ -220,7 +295,41 @@ ui.renderShellChrome = ui.renderShellChrome || function renderShellChrome() {
 ui.updateLessonProgress = ui.updateLessonProgress || function updateLessonProgress(percent) {
   const runtime = getRuntime();
   if (!runtime.el?.lessonProgressFill) return;
-  runtime.el.lessonProgressFill.style.width = `${Math.max(0, Math.min(100, percent || 0))}%`;
+  const normalizedPercent = Math.max(0, Math.min(100, Number(percent || 0)));
+  runtime.el.lessonProgressFill.style.width = `${normalizedPercent}%`;
+  runtime.el.lessonProgressFill.classList.toggle("is-empty", normalizedPercent <= 0);
+  runtime.el.lessonProgressBar?.setAttribute("aria-valuenow", String(normalizedPercent));
+};
+
+ui.getProgressStreakTier = ui.getProgressStreakTier || function getProgressStreakTier(streak = getRuntime().state.sessionStreak) {
+  const normalized = Math.max(0, Number(streak || 0));
+  if (normalized >= 8) return 4;
+  if (normalized >= 6) return 3;
+  if (normalized >= 4) return 2;
+  if (normalized >= 2) return 1;
+  return 0;
+};
+
+ui.renderProgressBarState = ui.renderProgressBarState || function renderProgressBarState() {
+  const runtime = getRuntime();
+  const progressBar = runtime.el?.lessonProgressBar;
+  const progressFill = runtime.el?.lessonProgressFill;
+  const streakTier = String(ui.getProgressStreakTier(runtime.state.sessionStreak));
+  const meta = ui.getGameplayHeaderMeta();
+  const parts = [
+    String(meta.progressText || "").trim(),
+    String(meta.timeAriaText || "").trim(),
+    String(meta.comboAriaText || "").trim(),
+  ].filter(Boolean);
+
+  if (progressBar) {
+    progressBar.dataset.streakTier = streakTier;
+    progressBar.setAttribute("aria-label", parts.join(" • ") || "Lesson progress");
+    progressBar.setAttribute("title", parts.join(" • "));
+  }
+  if (progressFill) {
+    progressFill.dataset.streakTier = streakTier;
+  }
 };
 
 ui.questionNeedsSelection = ui.questionNeedsSelection || function questionNeedsSelection(question) {
@@ -282,7 +391,7 @@ ui.updateLessonShellModeState = ui.updateLessonShellModeState || function update
 
   const layoutMode = runtime.state.mode === "verbMatch"
     ? "verb-match"
-    : (runtime.state.mode === "lesson" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj")
+    : (runtime.state.mode === "lesson" || runtime.state.mode === "sentenceBank" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj")
       ? "standard"
       : "idle";
 
@@ -290,8 +399,10 @@ ui.updateLessonShellModeState = ui.updateLessonShellModeState || function update
   promptCard.dataset.gameLayout = layoutMode;
   shell.classList.toggle("mode-standard", layoutMode === "standard");
   shell.classList.toggle("mode-verb-match", layoutMode === "verb-match");
+  shell.classList.toggle("mode-sentence-bank", runtime.state.mode === "sentenceBank");
   promptCard.classList.toggle("mode-standard", layoutMode === "standard");
   promptCard.classList.toggle("mode-verb-match", layoutMode === "verb-match");
+  promptCard.classList.toggle("mode-sentence-bank", runtime.state.mode === "sentenceBank");
   if (lessonTitleRow) {
     lessonTitleRow.classList.toggle("hidden", ui.isGameplayRouteActive());
     lessonTitleRow.setAttribute("aria-hidden", ui.isGameplayRouteActive() ? "true" : "false");
@@ -328,7 +439,7 @@ ui.updateStickyLessonActionsState = ui.updateStickyLessonActionsState || functio
   const feedbackDetail = runtime.el?.feedbackDetail || runtime.global?.document?.querySelector?.("#feedbackDetail");
   if (!actionBar) return;
   const hasVisibleAction = Array.from(actionBar.querySelectorAll("button")).some((button) => !button.classList.contains("hidden"));
-  const canShowFeedback = runtime.state.mode === "lesson" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj";
+  const canShowFeedback = runtime.state.mode === "lesson" || runtime.state.mode === "sentenceBank" || runtime.state.mode === "abbreviation" || runtime.state.mode === "advConj";
   const hasFeedback = canShowFeedback && Boolean(
     String(feedbackSentence?.textContent || "").trim() ||
     String(feedbackDetail?.textContent || "").trim()
@@ -350,11 +461,12 @@ ui.updateStickyLessonActionsState = ui.updateStickyLessonActionsState || functio
 ui.renderPromptHint = ui.renderPromptHint || function renderPromptHint() {
   const runtime = getRuntime();
   if (!runtime.el?.promptHint) return;
-  const showHint = runtime.state.mode === "verbMatch"
+  const speechHint = runtime.state.mode === "verbMatch"
     && runtime.state.match.active
     && (app.speech?.isEnabled?.() || false)
     && (app.speech?.isSupported?.() || false);
-  runtime.el.promptHint.textContent = showHint ? translate("speech.tipSelectHebrewFirst") : "";
+  const showHint = Boolean(speechHint);
+  runtime.el.promptHint.textContent = speechHint ? translate("speech.tipSelectHebrewFirst") : "";
   runtime.el.promptHint.classList.toggle("hidden", !showHint);
   ui.updatePromptCardState();
 };
@@ -366,6 +478,9 @@ ui.getCurrentPromptSpeechPayload = ui.getCurrentPromptSpeechPayload || function 
   }
   if (runtime.state.mode === "abbreviation") {
     return app.abbreviation?.getAbbreviationPromptSpeechPayload?.() || null;
+  }
+  if (runtime.state.mode === "sentenceBank") {
+    return app.sentenceBank?.getSentenceBankPromptSpeechPayload?.() || null;
   }
   if (runtime.state.mode === "advConj") {
     return app.advConj?.getAdvConjPromptSpeechPayload?.() || null;
@@ -455,6 +570,16 @@ ui.renderLearnState = ui.renderLearnState || function renderLearnState() {
     return;
   }
 
+  if (runtime.state.sentenceBank.active || runtime.state.mode === "sentenceBank") {
+    if (runtime.state.sentenceBank.active && runtime.state.sentenceBank.currentQuestion) {
+      app.sentenceBank?.renderSentenceBankQuestion?.();
+    } else {
+      app.sentenceBank?.renderSentenceBankIdleState?.();
+    }
+    ui.renderPromptHint();
+    return;
+  }
+
   if (runtime.state.mode === "advConj") {
     if (runtime.state.advConj.active && runtime.state.advConj.currentQuestion) {
       app.advConj?.renderAdvConjQuestion?.();
@@ -484,24 +609,18 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
   const data = getData();
   ui.updateLessonShellModeState();
   const finalizeHeaderRender = () => {
+    ui.renderProgressBarState();
+    ui.renderShellChrome();
     ui.updateStickyLessonActionsState();
     app.persistence?.persistSessionState?.();
   };
 
   ui.renderPromptHint();
-  if (runtime.el.sessionScore) {
-    runtime.el.sessionScore.textContent = translate("session.combo", { count: runtime.state.sessionStreak });
-  }
-  runtime.el.statusRow?.classList.toggle("hidden", false);
-  runtime.el.vocabCount.textContent = "";
-  runtime.el.vocabCount.classList.add("hidden");
   runtime.el.masterVerbBtn?.classList.add("hidden");
   ui.updateLessonProgress(0);
 
   if (runtime.state.mode === "summary" && runtime.state.summary.active) {
     runtime.el.modeTitle.textContent = translate(runtime.state.summary.titleKey || "summary.resultsHeader", runtime.state.summary.titleVars);
-    runtime.el.lessonStatus.textContent = "";
-    runtime.el.sessionScore.textContent = "";
     runtime.el.nextBtn.classList.add("hidden");
     finalizeHeaderRender();
     return;
@@ -515,10 +634,6 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
       : translate("match.progress", { current: 0, total: 0 });
 
     runtime.el.modeTitle.textContent = verbTitle;
-    runtime.el.lessonStatus.textContent = pairProgress;
-    runtime.el.vocabCount.classList.remove("hidden");
-    runtime.el.vocabCount.textContent = translate("match.timer", { seconds: runtime.state.match.elapsedSeconds });
-    runtime.el.sessionScore.textContent = translate("session.combo", { count: runtime.state.sessionStreak });
     ui.updateLessonProgress(
       runtime.state.match.totalPairs
         ? Math.round((runtime.state.match.matchedCount / runtime.state.match.totalPairs) * 100)
@@ -553,12 +668,6 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     runtime.el.modeTitle.textContent = runtime.state.abbreviation.active
       ? translate("session.abbreviationTitle")
       : translate("session.abbreviationStart");
-    runtime.el.lessonStatus.textContent = translate("session.round", {
-      current: runtime.state.abbreviation.currentRound,
-      total: targetRounds,
-    });
-    runtime.el.vocabCount.classList.remove("hidden");
-    runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.abbreviation.elapsedSeconds });
     ui.updateLessonProgress(targetRounds ? Math.round((runtime.state.abbreviation.currentRound / targetRounds) * 100) : 0);
     runtime.el.nextBtn.disabled = ui.questionNeedsSelection(runtime.state.abbreviation.currentQuestion);
     runtime.el.nextBtn.textContent = hasQuestion && !runtime.state.abbreviation.currentQuestion?.locked
@@ -569,15 +678,33 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     return;
   }
 
+  if (runtime.state.mode === "sentenceBank") {
+    const inReview = Boolean(runtime.state.sentenceBank.inReview);
+    const hasQuestion = runtime.state.sentenceBank.active && Boolean(runtime.state.sentenceBank.currentQuestion);
+    const question = runtime.state.sentenceBank.currentQuestion;
+    const totalRounds = app.sentenceBank?.getRoundTarget?.() || runtime.constants.LESSON_ROUNDS;
+    const canCheck = app.sentenceBank?.canSubmitCurrentQuestion?.(question) || false;
+
+    runtime.el.modeTitle.textContent = inReview
+      ? translate("session.sentenceBankSecondChanceTitle")
+      : translate("session.sentenceBankTitle");
+    ui.updateLessonProgress(
+      inReview
+        ? 100
+        : Math.round((runtime.state.sentenceBank.currentRound / Math.max(1, totalRounds)) * 100)
+    );
+    runtime.el.nextBtn.disabled = hasQuestion && !question?.locked ? !canCheck : false;
+    runtime.el.nextBtn.textContent = hasQuestion && !question?.locked
+      ? translate("session.check")
+      : translate("session.next");
+    runtime.el.nextBtn.classList.toggle("hidden", !hasQuestion);
+    finalizeHeaderRender();
+    return;
+  }
+
   if (runtime.state.mode === "advConj") {
     const hasQuestion = runtime.state.advConj.active && Boolean(runtime.state.advConj.currentQuestion);
     runtime.el.modeTitle.textContent = translate("game.advConjName");
-    runtime.el.lessonStatus.textContent = translate("session.round", {
-      current: runtime.state.advConj.currentRound,
-      total: runtime.constants.ADV_CONJ_ROUNDS,
-    });
-    runtime.el.vocabCount.classList.remove("hidden");
-    runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.advConj.elapsedSeconds });
     ui.updateLessonProgress(
       runtime.constants.ADV_CONJ_ROUNDS
         ? Math.round((runtime.state.advConj.currentRound / runtime.constants.ADV_CONJ_ROUNDS) * 100)
@@ -597,17 +724,6 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
   runtime.el.modeTitle.textContent = inSecondChance
     ? translate("session.secondChanceTitle")
     : translate("session.mixedTitle", { rounds: runtime.constants.LESSON_ROUNDS });
-  runtime.el.lessonStatus.textContent = inSecondChance
-    ? translate("session.secondChanceProgress", {
-        current: runtime.state.lesson.secondChanceCurrent,
-        total: runtime.state.lesson.secondChanceTotal,
-      })
-    : translate("session.round", {
-        current: runtime.state.lesson.currentRound,
-        total: runtime.constants.LESSON_ROUNDS,
-      });
-  runtime.el.vocabCount.classList.remove("hidden");
-  runtime.el.vocabCount.textContent = translate("session.timer", { seconds: runtime.state.lesson.elapsedSeconds });
   ui.updateLessonProgress(
     inSecondChance
       ? 100
@@ -640,8 +756,10 @@ ui.renderPromptText = ui.renderPromptText || function renderPromptText(question 
 
   if (question.promptIsHebrew) {
     runtime.el.promptText.classList.add("hebrew");
+    runtime.el.promptText.classList.remove("english-prompt");
   } else {
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
   }
 
   if (question.promptIsHebrew && question.word && promptUsesWordSurface) {
@@ -693,6 +811,13 @@ ui.renderGameModePerformance = ui.renderGameModePerformance || function renderGa
     abbreviation: { attempts: 0, correct: 0, wrong: 0 },
   };
   const cards = [
+    {
+      emoji: "🧩",
+      title: translate("game.sentenceBankName"),
+      attempts: stats.sentenceBank.attempts,
+      correct: stats.sentenceBank.correct,
+      wrong: stats.sentenceBank.wrong,
+    },
     {
       emoji: "🔗",
       title: translate("game.conjugationName"),
@@ -962,6 +1087,7 @@ ui.renderIdleLessonState = ui.renderIdleLessonState || function renderIdleLesson
   h.renderSessionHeader?.();
   ui.renderPromptLabel("", false);
   runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.classList.add("english-prompt");
   runtime.el.promptText.textContent = translate("learn.idlePrompt");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
@@ -976,6 +1102,7 @@ ui.renderHomeLessonButtons = ui.renderHomeLessonButtons || function renderHomeLe
     ? runtime.state.mode
     : runtime.state.lastPlayedMode || "lesson";
   ui.setHomeLessonState(runtime.el?.homeLessonBtn, highlightedMode === "lesson");
+  ui.setHomeLessonState(runtime.el?.homeSentenceBankBtn, highlightedMode === "sentenceBank");
   ui.setHomeLessonState(runtime.el?.homeVerbMatchBtn, highlightedMode === "verbMatch");
   ui.setHomeLessonState(runtime.el?.homeAbbreviationBtn, highlightedMode === "abbreviation");
 };

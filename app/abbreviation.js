@@ -140,6 +140,7 @@ abbreviation.renderAbbreviationIdleState = abbreviation.renderAbbreviationIdleSt
   h.renderSessionHeader?.();
   app.ui?.renderPromptLabel?.("", false);
   runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.classList.add("english-prompt");
   runtime.el.promptText.textContent = translate("prompt.abbreviationStart");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
@@ -181,6 +182,7 @@ abbreviation.startAbbreviation = abbreviation.startAbbreviation || function star
     abbreviation.renderAbbreviationIdleState();
     app.ui?.renderPromptLabel?.(translate("prompt.noAbbreviationTitle"), true);
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
     runtime.el.promptText.textContent = translate("prompt.noAbbreviationBody");
     h.setFeedback?.(translate("prompt.noAbbreviationTitle"), false);
     return;

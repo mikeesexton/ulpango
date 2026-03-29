@@ -217,6 +217,7 @@ globalThis.__appTestExports = {
   applyAnswer,
   applyAbbreviationAnswer,
   applyAdvConjAnswer,
+  applySentenceBankAnswer,
   applyVerbMatchMismatch,
   applyVerbMatchSuccess,
   buildAbbreviationMistakeSummary,
@@ -229,6 +230,7 @@ globalThis.__appTestExports = {
   confirmLeaveSession,
   closeLeaveSessionConfirm,
   closeWelcomeModal,
+  clearSentenceBankAnswer,
   document,
   goHome,
   getMostMissedRanked,
@@ -239,6 +241,7 @@ globalThis.__appTestExports = {
   navigateTo,
   nextAbbreviationQuestion,
   nextQuestion,
+  nextSentenceBankQuestion,
   renderChoices,
   requestLeaveSession,
   requestGoHome,
@@ -246,8 +249,10 @@ globalThis.__appTestExports = {
   restoreSessionState,
   startAbbreviation,
   startAdvConj,
+  startSentenceBank,
   startVerbMatch,
   toggleSoundPreference,
+  toggleSentenceBankHint,
   toggleSpeechPreference,
   updateProgress,
   state,
@@ -327,6 +332,7 @@ globalThis.__appTestExports = {
     Set,
     Promise,
     URLSearchParams,
+    innerWidth: Number(options.innerWidth || 0),
     setTimeout: trackedSetTimeout,
     clearTimeout: trackedClearTimeout,
     setInterval: trackedSetInterval,
@@ -411,6 +417,11 @@ globalThis.__appTestExports = {
         return abbreviations;
       },
     },
+    IvriQuestSentenceBank: {
+      getSentenceBank() {
+        return options.sentenceBank || [];
+      },
+    },
     IvriQuestHebrewVerbs: {
       MATCH_FORM_ORDER: [
         "present_masculine_singular",
@@ -468,6 +479,7 @@ globalThis.__appTestExports = {
     path.join(__dirname, "..", "app", "ui.js"),
     path.join(__dirname, "..", "app", "data.js"),
     path.join(__dirname, "..", "app", "lesson.js"),
+    path.join(__dirname, "..", "app", "sentence-bank.js"),
     path.join(__dirname, "..", "app", "abbreviation.js"),
     path.join(__dirname, "..", "app", "adv-conj.js"),
     path.join(__dirname, "..", "app", "verb-match.js"),
@@ -516,6 +528,120 @@ function getFeedbackText(document) {
   const sentence = document.querySelector("#feedbackSentence").textContent;
   const detail = document.querySelector("#feedbackDetail").textContent;
   return [sentence, detail].filter(Boolean).join(" ");
+}
+
+function findVisibleButtonByText(root, selector, text) {
+  return root.querySelectorAll(selector).find((node) => (
+    node.textContent === text
+    && !node.classList.contains("hidden")
+    && !node.classList.contains("used")
+  ));
+}
+
+function getSentenceSlots(document) {
+  return document.querySelector("#choiceContainer").querySelectorAll(".sentence-slot");
+}
+
+function getSentenceStaticTexts(document) {
+  return document.querySelector("#choiceContainer").querySelectorAll(".sentence-static").map((node) => node.textContent);
+}
+
+function getSentenceStaticWordChunks(document) {
+  return getSentenceStaticTexts(document).filter((text) => /[A-Za-z0-9]/.test(text));
+}
+
+function createFakeDataTransfer() {
+  const store = new Map();
+  return {
+    effectAllowed: "move",
+    dropEffect: "move",
+    setData(type, value) {
+      store.set(type, String(value));
+    },
+    getData(type) {
+      return store.get(type) || "";
+    },
+  };
+}
+
+function simulateDragAndDrop(source, target) {
+  const dataTransfer = createFakeDataTransfer();
+  const baseEvent = {
+    preventDefault() {},
+    stopPropagation() {},
+  };
+  (source.listeners.dragstart || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: source,
+    currentTarget: source,
+    dataTransfer,
+  }));
+  (target.listeners.dragenter || []).forEach((handler) => handler({
+    ...baseEvent,
+    target,
+    currentTarget: target,
+    dataTransfer,
+  }));
+  (target.listeners.dragover || []).forEach((handler) => handler({
+    ...baseEvent,
+    target,
+    currentTarget: target,
+    dataTransfer,
+  }));
+  (target.listeners.drop || []).forEach((handler) => handler({
+    ...baseEvent,
+    target,
+    currentTarget: target,
+    dataTransfer,
+  }));
+  (source.listeners.dragend || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: source,
+    currentTarget: source,
+    dataTransfer,
+  }));
+}
+
+function dragSentenceTokenToSlot(document, tokenText, slotIndex) {
+  const source = findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", tokenText);
+  const target = getSentenceSlots(document)[slotIndex];
+  simulateDragAndDrop(source, target);
+}
+
+function dragPlacedSentenceToken(document, fromIndex, toIndex) {
+  const slots = getSentenceSlots(document);
+  simulateDragAndDrop(slots[fromIndex], slots[toIndex]);
+}
+
+function placeSentenceTokenByTap(document, tokenText, slotIndex) {
+  const slot = getSentenceSlots(document)[slotIndex];
+  slot.click();
+  findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", tokenText).click();
+}
+
+function fillSentenceAnswerByTap(document, tokens) {
+  tokens.forEach((token, index) => placeSentenceTokenByTap(document, token, index));
+}
+
+function placeSentenceTokenInNextEmptySlotByTap(document, tokenText) {
+  findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", tokenText).click();
+}
+
+function pressKey(node, key) {
+  const baseEvent = {
+    key,
+    preventDefault() {},
+    stopPropagation() {},
+  };
+  (node.listeners.keydown || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: node,
+    currentTarget: node,
+  }));
+}
+
+function getSentenceSlotTexts(document) {
+  return getSentenceSlots(document).map((slot) => slot.textContent.replace(/\u00A0/g, "").trim());
 }
 
 test.afterEach(() => {
@@ -704,6 +830,1114 @@ test("show nikud preference persists when advancing translation and abbreviation
   nextAbbreviationQuestion();
   assert.equal(state.showNiqqudInline, true);
   assert.ok(state.abbreviation.currentQuestion);
+});
+
+test("sentence builder renders english answer lines left-to-right, keeps punctuation visible, and shows post-answer game tips", () => {
+  const sentenceBank = [
+    {
+      id: "sb-1",
+      category: "everyday",
+      difficulty: 2,
+      english: "He's just talking nonsense, don't take him seriously.",
+      hebrew: "הוא סתם מדבר שטויות, אל תיקח אותו ברצינות.",
+      english_tokens: ["He's", "just", "talking", "nonsense", "don't", "take", "him", "seriously"],
+      hebrew_tokens: ["הוא", "סתם", "מדבר", "שטויות", "אל", "תיקח", "אותו", "ברצינות"],
+      english_distractors: ["she", "truth", "listen", "later"],
+      hebrew_distractors: ["היא", "אמת", "תקשיב", "מחר"],
+      notes: "Third person gender swap (הוא/היא, מדבר/מדברת, אותו/אותה) is a good distractor set here.",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(state.sentenceBank.currentQuestion.direction, "he2en");
+  assert.equal(document.querySelector("#nextBtn").disabled, true);
+  assert.equal(document.querySelector("#stickyLessonActions").textContent.includes("Hint"), false);
+  assert.equal(document.querySelector("#stickyLessonActions").textContent.includes("Clear"), false);
+  assert.equal(document.querySelector("#promptHint").classList.contains("hidden"), true);
+  assert.equal(document.querySelector("#promptLabel").classList.contains("hidden"), true);
+  assert.equal(getSentenceSlots(document)[0].getAttribute("dir"), undefined);
+
+  fillSentenceAnswerByTap(document, ["He's", "just", "talking", "nonsense", "don't", "take", "him", "seriously"]);
+  assert.equal(document.querySelector("#nextBtn").disabled, false);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 2);
+  assert.equal(
+    getFeedbackText(document),
+    "Correct. The English sentence is He's just talking nonsense, don't take him seriously. "
+      + "Game tip: Watch the gender match here."
+  );
+  assert.equal(state.sentenceProgress["sb-1::he2en"].attempts, 1);
+  assert.equal(state.sentenceProgress["sb-1::he2en"].correct, 1);
+  assert.equal(state.sentenceProgress["sb-1::he2en"].level, 1);
+  assert.equal(state.sentenceProgress["sb-1::he2en"].misses, 0);
+  assert.equal(state.sentenceProgress["sb-1::en2he"], undefined);
+
+  const modeStats = harness.app.data.calculateGameModeStats();
+  assert.equal(modeStats.sentenceBank.attempts, 1);
+  assert.equal(modeStats.sentenceBank.correct, 1);
+  assert.equal(modeStats.sentenceBank.wrong, 0);
+});
+
+test("sentence builder rewrites formal notes into short learner-facing tips", () => {
+  const sentenceBank = [
+    {
+      id: "sb-formal-tip",
+      category: "formal",
+      difficulty: 3,
+      english: "The central question is how to implement this in practice, not just in theory.",
+      hebrew: "השאלה המרכזית היא כיצד ליישם זאת בפועל, ולא רק בתיאוריה.",
+      english_tokens: ["The", "central", "question", "is", "how", "to", "implement", "this", "in", "practice", "not", "just", "in", "theory"],
+      hebrew_tokens: ["השאלה", "המרכזית", "היא", "כיצד", "ליישם", "זאת", "בפועל", "ולא", "רק", "בתיאוריה"],
+      english_distractors: ["do", "important", "why"],
+      hebrew_distractors: ["מדוע", "לעשות", "החשובה"],
+      notes: "כיצד is the formal version of איך (how). ליישם (to implement) is formal; colloquial would be לעשות (to do).",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  fillSentenceAnswerByTap(document, ["The", "central", "question", "is", "how", "to", "implement", "this", "in", "practice", "not", "just", "in", "theory"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(
+    getFeedbackText(document),
+    "Correct. The English sentence is The central question is how to implement this in practice, not just in theory. "
+      + "Game tip: This one uses a more formal tone. Pick the more polished wording."
+  );
+});
+
+test("sentence builder prompt styles keep the prompt centered while answer rows stay language-aligned", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*justify-content:\s*center;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*text-align:\s*center;/s);
+  assert.match(styles, /\.prompt-text\.english-prompt\s*\{[^}]*direction:\s*ltr;[^}]*unicode-bidi:\s*isolate;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\.hebrew\s*\{[^}]*text-align:\s*center;/s);
+  assert.match(styles, /\.sentence-answer-line\.english\s*\{[^}]*text-align:\s*left;/s);
+  assert.match(styles, /\.sentence-answer-line\.hebrew\s*\{[^}]*text-align:\s*right;/s);
+});
+
+test("sentence builder gives English prompts explicit LTR prompt styling in Hebrew UI", () => {
+  const sentenceBank = [
+    {
+      id: "sb-english-prompt-bidi",
+      category: "formal",
+      difficulty: 3,
+      english: "One must consider the long-term implications before making a decision.",
+      hebrew: "יש לשקול את ההשלכות ארוכות הטווח לפני קבלת החלטה.",
+      english_tokens: ["One", "must", "consider", "the", "long-term", "implications", "before", "making", "a", "decision"],
+      hebrew_tokens: ["יש", "לשקול", "את", "ההשלכות", "ארוכות", "הטווח", "לפני", "קבלת", "החלטה"],
+      english_distractors: ["brief", "ignore", "afterward"],
+      hebrew_distractors: ["קצר", "להתעלם", "לאחר מכן"],
+      notes: "Formal register: יש לשקול means one should consider.",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  state.language = "he";
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  const prompt = document.querySelector("#promptText");
+  assert.equal(prompt.textContent, "One must consider the long-term implications before making a decision.");
+  assert.equal(prompt.classList.contains("english-prompt"), true);
+  assert.equal(prompt.classList.contains("hebrew"), false);
+});
+
+test("sentence builder base layout trims prompt, board, and feedback spacing without changing alignment", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-card\s*\{[^}]*padding:\s*0\.18rem 0\.58rem 0\.24rem;[^}]*gap:\s*0\.2rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*clamp\(3\.35rem,\s*5\.8vw,\s*4rem\);[^}]*padding-inline:\s*0\.16rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.16rem 2\.72rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*36ch\);[^}]*font-size:\s*clamp\(1\.36rem,\s*3\.7vw,\s*1\.86rem\);[^}]*line-height:\s*1\.18;/s);
+  assert.match(styles, /\.sentence-builder\s*\{[^}]*gap:\s*0\.68rem;/s);
+  assert.match(styles, /\.sentence-answer-line\s*\{[^}]*min-height:\s*2\.9rem;[^}]*line-height:\s*1\.68;/s);
+  assert.match(styles, /\.sentence-token-bank\s*\{[^}]*gap:\s*0\.44rem 0\.34rem;/s);
+  assert.match(styles, /\.sentence-answer-meta\s*\{[^}]*font-size:\s*0\.8rem;/s);
+  assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.feedback-tray\s*\{[^}]*padding:\s*0\.64rem 0\.8rem 0\.68rem;/s);
+});
+
+test("sentence builder mobile breakpoint uses smaller sentence tokens and a tighter footer stack", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const mobileChoiceBtn = styles.match(/@media \(max-width: 767px\)\s*\{[\s\S]*?\.choice-btn\s*\{[^}]*min-height:\s*(\d+)px;/s);
+  const mobileSentenceToken = styles.match(/@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.sentence-token\s*\{[^}]*min-height:\s*(\d+)px;[^}]*padding:\s*0\.32rem 0\.6rem;[^}]*border-radius:\s*12px;[^}]*font-size:\s*0\.9rem;/s);
+
+  assert.ok(mobileChoiceBtn);
+  assert.ok(mobileSentenceToken);
+  assert.ok(Number(mobileSentenceToken[1]) < Number(mobileChoiceBtn[1]));
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.progress-strip\s*\{[^}]*height:\s*11px;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*3\.08rem;[^}]*padding-inline:\s*0\.04rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.04rem 2\.04rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*34ch\);[^}]*font-size:\s*clamp\(1\.34rem,\s*5\.9vw,\s*1\.66rem\);/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.lesson-footer\s*\{[^}]*bottom:\s*calc\(4\.05rem \+ env\(safe-area-inset-bottom\)\);[^}]*gap:\s*0\.34rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.feedback-tray\s*\{[^}]*padding:\s*0\.52rem 0\.66rem 0\.58rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.next-btn\s*\{[^}]*min-height:\s*50px;[^}]*font-size:\s*0\.96rem;/s);
+});
+
+test("sentence builder short mobile breakpoint adds an extra compaction step", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*min-height:\s*2\.9rem;[^}]*padding-inline:\s*0\.02rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-card\.has-prompt-control \.prompt-content-row\s*\{[^}]*padding-inline:\s*0\.02rem 1\.9rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*max-width:\s*min\(100%,\s*32ch\);[^}]*font-size:\s*clamp\(1\.24rem,\s*5\.3vw,\s*1\.48rem\);/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.sentence-token\s*\{[^}]*min-height:\s*36px;[^}]*padding:\s*0\.28rem 0\.56rem;[^}]*border-radius:\s*11px;[^}]*font-size:\s*0\.86rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.feedback-tray\s*\{[^}]*padding:\s*0\.46rem 0\.6rem 0\.5rem;/s);
+  assert.match(styles, /@media \(max-width: 767px\) and \(max-height: 760px\)\s*\{[\s\S]*?\.lesson-shell\.mode-sentence-bank \.next-btn\s*\{[^}]*min-height:\s*46px;[^}]*font-size:\s*0\.92rem;/s);
+});
+
+test("gameplay header styling uses a warm progress bar and a top-right status pill", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+  assert.match(styles, /\.shell-gameplay-pill\s*\{[^}]*padding:\s*0\.46rem 0\.78rem;[^}]*border-radius:\s*999px;/s);
+  assert.match(styles, /\.progress-strip\s*\{[^}]*height:\s*13px;[^}]*border:\s*1px solid rgba\(240,\s*171,\s*49,\s*0\.2\);/s);
+  assert.match(styles, /\.progress-fill\s*\{[^}]*background:\s*linear-gradient\(90deg,\s*#7d1812 0%,\s*#b72a14 34%,\s*#e05a18 68%,\s*#f2a22d 88%,\s*#f6d15d 100%\);/s);
+  assert.match(styles, /\.progress-fill::after\s*\{[^}]*background:\s*radial-gradient\(circle at 28% 50%,[^}]*#f8d35d 40%/s);
+  assert.match(styles, /\.progress-strip\[data-streak-tier="4"\] \.progress-fill,\s*\.progress-fill\[data-streak-tier="4"\]\s*\{[^}]*brightness\(1\.21\)[^}]*0 0 42px rgba\(248,\s*211,\s*93,\s*0\.3\);/s);
+});
+
+test("desktop layout uses three live columns and drops the old sidebar", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const markup = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+
+  assert.doesNotMatch(markup, /class="desktop-nav\b/);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] \.page-stack\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\) minmax\(290px,\s*0\.74fr\);/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-ui-lang="he"\]\[data-desktop-hub-layout="true"\] \.page-stack\s*\{[^}]*grid-template-columns:\s*minmax\(290px,\s*0\.74fr\) minmax\(0,\s*1fr\) minmax\(0,\s*1fr\);/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #reviewView\s*\{[^}]*order:\s*1;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #homeView\s*\{[^}]*order:\s*2;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] #settingsView\s*\{[^}]*order:\s*3;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] \.review-grid\s*\{[^}]*grid-template-columns:\s*1fr;/s);
+});
+
+test("desktop review and settings cards use centered collapsible headers", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  const markup = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+
+  assert.match(markup, /id="mostMissedToggle"[\s\S]*aria-controls="mostMissedPanel"/s);
+  assert.match(markup, /id="reviewAnalyticsToggle"[\s\S]*aria-controls="reviewAnalyticsPanel"/s);
+  assert.match(markup, /id="settingsToggle"[\s\S]*aria-controls="settingsPanel"/s);
+  assert.match(styles, /\.collapsible-toggle\s*\{[^}]*width:\s*100%;[^}]*text-align:\s*center;/s);
+  assert.match(styles, /@media \(min-width: 1024px\)\s*\{[\s\S]*?body\[data-desktop-hub-layout="true"\] \.collapsible-card\[data-collapsed="true"\] \.collapsible-content\s*\{[^}]*display:\s*none;/s);
+});
+
+test("Hebrew progress bars fill from right to left", () => {
+  const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+  assert.match(styles, /body\[data-ui-lang="he"\] \.progress-fill\s*\{[^}]*margin-left:\s*auto;[^}]*margin-right:\s*0;[^}]*background:\s*linear-gradient\(270deg,\s*#7d1812 0%,\s*#b72a14 34%,\s*#e05a18 68%,\s*#f2a22d 88%,\s*#f6d15d 100%\);/s);
+  assert.match(styles, /body\[data-ui-lang="he"\] \.progress-fill::after\s*\{[^}]*left:\s*-1px;[^}]*circle at 72% 50%/s);
+});
+
+test("sentence builder uses compact phrase chips instead of prefilled english glue", () => {
+  const sentenceBank = [
+    {
+      id: "sb-streamlined-english",
+      category: "colloquial",
+      difficulty: 2,
+      english: "I don't have energy for this right now, we'll talk later.",
+      hebrew: "אין לי כוח לזה עכשיו, נדבר אחר כך.",
+      english_tokens: ["I", "don't", "have", "energy", "for this", "right now", "we'll", "talk", "later"],
+      hebrew_tokens: ["אין", "לי", "כוח", "לזה", "עכשיו", "נדבר", "אחר", "כך"],
+      english_distractors: ["more time", "tomorrow morning", "never"],
+      hebrew_distractors: ["יש", "מחר", "דיברנו"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 9);
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "for this"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "right now"));
+
+  fillSentenceAnswerByTap(document, ["I", "don't", "have", "energy", "for this", "right now", "we'll", "talk", "later"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.match(getFeedbackText(document), /^Correct\. The English sentence is I don't have energy for this right now, we'll talk later\./);
+});
+
+test("sentence builder renders formal predicate phrases like is based on as a single chip", () => {
+  const sentenceBank = [
+    {
+      id: "sb-based-on-phrase",
+      category: "formal",
+      difficulty: 3,
+      english: "The analysis is based on several assumptions, which may not be accurate.",
+      hebrew: "הניתוח מבוסס על מספר הנחות יסוד, שייתכן שאינן מדויקות.",
+      english_tokens: ["The analysis", "is based on", "several assumptions", "which", "may not be", "accurate"],
+      hebrew_tokens: ["הניתוח", "מבוסס", "על", "מספר", "הנחות", "יסוד", "שייתכן", "שאינן", "מדויקות"],
+      english_distractors: ["The research", "depends on", "many assumptions"],
+      hebrew_distractors: ["המחקר", "תלוי", "מוכחות"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 6);
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "is based on"));
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "is"), undefined);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "based"), undefined);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "on"), undefined);
+});
+
+test("sentence builder keeps right now as a single colloquial chip", () => {
+  const sentenceBank = [
+    {
+      id: "sb-right-now-phrase",
+      category: "colloquial",
+      difficulty: 2,
+      english: "Are you serious right now? That sounds completely ridiculous to me.",
+      hebrew: "אתה רציני עכשיו? זה נשמע לי הזוי לגמרי.",
+      english_tokens: ["Are you", "serious", "right now", "That sounds", "completely ridiculous", "to me"],
+      hebrew_tokens: ["אתה", "רציני", "עכשיו", "זה", "נשמע", "לי", "הזוי", "לגמרי"],
+      english_distractors: ["You look", "slightly weird", "totally normal"],
+      hebrew_distractors: ["נראה", "קצת", "נורמלי"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "right now"));
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "right"), undefined);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "now"), undefined);
+});
+
+test("sentence builder renders request scaffolds like Can we get as one option while keeping the row blank", () => {
+  const sentenceBank = [
+    {
+      id: "sb-can-we-get-phrase",
+      category: "professional",
+      difficulty: 2,
+      english: "Can we get clarification on this matter? It's not entirely clear.",
+      hebrew: "אפשר לקבל הבהרה בנושא הזה? זה לא לגמרי ברור.",
+      english_tokens: ["Can we get", "clarification", "on this matter", "It's not", "entirely clear"],
+      hebrew_tokens: ["אפשר", "לקבל", "הבהרה", "בנושא", "הזה", "זה", "לא", "לגמרי", "ברור"],
+      english_distractors: ["quick summary", "about that", "fully understood"],
+      hebrew_distractors: ["הסבר", "על", "מובן"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 5);
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "Can we get"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "It's not"));
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "Can"), undefined);
+});
+
+test("sentence builder renders Hebrew meal compounds as one chip with shape-matched distractors", () => {
+  const sentenceBank = [
+    {
+      id: "sb-hebrew-meal-compound",
+      category: "everyday",
+      difficulty: 1,
+      english: "I want to plan dinner.",
+      hebrew: "אני רוצה לתכנן ארוחת ערב.",
+      english_tokens: ["I want", "to plan", "dinner"],
+      hebrew_tokens: ["אני", "רוצה", "לתכנן", "ארוחת ערב"],
+      english_distractors: ["need to cook", "lunch plans", "breakfast"],
+      hebrew_distractors: ["ארוחת צהריים", "ארוחת בוקר", "צריך"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 4);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "ארוחת ערב"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "ארוחת צהריים"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "ארוחת בוקר"));
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "ארוחת"), undefined);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "ערב"), undefined);
+});
+
+test("sentence builder attaches punctuation to the preceding answer chunk so commas do not hang alone", () => {
+  const sentenceBank = [
+    {
+      id: "sb-inline-punctuation",
+      category: "everyday",
+      difficulty: 1,
+      english: "I'm running a few minutes late, I'm already on my way.",
+      hebrew: "אני מאחר בכמה דקות, כבר יוצא לדרך.",
+      english_tokens: ["I'm", "running", "a", "few", "minutes", "late", "I'm", "on", "my", "way"],
+      hebrew_tokens: ["אני", "מאחר", "בכמה", "דקות", "כבר", "יוצא", "לדרך"],
+      english_distractors: ["hours", "returning", "still"],
+      hebrew_distractors: ["שעות", "חוזר", "עוד"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  const answerLine = document.querySelector("#choiceContainer").querySelector(".sentence-answer-line");
+  const topLevelStaticTexts = answerLine.children
+    .filter((child) => child.classList.contains("sentence-static"))
+    .map((child) => child.textContent);
+  const attachedSuffixes = answerLine.querySelectorAll(".sentence-static-attached").map((child) => child.textContent);
+
+  assert.equal(topLevelStaticTexts.includes(", "), false);
+  assert.equal(topLevelStaticTexts.includes("."), false);
+  assert.deepEqual(attachedSuffixes, [", ", "."]);
+});
+
+test("sentence builder keeps article-based english prompts fully blank by compacting phrase chips", () => {
+  const sentenceBank = [
+    {
+      id: "sb-article-phrase",
+      category: "everyday",
+      difficulty: 1,
+      english: "The soap ran out, we need to buy more.",
+      hebrew: "נגמר הסבון, צריך לקנות.",
+      english_tokens: ["The soap", "ran out", "we need", "to buy", "more"],
+      hebrew_tokens: ["נגמר", "הסבון", "צריך", "לקנות"],
+      english_distractors: ["hair gel", "shampoo bottle", "we want"],
+      hebrew_distractors: ["נשאר", "השמפו", "רוצים"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 5);
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "The soap"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "we need"));
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "to buy"));
+});
+
+test("sentence builder keeps fused-form english prompts fully blank by compacting phrase chips", () => {
+  const sentenceBank = [
+    {
+      id: "sb-restored-alignment",
+      category: "formal",
+      difficulty: 3,
+      english: "It can be inferred from this that the model is not stable under certain conditions.",
+      hebrew: "ניתן להסיק מכך כי המודל אינו יציב בתנאים מסוימים.",
+      english_tokens: ["It", "can", "be", "inferred", "from this", "that", "the", "model", "is", "not", "stable", "under", "certain", "conditions"],
+      hebrew_tokens: ["ניתן", "להסיק", "מכך", "כי", "המודל", "אינו", "יציב", "בתנאים", "מסוימים"],
+      english_distractors: ["can see", "look at", "fully accurate"],
+      hebrew_distractors: ["אפשר", "לראות", "מדויק"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.equal(getSentenceSlots(document).length, 14);
+  assert.deepEqual(getSentenceStaticWordChunks(document), []);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "from this"));
+});
+
+test("sentence builder lets you drag into any blank and still supports tap-to-place fallback", () => {
+  const sentenceBank = [
+    {
+      id: "sb-drag",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  dragSentenceTokenToSlot(document, "tomorrow", 4);
+  dragSentenceTokenToSlot(document, "We", 0);
+  placeSentenceTokenByTap(document, "will", 1);
+  placeSentenceTokenByTap(document, "see", 2);
+  placeSentenceTokenByTap(document, "you", 3);
+
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "answer-1",
+      "answer-2",
+      "answer-3",
+      "answer-4",
+    ])
+  );
+  assert.equal(document.querySelector("#nextBtn").disabled, false);
+});
+
+test("sentence builder contracts the bank after a word is used instead of keeping placeholders", () => {
+  const sentenceBank = [
+    {
+      id: "sb-contracting-bank",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  const initialButtons = document.querySelector("#choiceContainer").querySelectorAll(".sentence-token");
+  assert.equal(initialButtons.length, 7);
+
+  placeSentenceTokenByTap(document, "We", 0);
+
+  const bankButtons = document.querySelector("#choiceContainer").querySelectorAll(".sentence-token");
+  assert.equal(bankButtons.length, 6);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "We"), undefined);
+});
+
+test("sentence builder inserts a dragged bank word into an occupied slot and shifts later words right", () => {
+  const sentenceBank = [
+    {
+      id: "sb-insert-bank-into-occupied",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "We", 0);
+  placeSentenceTokenByTap(document, "will", 1);
+  dragSentenceTokenToSlot(document, "tomorrow", 4);
+  dragSentenceTokenToSlot(document, "see", 1);
+
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "answer-2",
+      "answer-1",
+      "",
+      "answer-4",
+    ])
+  );
+  assert.deepEqual(getSentenceSlotTexts(document), ["We", "see", "will", "", "tomorrow"]);
+});
+
+test("sentence builder returns the last word to the bank when an occupied-slot insert happens on a full row", () => {
+  const sentenceBank = [
+    {
+      id: "sb-insert-full-overflow",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  fillSentenceAnswerByTap(document, ["We", "will", "see", "you", "tomorrow"]);
+  dragSentenceTokenToSlot(document, "later", 1);
+
+  assert.deepEqual(getSentenceSlotTexts(document), ["We", "later", "will", "see", "you"]);
+  assert.ok(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "tomorrow"));
+  assert.equal(document.querySelector("#nextBtn").disabled, false);
+});
+
+test("sentence builder inserts a dragged placed word into an occupied slot without collapsing earlier gaps", () => {
+  const sentenceBank = [
+    {
+      id: "sb-insert-moved-word",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "We", 0);
+  placeSentenceTokenByTap(document, "will", 2);
+  placeSentenceTokenByTap(document, "see", 3);
+  placeSentenceTokenByTap(document, "tomorrow", 4);
+  dragPlacedSentenceToken(document, 4, 2);
+
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "",
+      "answer-4",
+      "answer-1",
+      "answer-2",
+    ])
+  );
+  assert.deepEqual(getSentenceSlotTexts(document), ["We", "", "tomorrow", "will", "see"]);
+});
+
+test("sentence builder lets you tap a word to fill the next empty line", () => {
+  const sentenceBank = [
+    {
+      id: "sb-next-empty-tap",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  dragSentenceTokenToSlot(document, "tomorrow", 4);
+  placeSentenceTokenInNextEmptySlotByTap(document, "We");
+  placeSentenceTokenInNextEmptySlotByTap(document, "will");
+  placeSentenceTokenInNextEmptySlotByTap(document, "see");
+  placeSentenceTokenInNextEmptySlotByTap(document, "you");
+
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "answer-1",
+      "answer-2",
+      "answer-3",
+      "answer-4",
+    ])
+  );
+  assert.equal(document.querySelector("#nextBtn").disabled, false);
+});
+
+test("sentence builder keyboard flow can select a bank word and insert it into an occupied slot", () => {
+  const sentenceBank = [
+    {
+      id: "sb-keyboard-insert",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "We", 0);
+  placeSentenceTokenByTap(document, "will", 1);
+  dragSentenceTokenToSlot(document, "tomorrow", 4);
+
+  pressKey(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "see"), " ");
+  assert.equal(state.sentenceBank.currentQuestion.selectedBankTokenId, "answer-2");
+
+  pressKey(getSentenceSlots(document)[1], "Enter");
+
+  assert.equal(state.sentenceBank.currentQuestion.selectedBankTokenId, "");
+  assert.deepEqual(getSentenceSlotTexts(document), ["We", "see", "will", "", "tomorrow"]);
+});
+
+test("sentence builder keyboard flow removes filled slots and clears selection", () => {
+  const sentenceBank = [
+    {
+      id: "sb-keyboard-remove-escape",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "We", 0);
+  pressKey(getSentenceSlots(document)[0], "Backspace");
+  assert.deepEqual(getSentenceSlotTexts(document), ["", "", "", "", ""]);
+
+  pressKey(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "see"), " ");
+  assert.equal(state.sentenceBank.currentQuestion.selectedBankTokenId, "answer-2");
+  pressKey(getSentenceSlots(document)[0], "Escape");
+  assert.equal(state.sentenceBank.currentQuestion.selectedBankTokenId, "");
+});
+
+test("sentence builder filters exact-synonym distractors from the prepared deck", () => {
+  const harness = loadAppHarness([]);
+  const deck = harness.app.sentenceBank.prepareSentenceBankDeck([
+    {
+      id: "sb-synonym-filter",
+      category: "test",
+      difficulty: 2,
+      english: "But how accurate?",
+      hebrew: "אך כיצד מדויקות",
+      english_tokens: ["but", "how", "accurate"],
+      hebrew_tokens: ["אך", "כיצד", "מדויקות"],
+      english_distractors: ["however", "why", "correct", "reliable"],
+      hebrew_distractors: ["אבל", "מדוע", "איך", "נכונות", "מוכחות"],
+      notes: "",
+    },
+  ]);
+
+  assert.deepEqual(deck[0].englishDistractors, ["why", "reliable"]);
+  assert.deepEqual(deck[0].hebrewDistractors, ["מדוע", "מוכחות"]);
+});
+
+test("sentence builder filters about/on distractors as too close to be fair", () => {
+  const harness = loadAppHarness([]);
+  const deck = harness.app.sentenceBank.prepareSentenceBankDeck([
+    {
+      id: "sb-about-on-filter",
+      category: "formal",
+      difficulty: 2,
+      english: "Can we get clarification on this matter?",
+      hebrew: "אפשר לקבל הבהרה בנושא הזה?",
+      english_tokens: ["Can", "we", "get", "clarification", "on", "this", "matter"],
+      hebrew_tokens: ["אפשר", "לקבל", "הבהרה", "בנושא", "הזה"],
+      english_distractors: ["about", "explanation", "that"],
+      hebrew_distractors: ["על", "הסבר", "ההוא"],
+      notes: "",
+    },
+  ]);
+
+  assert.deepEqual(deck[0].englishDistractors, ["explanation", "that"]);
+  assert.deepEqual(deck[0].hebrewDistractors, ["על", "הסבר", "ההוא"]);
+});
+
+test("sentence builder accepts a Hebrew here/very swap when the meaning stays the same", () => {
+  const sentenceBank = [
+    {
+      id: "sb-hot-here",
+      category: "everyday",
+      difficulty: 1,
+      english: "Can you open the window? It's very hot here.",
+      hebrew: "אפשר לפתוח את החלון? חם כאן מאוד.",
+      english_tokens: ["Can", "you", "open", "the", "window", "It's", "very", "hot", "here"],
+      hebrew_tokens: ["אפשר", "לפתוח", "את", "החלון", "חם", "כאן", "מאוד"],
+      english_distractors: ["close", "door", "cold"],
+      hebrew_distractors: ["לסגור", "הדלת", "קר"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  fillSentenceAnswerByTap(document, ["אפשר", "לפתוח", "את", "החלון", "חם", "מאוד", "כאן"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 2);
+  assert.match(getFeedbackText(document), /^Correct\. The Hebrew sentence is אפשר לפתוח את החלון\? חם כאן מאוד\./);
+  assert.ok(getSentenceSlots(document).every((slot) => slot.classList.contains("correct") && !slot.classList.contains("wrong")));
+});
+
+test("sentence builder accepts a Hebrew degree-word swap when the meaning stays the same", () => {
+  const sentenceBank = [
+    {
+      id: "sb-not-clear",
+      category: "professional",
+      difficulty: 2,
+      english: "It's not entirely clear.",
+      hebrew: "זה לא לגמרי ברור.",
+      english_tokens: ["It's", "not", "entirely", "clear"],
+      hebrew_tokens: ["זה", "לא", "לגמרי", "ברור"],
+      english_distractors: ["fully", "understood"],
+      hebrew_distractors: ["מאוד", "מובן"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  fillSentenceAnswerByTap(document, ["זה", "לא", "ברור", "לגמרי"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 3);
+  assert.match(getFeedbackText(document), /^Correct\. The Hebrew sentence is זה לא לגמרי ברור\./);
+  assert.ok(getSentenceSlots(document).every((slot) => slot.classList.contains("correct") && !slot.classList.contains("wrong")));
+});
+
+test("sentence builder wrong answers enqueue review in the same direction without awarding review score", async () => {
+  const sentenceBank = [
+    {
+      id: "sb-review",
+      category: "everyday",
+      difficulty: 1,
+      english: "See you later.",
+      hebrew: "נתראה אחר כך.",
+      english_tokens: ["See", "you", "later"],
+      hebrew_tokens: ["נתראה", "אחר", "כך"],
+      english_distractors: ["now", "tomorrow", "again"],
+      hebrew_distractors: ["היום", "עוד", "שם"],
+      notes: "A casual goodbye for now.",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "later", 0);
+  placeSentenceTokenByTap(document, "you", 1);
+  placeSentenceTokenByTap(document, "See", 2);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 0);
+  assert.equal(state.sentenceBank.wrongAnswers, 1);
+  assert.equal(JSON.stringify(state.sentenceBank.reviewQueue), JSON.stringify([{ sentenceId: "sb-review", direction: "he2en" }]));
+  assert.match(getFeedbackText(document), /Not quite\. The English sentence is See you later\./);
+
+  harness.nextSentenceBankQuestion();
+  await waitForTimers();
+  if (state.sentenceBank.introActive) {
+    harness.app.sentenceBank.beginSentenceBankFromIntro();
+  }
+
+  assert.equal(state.sentenceBank.currentQuestion.isReview, true);
+  assert.equal(state.sentenceBank.currentQuestion.direction, "he2en");
+  fillSentenceAnswerByTap(document, ["See", "you", "later"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 0);
+  assert.equal(state.sentenceProgress["sb-review::he2en"].attempts, 2);
+  assert.equal(state.sentenceProgress["sb-review::he2en"].correct, 1);
+  assert.equal(state.sentenceProgress["sb-review::he2en"].misses, 1);
+});
+
+test("sentence builder removes and moves placed words without collapsing the slot layout", () => {
+  const sentenceBank = [
+    {
+      id: "sb-move",
+      category: "everyday",
+      difficulty: 1,
+      english: "See you soon.",
+      hebrew: "נתראה בקרוב.",
+      english_tokens: ["See", "you", "soon"],
+      hebrew_tokens: ["נתראה", "בקרוב"],
+      english_distractors: ["later"],
+      hebrew_distractors: ["מחר"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  dragSentenceTokenToSlot(document, "soon", 2);
+  dragSentenceTokenToSlot(document, "See", 0);
+  getSentenceSlots(document)[2].click();
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify(["answer-0", "", ""])
+  );
+
+  placeSentenceTokenByTap(document, "soon", 2);
+  dragPlacedSentenceToken(document, 0, 1);
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify(["", "answer-0", "answer-2"])
+  );
+});
+
+test("sentence builder restores partially filled non-sequential slots from persisted session state", () => {
+  const sentenceBank = [
+    {
+      id: "sb-restore",
+      category: "everyday",
+      difficulty: 1,
+      english: "I need to buy milk and bread, there's nothing at home.",
+      hebrew: "אני צריך לקנות חלב ולחם, אין כלום בבית.",
+      english_tokens: ["I", "need", "to", "buy", "milk", "and", "bread", "there's", "nothing", "at", "home"],
+      hebrew_tokens: ["אני", "צריך", "לקנות", "חלב", "ולחם", "אין", "כלום", "בבית"],
+      english_distractors: ["sell", "everything"],
+      hebrew_distractors: ["למכור", "הכל"],
+      notes: "",
+    },
+  ];
+  const firstHarness = loadAppHarness([], [], [], { sentenceBank });
+  firstHarness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  firstHarness.state.mode = "sentenceBank";
+  firstHarness.state.sentenceBank.active = true;
+  firstHarness.nextSentenceBankQuestion();
+
+  dragSentenceTokenToSlot(firstHarness.document, "home", 10);
+  dragSentenceTokenToSlot(firstHarness.document, "I", 0);
+  dragSentenceTokenToSlot(firstHarness.document, "buy", 3);
+
+  const restoredHarness = loadAppHarness([], [], [], {
+    sentenceBank,
+    localStorageData: firstHarness.localStorage.__dump(),
+  });
+
+  assert.equal(restoredHarness.state.mode, "sentenceBank");
+  assert.ok(restoredHarness.state.sentenceBank.currentQuestion);
+  assert.equal(
+    JSON.stringify(Array.from(restoredHarness.state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "",
+      "",
+      "answer-3",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "answer-10",
+    ])
+  );
+});
+
+test("sentence builder hides the translate label while keeping the prompt text and Hebrew speech button", () => {
+  const sentenceBank = [
+    {
+      id: "sb-speech",
+      category: "everyday",
+      difficulty: 1,
+      english: "No problem.",
+      hebrew: "אין בעיה.",
+      english_tokens: ["No", "problem"],
+      hebrew_tokens: ["אין", "בעיה"],
+      english_distractors: ["thanks"],
+      hebrew_distractors: ["כן"],
+      notes: "",
+    },
+  ];
+
+  const hebrewHarness = loadAppHarness([], [], [], { sentenceBank });
+  hebrewHarness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  hebrewHarness.state.mode = "sentenceBank";
+  hebrewHarness.state.sentenceBank.active = true;
+  hebrewHarness.nextSentenceBankQuestion();
+  assert.equal(hebrewHarness.document.querySelector("#promptLabel").classList.contains("hidden"), true);
+  assert.equal(hebrewHarness.document.querySelector("#promptText").textContent, "אין בעיה.");
+  assert.equal(hebrewHarness.document.querySelector("#promptSpeechBtn").classList.contains("hidden"), false);
+  hebrewHarness.document.querySelector("#promptSpeechBtn").click();
+  assert.deepEqual(hebrewHarness.speechSpeakLog.map((entry) => entry.text), ["אין בעיה."]);
+
+  const englishHarness = loadAppHarness([], [], [], { sentenceBank });
+  englishHarness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  englishHarness.state.mode = "sentenceBank";
+  englishHarness.state.sentenceBank.active = true;
+  englishHarness.nextSentenceBankQuestion();
+  assert.equal(englishHarness.document.querySelector("#promptLabel").classList.contains("hidden"), true);
+  assert.equal(englishHarness.document.querySelector("#promptText").textContent, "No problem.");
+  assert.equal(englishHarness.document.querySelector("#promptSpeechBtn").classList.contains("hidden"), true);
+});
+
+test("sentence builder explains the correct and chosen word when only one slotted word is wrong", () => {
+  const vocabulary = [
+    { id: "support", category: "core_advanced", en: "support", he: "תומכים", heNiqqud: "תּוֹמְכִים", utility: 80, source: "test" },
+    { id: "contradict", category: "core_advanced", en: "contradict", he: "סותרים", heNiqqud: "סוֹתְרִים", utility: 78, source: "test" },
+  ];
+  const sentenceBank = [
+    {
+      id: "sb-word-tip",
+      category: "formal",
+      difficulty: 2,
+      english: "The findings support the model.",
+      hebrew: "הממצאים תומכים במודל.",
+      english_tokens: ["The", "findings", "support", "the", "model"],
+      hebrew_tokens: ["הממצאים", "תומכים", "במודל"],
+      english_distractors: ["contradict"],
+      hebrew_distractors: ["סותרים"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness(vocabulary, [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "הממצאים", 0);
+  placeSentenceTokenByTap(document, "סותרים", 1);
+  placeSentenceTokenByTap(document, "במודל", 2);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(
+    getFeedbackText(document),
+    "Not quite. The Hebrew sentence is הממצאים תומכים במודל. "
+      + "Correct word: תומכים = support. Chosen word: סותרים = contradict."
+  );
+});
+
+test("sentence builder falls back to the generic game tip when the miss is not a single resolvable word swap", () => {
+  const sentenceBank = [
+    {
+      id: "sb-generic-tip",
+      category: "everyday",
+      difficulty: 1,
+      english: "See you later.",
+      hebrew: "נתראה אחר כך.",
+      english_tokens: ["See", "you", "later"],
+      hebrew_tokens: ["נתראה", "אחר", "כך"],
+      english_distractors: ["now", "tomorrow", "again"],
+      hebrew_distractors: ["היום", "עוד", "שם"],
+      notes: "A casual goodbye for now.",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  placeSentenceTokenByTap(document, "later", 0);
+  placeSentenceTokenByTap(document, "See", 1);
+  placeSentenceTokenByTap(document, "you", 2);
+  document.querySelector("#nextBtn").click();
+
+  assert.match(getFeedbackText(document), /Game tip: This one is casual Hebrew\./);
+  assert.doesNotMatch(getFeedbackText(document), /Correct word:/);
 });
 
 test("abbreviation expansions use niqqud only on the full expansion text", () => {
@@ -1304,7 +2538,7 @@ test("verb match prompt speech button reads the current Hebrew prompt", () => {
   assert.deepEqual(harness.speechSpeakLog.map((entry) => entry.text), ["לָלֶכֶת"]);
 });
 
-test("header combo pill is displayed uniformly across lesson and conjugation", () => {
+test("gameplay headers collapse stats into the streak-aware progress bar across lesson and conjugation", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
   ];
@@ -1332,8 +2566,12 @@ test("header combo pill is displayed uniformly across lesson and conjugation", (
     options: [{ id: "alpha", word: vocabulary[0] }],
     selectedOptionId: null,
   };
+  harness.state.lesson.elapsedSeconds = 166;
   harness.app.ui.renderSessionHeader();
-  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x4");
+  assert.equal(harness.document.querySelector("#lessonProgressBar").dataset.streakTier, "2");
+  assert.match(harness.document.querySelector("#lessonProgressBar").getAttribute("aria-label"), /Combo x4/);
+  assert.equal(harness.document.querySelector("#shellGameplayTime").textContent, "166s");
+  assert.equal(harness.document.querySelector("#shellGameplayCombo").textContent, "x4");
 
   harness.state.mode = "verbMatch";
   harness.state.match.active = true;
@@ -1341,11 +2579,15 @@ test("header combo pill is displayed uniformly across lesson and conjugation", (
   harness.state.match.matchedCount = 0;
   harness.state.match.totalPairs = 1;
   harness.state.match.bestCombo = 9;
+  harness.state.match.elapsedSeconds = 203;
   harness.app.ui.renderSessionHeader();
-  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x4");
+  assert.equal(harness.document.querySelector("#lessonProgressBar").dataset.streakTier, "2");
+  assert.match(harness.document.querySelector("#lessonProgressBar").getAttribute("aria-label"), /Combo x4/);
+  assert.equal(harness.document.querySelector("#shellGameplayTime").textContent, "203s");
+  assert.equal(harness.document.querySelector("#shellGameplayCombo").textContent, "x4");
 });
 
-test("active gameplay shows the game title beside the app title and hides the in-stage title row", () => {
+test("active gameplay shows the top-right time and combo pill and hides it outside gameplay", () => {
   const vocabulary = [
     { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
   ];
@@ -1354,13 +2596,17 @@ test("active gameplay shows the game title beside the app title and hides the in
   harness.state.route = "home";
   harness.state.mode = "lesson";
   harness.state.lesson.active = true;
-  harness.app.ui.renderShellChrome();
+  harness.state.lesson.elapsedSeconds = 298;
+  harness.state.sessionStreak = 3;
+  harness.app.ui.renderSessionHeader();
   harness.app.ui.updateLessonShellModeState();
 
   assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "true");
   assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
-  assert.equal(harness.document.querySelector("#shellGameTitle").textContent, "Translation");
-  assert.equal(harness.document.querySelector("#shellGameTitle").classList.contains("hidden"), false);
+  assert.equal(harness.document.querySelector("#shellGameplayPill").classList.contains("hidden"), false);
+  assert.equal(harness.document.querySelector("#shellGameplayTime").textContent, "298s");
+  assert.equal(harness.document.querySelector("#shellGameplayCombo").textContent, "x3");
+  assert.match(harness.document.querySelector("#shellGameplayPill").getAttribute("aria-label"), /Time: 298s • Combo x3/);
   assert.equal(harness.document.querySelector("#lessonTitleRow").classList.contains("hidden"), true);
 
   harness.state.lesson.active = false;
@@ -1370,7 +2616,59 @@ test("active gameplay shows the game title beside the app title and hides the in
 
   assert.equal(harness.document.body.getAttribute("data-gameplay-active"), "false");
   assert.equal(harness.document.querySelector("#shellTopTitle").textContent, "IvritElite");
-  assert.equal(harness.document.querySelector("#shellGameTitle").classList.contains("hidden"), true);
+  assert.equal(harness.document.querySelector("#shellGameplayPill").classList.contains("hidden"), true);
+});
+
+test("desktop widths show home, review, and settings together while results still take over the stack", () => {
+  const harness = loadAppHarness([], [], [], { innerWidth: 1280 });
+
+  harness.state.route = "review";
+  harness.state.summary.active = false;
+  harness.app.ui.renderRouteVisibility();
+
+  assert.equal(harness.document.body.getAttribute("data-desktop-hub-layout"), "true");
+  assert.equal(harness.document.querySelector("#homeView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#reviewView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#settingsView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#resultsView").classList.contains("active"), false);
+
+  harness.state.route = "results";
+  harness.state.summary.active = true;
+  harness.app.ui.renderRouteVisibility();
+
+  assert.equal(harness.document.body.getAttribute("data-desktop-hub-layout"), "false");
+  assert.equal(harness.document.querySelector("#homeView").classList.contains("active"), false);
+  assert.equal(harness.document.querySelector("#reviewView").classList.contains("active"), false);
+  assert.equal(harness.document.querySelector("#settingsView").classList.contains("active"), false);
+  assert.equal(harness.document.querySelector("#resultsView").classList.contains("active"), true);
+});
+
+test("desktop hub cards collapse on desktop but stay expanded on mobile", () => {
+  const desktopHarness = loadAppHarness([], [], [], { innerWidth: 1280 });
+  const desktopCard = desktopHarness.document.querySelector("#mostMissedCard");
+  const desktopToggle = desktopHarness.document.querySelector("#mostMissedToggle");
+
+  assert.equal(desktopHarness.document.body.getAttribute("data-desktop-hub-layout"), "true");
+  assert.equal(desktopCard.getAttribute("data-collapsed"), "false");
+  assert.equal(desktopToggle.getAttribute("aria-expanded"), "true");
+
+  desktopToggle.click();
+  assert.equal(desktopCard.getAttribute("data-collapsed"), "true");
+  assert.equal(desktopToggle.getAttribute("aria-expanded"), "false");
+
+  desktopToggle.click();
+  assert.equal(desktopCard.getAttribute("data-collapsed"), "false");
+  assert.equal(desktopToggle.getAttribute("aria-expanded"), "true");
+
+  const mobileHarness = loadAppHarness([], [], [], { innerWidth: 400 });
+  const mobileCard = mobileHarness.document.querySelector("#mostMissedCard");
+  const mobileToggle = mobileHarness.document.querySelector("#mostMissedToggle");
+
+  assert.equal(mobileHarness.document.body.getAttribute("data-desktop-hub-layout"), "false");
+  assert.equal(mobileCard.getAttribute("data-collapsed"), "false");
+  mobileToggle.click();
+  assert.equal(mobileCard.getAttribute("data-collapsed"), "false");
+  assert.equal(mobileToggle.getAttribute("aria-expanded"), "true");
 });
 
 test("all game summaries now use only score accuracy and time metrics", () => {
@@ -1416,7 +2714,8 @@ test("starting advanced conjugation resets the game score but preserves the shar
 
   assert.equal(harness.state.sessionScore, 0);
   assert.equal(harness.state.sessionStreak, 3);
-  assert.equal(harness.document.querySelector("#sessionScore").textContent, "Combo x3");
+  assert.equal(harness.document.querySelector("#lessonProgressBar").dataset.streakTier, "1");
+  assert.match(harness.document.querySelector("#lessonProgressBar").getAttribute("aria-label"), /Combo x3/);
   harness.goHome();
 });
 

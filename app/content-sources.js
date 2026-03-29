@@ -152,24 +152,35 @@ contentSources.fallbackVerbApi = contentSources.fallbackVerbApi || {
   },
 };
 
+contentSources.fallbackSentenceBankApi = contentSources.fallbackSentenceBankApi || {
+  getSentenceBank() {
+    return [];
+  },
+};
+
 contentSources.resolveContentApis = contentSources.resolveContentApis || function resolveContentApis(globalScope) {
   const fallbackVocabApi = contentSources.fallbackVocabApi;
   const fallbackAbbreviationApi = contentSources.fallbackAbbreviationApi;
   const fallbackVerbApi = contentSources.fallbackVerbApi;
+  const fallbackSentenceBankApi = contentSources.fallbackSentenceBankApi;
   const vocabApi = globalScope.IvriQuestVocab ? globalScope.IvriQuestVocab : fallbackVocabApi;
   const abbreviationApi = globalScope.IvriQuestAbbreviations ? globalScope.IvriQuestAbbreviations : fallbackAbbreviationApi;
   const verbApi = globalScope.IvriQuestHebrewVerbs ? globalScope.IvriQuestHebrewVerbs : fallbackVerbApi;
+  const sentenceBankApi = globalScope.IvriQuestSentenceBank ? globalScope.IvriQuestSentenceBank : fallbackSentenceBankApi;
   const expansionTracks = vocabApi.EXPANSION_TRACKS || {};
 
   return {
     vocabApi,
     abbreviationApi,
     verbApi,
+    sentenceBankApi,
     fallbackVerbApi,
     usingFallbackVocab: vocabApi === fallbackVocabApi,
     usingFallbackAbbreviations: abbreviationApi === fallbackAbbreviationApi,
+    usingFallbackSentenceBank: sentenceBankApi === fallbackSentenceBankApi,
     getBaseVocabularyFn: vocabApi.getBaseVocabulary,
     getAbbreviationsFn: abbreviationApi.getAbbreviations,
+    getSentenceBankFn: sentenceBankApi.getSentenceBank,
     expansionTrackCount: Object.values(expansionTracks).reduce(
       (sum, group) => sum + (Array.isArray(group) ? group.length : 0),
       0

@@ -7,6 +7,168 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-29 16:38 — Fix English prompt punctuation order inside Hebrew UI
+
+**Requested:** Investigate a Hebrew-UI bug where an English sentence-builder prompt showed its final period on the wrong side of the sentence.
+
+**Files changed:**
+- `styles.css` — Added explicit LTR isolation for `.prompt-text.english-prompt` and isolated Hebrew prompt text as well, so terminal punctuation stays attached to the correct visual edge inside mixed-direction shells.
+- `app/ui.js` — Updated the shared prompt renderer to add `english-prompt` whenever the current prompt surface is English and remove it when the prompt is Hebrew.
+- `app/adv-conj.js` — Synced the advanced-conjugation prompt renderer with the same `english-prompt` class toggling logic.
+- `app/lesson.js`, `app/abbreviation.js`, `app/verb-match.js`, `app/sentence-bank.js` — Marked English fallback/idle/no-content prompt states as `english-prompt` so they also render correctly in Hebrew UI.
+- `tests/app-progress.test.js` — Added a style guard for LTR prompt isolation and a sentence-builder regression that verifies English prompts pick up the explicit English prompt class.
+
+**Behavior changed:** English prompts shown inside the Hebrew UI shell now render with stable LTR punctuation ordering, so sentence-final periods no longer jump to the wrong side. The same fix also covers English fallback prompts in other game modes, not just Sentence Builder.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 97/97. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main manual QA item is simply refreshing the browser and checking one or two English prompts in Hebrew UI across both Sentence Builder and another mode, just to confirm the LTR isolation feels natural and didn’t affect centered alignment.
+
+---
+
+### 2026-03-29 16:26 — Reverse the Hebrew progress-fill gradient direction
+
+**Requested:** In Hebrew UI, make the gameplay progress bar move from red to gold from right to left by reversing the fill gradient direction, not just the fill position and glowing tip.
+
+**Files changed:**
+- `styles.css` — Added a Hebrew-specific `progress-fill` gradient override so the red-to-gold color flow mirrors correctly in RTL.
+- `tests/app-progress.test.js` — Strengthened the Hebrew progress-bar regression so it asserts the RTL-specific gradient direction as well as the right-anchored fill and left-side glowing tip.
+
+**Behavior changed:** In Hebrew gameplay screens, the progress bar now reads naturally from right to left in both motion and color progression: the fill starts red on the right and runs toward the gold leading edge on the left.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 96/96. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** Manual QA should just confirm the mirrored gradient still feels visually balanced at very low progress percentages, since the gold tip now sits on the RTL leading edge as intended.
+
+---
+
+### 2026-03-29 16:20 — Mirror the desktop column widths in Hebrew
+
+**Requested:** In Hebrew UI, reverse the desktop three-column *proportions* as well as the panel order, so the narrow Settings column moves to the left instead of staying on the right.
+
+**Files changed:**
+- `styles.css` — Added a Hebrew-specific desktop grid template so the three-column hub mirrors the English proportions rather than only swapping the card order.
+- `tests/app-progress.test.js` — Added a regression asserting that the Hebrew desktop hub uses the mirrored column-width template.
+
+**Behavior changed:** In Hebrew desktop layout, the narrow side column now appears on the left with Settings, while the center gameplay column and the opposite review column keep the wider proportions. This makes the whole desktop layout feel properly mirrored instead of just reordered.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 96/96. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main manual QA item is simply checking the visual balance of the mirrored Hebrew layout at desktop widths close to the breakpoint, since the narrower side column now changes sides as intended.
+
+---
+
+### 2026-03-29 16:12 — Add collapsible desktop Review and Settings cards
+
+**Requested:** On desktop, make `Most Missed`, `Category Analytics`, and `Settings` collapsible so the user can reduce visual clutter, and center those section names within their boxes.
+
+**Files changed:**
+- `index.html` — Wrapped the desktop-side Review and Settings content blocks in collapsible panel containers, added centered toggle headers for `Most Missed`, `Category Analytics`, and `Settings`, and bumped asset versions for the updated stylesheet/controller/runtime files.
+- `app/bootstrap-runtime.js` — Registered the new collapsible card and toggle elements so the controller can manage them.
+- `app/controller.js` — Added desktop-hub panel toggle handlers plus sync logic so the three side cards can collapse/expand on desktop while staying effectively always open on smaller layouts.
+- `app/ui.js` — Hooked route visibility updates into the desktop-hub panel sync so the collapsible controls stay in the right state as the layout switches between stacked and three-column modes.
+- `styles.css` — Added centered collapsible header styling, desktop-only collapsed-content hiding, and a small chevron affordance that keeps the title visually centered while still showing expand/collapse state.
+- `tests/app-progress.test.js` — Added regressions for the new centered collapsible headers and for the desktop-only collapse interaction behavior.
+
+**Behavior changed:** On the three-column desktop hub, `Most Missed`, `Category Analytics`, and `Settings` can now each be collapsed down to a compact title bar, which makes it easier to reduce clutter while keeping those panels available. Their titles are centered within the card headers. On smaller layouts, the same headers remain visible but do not collapse the content.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 96/96. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The only real UX thing to spot-check manually is whether the centered header plus right-edge chevron still feels balanced in Hebrew, especially when the side columns are narrow. The collapse state is intentionally not persisted between reloads right now, which keeps the implementation simple but means the side panels reopen on refresh.
+
+---
+
+### 2026-03-29 15:27 — Warm gameplay header refresh and Hebrew meal-chip cleanup
+
+**Requested:** Replace the gameplay title/header pill treatment with a warmer shared progress-bar-and-status-pill header, make the top-right gameplay chrome show only time and combo, normalize Hebrew meal compounds into single sentence-builder chips with shape-matched distractors, and identify any cleanup worth doing before the next commit.
+
+**Files changed:**
+- `index.html` — Replaced the old top-right gameplay title with a dedicated gameplay-status pill, removed the in-stage round/time/combo row from the lesson header, and bumped cache-busting versions for the updated frontend assets.
+- `app/bootstrap-runtime.js` — Registered the new gameplay pill elements and removed the old hidden lesson-status element lookups.
+- `app/ui.js` — Switched gameplay-header rendering to a shared state-driven meta model, fed both the top-right pill and progress-bar accessibility text from the same timer/combo/progress data, and removed the old hidden status-row plumbing.
+- `styles.css` — Restyled the shared gameplay progress bar to use a red/orange fill with a gold tip and warmer streak glow, added the new top-right gameplay pill styling, trimmed Sentence Builder prompt side gutters again, reduced mobile sentence-chip height a bit further, and removed obsolete status-row/game-title styling.
+- `sentence-bank-data.js` — Normalized `ארוחת ערב` into a single Hebrew target chip, replaced the underscore placeholder meal distractor with real spaced Hebrew meal chips, and added `ארוחת בוקר`/`breakfast` as a shape-matched distractor.
+- `tests/app-progress.test.js` — Updated layout/header regressions for the new top-right pill and warm progress bar, tightened the mobile sentence-builder spacing expectations, and added a render regression for one-chip Hebrew meal compounds.
+- `tests/sentence-bank-data.test.js` — Added exact meal-expression checks plus a guardrail that bans underscore-form Hebrew placeholders and requires shape-matched multiword Hebrew distractors whenever a sentence uses a multiword Hebrew target chip.
+- `.gitignore` — Ignored `.claude/` so the local `launch.json` does not get accidentally staged.
+
+**Behavior changed:** During active gameplay, the top banner now shows a compact time/combo pill instead of the game name, and the only in-stage header chrome left is the warm red/orange progress bar with a gold tip that glows more strongly as the combo rises. Sentence Builder Hebrew meal expressions now appear as real single chips like `ארוחת ערב`, with matching multiword distractors such as `ארוחת צהריים` and `ארוחת בוקר`, so the answer is no longer telegraphed by chip count. On mobile, the sentence-builder prompt uses more of the available width and the option chips are slightly shorter.
+
+**Tests run:** `node --test tests/app-progress.test.js tests/sentence-bank-data.test.js tests/hebrew-verbs.test.js` — passed, 127/127. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main remaining manual QA item is visual: spot-check the new top-right gameplay pill and warm progress bar in both light and dark themes on desktop and a narrow mobile viewport, especially in Hebrew UI, to confirm the pill stays anchored on the right and the gold progress tip does not feel too strong at very low progress.
+
+---
+
+### 2026-03-25 17:34 — Tighten Sentence Builder vertical spacing to reduce scrolling on mobile
+
+**Requested:** Make the Sentence Builder boxes more vertically compact so the mode is less likely to require scrolling.
+
+**Files changed:**
+- `styles.css` — Reduced the base Sentence Builder spacing, slot/token heights, padding, and answer-row height, then added tighter phone and short-screen overrides so the sentence scaffold and word bank compress more aggressively on constrained viewports.
+- `index.html` — Bumped the stylesheet asset version to `20260325b` so the compact layout refreshes cleanly in the browser.
+
+**Behavior changed:** Sentence Builder now uses shorter answer slots, denser token pills, smaller inter-row gaps, and a tighter sentence frame overall. On phones and especially shorter mobile screens, the sentence bank contracts even further before the rest of the lesson UI does, which should cut down on avoidable scrolling without changing the gameplay flow.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 61/61. `npm test` — passed, 104/104.
+
+**Risks / regressions to check:** The compact pass keeps tap targets reasonably large, but the remaining manual QA item is checking whether the smallest token pills still feel comfortable to tap on an actual phone, especially for longer English tokens like contractions.
+
+---
+
+### 2026-03-25 17:18 — Refine Sentence Builder assembly flow, remove inline hint controls, and turn notes into game tips
+
+**Requested:** Make English sentence assembly read in the proper direction, improve the empty sentence display so punctuation is visible before the answer is filled, remove the `Hint` and `Clear` buttons, and move the note into post-answer feedback with more player-facing wording.
+
+**Files changed:**
+- `app/sentence-bank.js` — Rebuilt the answer-row renderer to map punctuation from the target sentence into an inline sentence frame, set explicit LTR/RTL direction on answer/bank rows, kept tap-to-remove on placed tokens, and rewrote sentence notes into post-answer “Game tip” explanations.
+- `app/ui.js` — Removed sentence-mode pre-answer hint rendering and simplified the sentence-mode header actions so only the core `Check`/`Next` flow remains.
+- `app/controller.js` — Dropped the old sentence hint/clear button bindings while keeping the sentence mode wired into the shared `Next` action flow.
+- `app/bootstrap-runtime.js`, `app/session.js`, `app/persistence.js` — Removed the old sentence hint visibility state from the runtime/session snapshot shape.
+- `app/bootstrap-data.js` — Added a localized `sentenceBankGameTip` feedback string used for post-answer note explanations.
+- `index.html` — Removed the `Hint` and `Clear` buttons from the sticky action row and bumped the relevant frontend asset versions.
+- `styles.css` — Restyled the sentence answer area as an inline sentence frame with visible punctuation scaffolding, explicit LTR/RTL alignment, and size-aware blank slots.
+- `tests/app-progress.test.js` — Updated sentence-builder coverage to reflect the new no-hint/no-clear flow and the new post-answer game-tip behavior.
+
+**Behavior changed:** Sentence Builder now shows the target sentence as a real scaffold rather than a centered stack of anonymous blanks, so commas/periods/question marks stay visible and English assembly is explicitly rendered left-to-right. The old pre-answer hint flow is gone; instead, notes now appear only after submission as learner-facing “Game tip” explanations with developer-ish distractor wording rewritten into gameplay guidance.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 61/61. `npm test` — passed, 104/104.
+
+**Risks / regressions to check:** The automated tests cover the gameplay flow and feedback behavior, but the punctuation scaffold itself still deserves a quick browser pass on narrow mobile widths to confirm wrapping feels natural for long English answers and dense Hebrew punctuation.
+
+---
+
+### 2026-03-24 22:12 — Add Sentence Builder sentence-bank game mode
+
+**Requested:** Implement the planned `Sentence Builder` MVP inside `Ulpango` using the provided sentence dataset and icon asset, with both translation directions, tap-to-build word-bank gameplay, notes as hints/explanations, separate sentence progress storage, and regression coverage.
+
+**Files changed:**
+- `sentence-bank-data.js` — Added the browser-loaded sentence-bank dataset generated from the provided JSON source and exposed it as `IvriQuestSentenceBank.getSentenceBank()`.
+- `assets/icon-sentence-builder.png` — Added the provided game tile icon in the same transparent PNG format as the existing mode icons.
+- `app/sentence-bank.js` — New Sentence Builder mode module for sentence deck preparation, weighted question selection, tap-to-build answer assembly, hint toggling, answer checking, review rounds, prompt speech, scoring, and sentence-specific progress updates.
+- `app/content-sources.js` — Added sentence-bank content-source resolution with a safe fallback API.
+- `app/constants.js` — Added a dedicated `sentenceProgress` storage key.
+- `app/bootstrap-runtime.js` — Registered the new tile/buttons/intro elements and added `sentenceProgress` plus `sentenceBank` runtime state.
+- `app/persistence.js` — Added sentence-progress persistence and sentence-bank session snapshot persistence.
+- `app/session.js` — Wired Sentence Builder into session lifecycle handling, timer restore/cleanup, intro restore, leave/reset flow, and results summary generation.
+- `app/controller.js` — Bound the new home/game-picker tile, hint/clear actions, reset behavior, results replay behavior, and sentence-bank submit/next handling.
+- `app/ui.js` — Added Sentence Builder shell title handling, prompt hint rendering, prompt speech routing, header/action-state logic, analytics card rendering, and home-tile highlighting.
+- `app/data.js` — Added sentence-bank totals into game-mode analytics without touching vocabulary most-missed rankings.
+- `app/bootstrap-data.js` — Added English/Hebrew copy for the Sentence Builder tile, prompts, buttons, feedback, and summary labels.
+- `index.html` — Added the new tile in both launch surfaces, the hint/clear footer buttons, the intro overlay, the sentence-bank script tag, the new mode module script tag, and refreshed cache-busting versions for changed assets/scripts.
+- `styles.css` — Added Sentence Builder board, answer-row, token-bank, and tile-hover styling.
+- `tests/app-progress.test.js` — Extended the app harness to load sentence-bank data/module support and added regression coverage for full-answer gating, hint/clear behavior, direction-specific scoring/progress, review-round reuse, and prompt speech behavior.
+- `tests/sentence-bank-data.test.js` — Added a direct dataset integrity test for the real `sentence-bank-data.js` file.
+- `task-log.md` — Appended this entry.
+
+**Behavior changed:** `Ulpango` now includes a fifth playable mode, `Sentence Builder`, that lets the learner translate full sentences by tapping tokens from a shuffled bank into a fixed answer row. The mode supports both Hebrew→English and English→Hebrew prompts, gives extra score weight to English→Hebrew production, stores sentence progress separately from vocabulary progress, offers optional pre-answer notes as hints, reuses notes as post-answer explanations, supports second-chance review rounds for missed prompts, and contributes its own performance card in the home/review analytics area.
+
+**Tests run:** `npm test` — passed, 104/104. `node --test tests/app-progress.test.js` — passed, 61/61. `node --test tests/sentence-bank-data.test.js` — passed, 1/1. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** Manual browser QA should confirm the new Sentence Builder footer button stack feels comfortable on smaller phones, especially when both `Hint` and `Clear` are visible before answer submission. Because sentence feedback now reveals the full target sentence exactly as stored in the dataset, it is also worth spot-checking a few punctuation-heavy prompts in both directions to confirm the revealed text and tap-built token order feel natural to learners.
+
+---
+
 ### 2026-03-14 14:28 — Tighten Advanced Conjugation English grammar and filter confusing second-person banks
 
 **Requested:** Fix Advanced Conjugation grammar issues so second-person English prompts are correct, and prevent confusing cards where a second-person subject is paired with a second-person object/possessive target such as `you (m.pl.) get off your (sg.) back`.
@@ -1552,5 +1714,24 @@ Each entry records what was requested, what changed, what was tested, and what t
 **Tests run:** `node --test tests/app-progress.test.js` — passed, 56/56. `node --test tests/app-speech.test.js` — passed, 5/5. `node --test` — passed, 88/88.
 
 **Risks / regressions to check:** Manual QA should confirm the success/error tint balance still feels calm in light mode and that the updated card-state text colors remain readable across translation, abbreviation, advanced conjugation, and conjugation.
+
+---
+
+### 2026-03-29 15:52 — Replace the desktop sidebar with a live three-column hub and fix Hebrew progress direction
+
+**Requested:** Rework desktop so Home/Review/Settings are no longer separate pages behind a sidebar, but instead appear as three live columns with Review on the left and Settings on the right in English; fix the top-right time/combo pill icon styling; make the progress bar behave correctly in Hebrew; and call out anything that could get messy with this implementation.
+
+**Files changed:**
+- `index.html` — Removed the old desktop sidebar markup entirely, switched the gameplay pill to emoji clock/fire icons, and bumped the stylesheet asset version so the new desktop shell and progress tweaks refresh cleanly.
+- `app/ui.js` — Updated route visibility so desktop widths show Home, Review, and Settings together whenever results are not active, while keeping Results as a full-width takeover state and mirroring the side-column order in Hebrew.
+- `app/controller.js` — Added a resize-driven re-render hook so the app can move cleanly between stacked and three-column layouts without requiring a reload.
+- `styles.css` — Replaced the desktop shell/sidebar layout with a three-column page grid, narrowed the Settings column relative to Home/Review, removed obsolete sidebar-only styling, forced the gameplay pill to remain LTR for emoji/time/combo readability, and made the progress-fill tip anchor on the logical leading edge in Hebrew.
+- `tests/app-progress.test.js` — Added regressions for the three-column desktop layout, the combined desktop route visibility, and right-to-left progress fill behavior, then refreshed the sidebar cleanup assertion so it checks that the dead sidebar markup is actually gone.
+
+**Behavior changed:** On desktop, the app now behaves like a single dashboard: Review stays visible on the left, the active game or lesson picker lives in the center, and Settings stays visible on the right, including during gameplay. The old desktop sidebar is gone rather than merely hidden. The gameplay status pill now uses readable emoji icons, and Hebrew progress bars fill from the right with the glowing tip leading correctly from that side.
+
+**Tests run:** `node --test tests/app-progress.test.js tests/sentence-bank-data.test.js tests/hebrew-verbs.test.js` — passed, 130/130. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main thing to watch is desktop density near the `1024px` breakpoint, where the three-column hub has much less horizontal slack than before; if anything feels cramped there, the safest next adjustment is widening the breakpoint or slightly loosening the center/side column ratio rather than reintroducing hidden navigation. The other semantic change is intentional but important: on desktop, `review` and `settings` are no longer standalone destinations during normal use, so results is now the main full-screen route takeover.
 
 ---

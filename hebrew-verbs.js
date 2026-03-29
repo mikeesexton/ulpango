@@ -219,6 +219,7 @@ const TRANSLATION_HIDDEN_STARTER_VERB_IDS = new Set([
   "starter-verb-laavod",
   "starter-verb-lagur",
   "starter-verb-larutz",
+  "starter-verb-lirkhosh",
   "starter-verb-lavo",
   "starter-verb-lihyot",
   "starter-verb-lirot",
@@ -923,6 +924,57 @@ function buildStarterVerbEntries() {
       difficulty_level: 2,
       tags: ["starter", "seed", "regular"],
       personal_priority: 85,
+    }),
+    createVerbEntry({
+      id: "starter-verb-lirkhosh",
+      availability: getStarterVerbAvailability("starter-verb-lirkhosh"),
+      lemma: "לרכוש",
+      lemma_niqqud: "לִרְכּוֹשׁ",
+      root: ["ר", "כ", "ש"],
+      binyan: "paal",
+      regularity: "regular",
+      conjugation_mode: "curated",
+      senses: [makeSense("to purchase", null, false)],
+      forms: makeForms(
+        makePresent(
+          markedForm("רוכש", "רוֹכֵשׁ"),
+          markedForm("רוכשת", "רוֹכֶשֶׁת"),
+          markedForm("רוכשים", "רוֹכְשִׁים"),
+          markedForm("רוכשות", "רוֹכְשׁוֹת")
+        ),
+        makePast(
+          markedForm("רכשתי", "רָכַשְׁתִּי"),
+          markedForm("רכשת", "רָכַשְׁתָּ"),
+          markedForm("רכשת", "רָכַשְׁתְּ"),
+          markedForm("רכש", "רָכַשׁ"),
+          markedForm("רכשה", "רָכְשָׁה"),
+          markedForm("רכשנו", "רָכַשְׁנוּ"),
+          markedForm("רכשתם", "רָכַשְׁתֶּם"),
+          markedForm("רכשתן", "רָכַשְׁתֶּן"),
+          markedForm("רכשו", "רָכְשׁוּ")
+        ),
+        makeFuture(
+          markedForm("ארכוש", "אֶרְכּוֹשׁ"),
+          markedForm("תרכוש", "תִּרְכּוֹשׁ"),
+          markedForm("תרכשי", "תִּרְכְּשִׁי"),
+          markedForm("ירכוש", "יִרְכּוֹשׁ"),
+          markedForm("תרכוש", "תִּרְכּוֹשׁ"),
+          markedForm("נרכוש", "נִרְכּוֹשׁ"),
+          markedForm("תרכשו", "תִּרְכְּשׁוּ"),
+          markedForm("ירכשו", "יִרְכְּשׁוּ")
+        ),
+        makeImperative(
+          markedForm("רכוש", "רְכוֹשׁ"),
+          markedForm("רכשי", "רִכְשִׁי"),
+          markedForm("רכשו", "רִכְשׁוּ"),
+          markedForm("רכשנה", "רְכוֹשְׁנָה")
+        )
+      ),
+      review_status: "approved",
+      notes: "Stored authoritative forms cover the common everyday verb for purchasing.",
+      difficulty_level: 2,
+      tags: ["starter", "seed", "curated"],
+      personal_priority: 84,
     }),
     createVerbEntry({
       id: "starter-verb-lavo",
