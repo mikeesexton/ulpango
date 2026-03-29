@@ -756,8 +756,10 @@ ui.renderPromptText = ui.renderPromptText || function renderPromptText(question 
 
   if (question.promptIsHebrew) {
     runtime.el.promptText.classList.add("hebrew");
+    runtime.el.promptText.classList.remove("english-prompt");
   } else {
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
   }
 
   if (question.promptIsHebrew && question.word && promptUsesWordSurface) {
@@ -1085,6 +1087,7 @@ ui.renderIdleLessonState = ui.renderIdleLessonState || function renderIdleLesson
   h.renderSessionHeader?.();
   ui.renderPromptLabel("", false);
   runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.classList.add("english-prompt");
   runtime.el.promptText.textContent = translate("learn.idlePrompt");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");

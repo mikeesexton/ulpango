@@ -183,6 +183,7 @@ lessonMode.nextQuestion = lessonMode.nextQuestion || function nextQuestion() {
     const hasMastered = (data.getMasteredWords?.() || []).length > 0;
     app.ui?.renderPromptLabel?.(hasMastered ? translate("prompt.masteredOnlyTitle") : translate("prompt.noVocabTitle"), true);
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
     runtime.el.promptText.textContent = hasMastered ? translate("prompt.masteredOnlyBody") : translate("prompt.noVocabBody");
     runtime.el.choiceContainer.innerHTML = "";
     h.renderNiqqudToggle?.();

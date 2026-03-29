@@ -909,6 +909,7 @@ sentenceBank.startSentenceBank = sentenceBank.startSentenceBank || function star
     sentenceBank.renderSentenceBankIdleState();
     app.ui?.renderPromptLabel?.(translate("prompt.noSentenceBankTitle"), true);
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
     runtime.el.promptText.textContent = translate("prompt.noSentenceBankBody");
     h.setFeedback?.(translate("prompt.noSentenceBankTitle"), false);
     return;

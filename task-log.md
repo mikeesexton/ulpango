@@ -7,6 +7,25 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 ---
 
+### 2026-03-29 16:38 — Fix English prompt punctuation order inside Hebrew UI
+
+**Requested:** Investigate a Hebrew-UI bug where an English sentence-builder prompt showed its final period on the wrong side of the sentence.
+
+**Files changed:**
+- `styles.css` — Added explicit LTR isolation for `.prompt-text.english-prompt` and isolated Hebrew prompt text as well, so terminal punctuation stays attached to the correct visual edge inside mixed-direction shells.
+- `app/ui.js` — Updated the shared prompt renderer to add `english-prompt` whenever the current prompt surface is English and remove it when the prompt is Hebrew.
+- `app/adv-conj.js` — Synced the advanced-conjugation prompt renderer with the same `english-prompt` class toggling logic.
+- `app/lesson.js`, `app/abbreviation.js`, `app/verb-match.js`, `app/sentence-bank.js` — Marked English fallback/idle/no-content prompt states as `english-prompt` so they also render correctly in Hebrew UI.
+- `tests/app-progress.test.js` — Added a style guard for LTR prompt isolation and a sentence-builder regression that verifies English prompts pick up the explicit English prompt class.
+
+**Behavior changed:** English prompts shown inside the Hebrew UI shell now render with stable LTR punctuation ordering, so sentence-final periods no longer jump to the wrong side. The same fix also covers English fallback prompts in other game modes, not just Sentence Builder.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 97/97. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** The main manual QA item is simply refreshing the browser and checking one or two English prompts in Hebrew UI across both Sentence Builder and another mode, just to confirm the LTR isolation feels natural and didn’t affect centered alignment.
+
+---
+
 ### 2026-03-29 16:26 — Reverse the Hebrew progress-fill gradient direction
 
 **Requested:** In Hebrew UI, make the gameplay progress bar move from red to gold from right to left by reversing the fill gradient direction, not just the fill position and glowing tip.

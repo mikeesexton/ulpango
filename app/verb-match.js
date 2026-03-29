@@ -355,6 +355,7 @@ verbMatch.renderVerbMatchIdleState = verbMatch.renderVerbMatchIdleState || funct
   h.renderSessionHeader?.();
   app.ui?.renderPromptLabel?.("", false);
   runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.classList.add("english-prompt");
   runtime.el.promptText.textContent = translate("prompt.verbMatchStart");
   runtime.el.choiceContainer.innerHTML = "";
   runtime.el.choiceContainer.classList.remove("match-grid");
@@ -384,6 +385,7 @@ verbMatch.renderVerbMatchPrompt = verbMatch.renderVerbMatchPrompt || function re
   const h = getHelpers();
   if (!runtime.state.match.active || !runtime.state.match.currentVerb) {
     runtime.el.promptText.classList.remove("hebrew");
+    runtime.el.promptText.classList.add("english-prompt");
     runtime.el.promptText.textContent = translate("prompt.verbMatchStart");
     h.renderNiqqudToggle?.();
     return;
@@ -392,6 +394,7 @@ verbMatch.renderVerbMatchPrompt = verbMatch.renderVerbMatchPrompt || function re
   const current = runtime.state.match.currentVerb.word;
   const heText = runtime.state.showNiqqudInline ? current.heNiqqud : current.he;
   runtime.el.promptText.classList.remove("hebrew");
+  runtime.el.promptText.classList.add("english-prompt");
   runtime.el.promptText.textContent = `${current.en} | ${heText}`;
   h.renderNiqqudToggle?.();
 };

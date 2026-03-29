@@ -923,9 +923,40 @@ test("sentence builder prompt styles keep the prompt centered while answer rows 
 
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*justify-content:\s*center;/s);
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*text-align:\s*center;/s);
+  assert.match(styles, /\.prompt-text\.english-prompt\s*\{[^}]*direction:\s*ltr;[^}]*unicode-bidi:\s*isolate;/s);
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\.hebrew\s*\{[^}]*text-align:\s*center;/s);
   assert.match(styles, /\.sentence-answer-line\.english\s*\{[^}]*text-align:\s*left;/s);
   assert.match(styles, /\.sentence-answer-line\.hebrew\s*\{[^}]*text-align:\s*right;/s);
+});
+
+test("sentence builder gives English prompts explicit LTR prompt styling in Hebrew UI", () => {
+  const sentenceBank = [
+    {
+      id: "sb-english-prompt-bidi",
+      category: "formal",
+      difficulty: 3,
+      english: "One must consider the long-term implications before making a decision.",
+      hebrew: "יש לשקול את ההשלכות ארוכות הטווח לפני קבלת החלטה.",
+      english_tokens: ["One", "must", "consider", "the", "long-term", "implications", "before", "making", "a", "decision"],
+      hebrew_tokens: ["יש", "לשקול", "את", "ההשלכות", "ארוכות", "הטווח", "לפני", "קבלת", "החלטה"],
+      english_distractors: ["brief", "ignore", "afterward"],
+      hebrew_distractors: ["קצר", "להתעלם", "לאחר מכן"],
+      notes: "Formal register: יש לשקול means one should consider.",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  state.language = "he";
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  const prompt = document.querySelector("#promptText");
+  assert.equal(prompt.textContent, "One must consider the long-term implications before making a decision.");
+  assert.equal(prompt.classList.contains("english-prompt"), true);
+  assert.equal(prompt.classList.contains("hebrew"), false);
 });
 
 test("sentence builder base layout trims prompt, board, and feedback spacing without changing alignment", () => {

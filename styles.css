@@ -1005,8 +1005,14 @@ body[data-theme="light"] .prompt-speech-btn:focus-visible {
   text-align: center;
 }
 
+.prompt-text.english-prompt {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
 .prompt-text.hebrew {
   direction: rtl;
+  unicode-bidi: isolate;
   text-align: center;
 }
 
