@@ -4,6 +4,8 @@
 const app = global.IvriQuestApp = global.IvriQuestApp || {};
 const sentenceBank = app.sentenceBank = app.sentenceBank || {};
 let activeSentenceDrag = null;
+let activeSentenceTouchDrag = null;
+let suppressSentenceTapUntil = 0;
 
 function getRuntime() {
   return app.runtime || {};
@@ -19,6 +21,10 @@ function getSession() {
 
 function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
+}
+
+function getNowMs() {
+  return Number(global.Date?.now ? global.Date.now() : Date.now());
 }
 
 function clampDifficulty(value) {
@@ -65,6 +71,7 @@ const NON_DISTINCT_DISTRACTOR_GROUPS = [
   ["about", "on"],
   ["accurate", "correct"],
   ["but", "however"],
+  ["hold on", "wait", "wait up"],
   ["מדויק", "נכון"],
   ["מדויקת", "נכונה"],
   ["מדויקים", "נכונים"],
@@ -486,6 +493,96 @@ function setSentenceDragPayload(payload) {
 
 function clearSentenceDragPayload() {
   activeSentenceDrag = null;
+}
+
+function suppressSentenceTap(durationMs = 400) {
+  suppressSentenceTapUntil = getNowMs() + Math.max(0, Number(durationMs || 0));
+}
+
+function shouldSuppressSentenceTap() {
+  return suppressSentenceTapUntil > getNowMs();
+}
+
+function clearSentenceTouchDragTargets() {
+  getRuntime().el?.choiceContainer?.querySelectorAll?.(".sentence-slot").forEach((slot) => {
+    slot.classList.remove("drag-target");
+    slot.classList.remove("insert-target");
+  });
+}
+
+function clearSentenceDragState() {
+  activeSentenceTouchDrag = null;
+  clearSentenceTouchDragTargets();
+  clearSentenceDragPayload();
+}
+
+function resolveSentenceTouchSlotElement(clientX, clientY) {
+  const pointedNode = global.document?.elementFromPoint?.(clientX, clientY);
+  if (!pointedNode) return null;
+  if (pointedNode.classList?.contains?.("sentence-slot")) return pointedNode;
+  return typeof pointedNode.closest === "function" ? pointedNode.closest(".sentence-slot") : null;
+}
+
+function updateSentenceTouchDragTarget(question, touchPoint) {
+  clearSentenceTouchDragTargets();
+  if (!question || question.locked || !touchPoint) return null;
+  const slot = resolveSentenceTouchSlotElement(touchPoint.clientX, touchPoint.clientY);
+  if (!slot) return null;
+
+  const slotTokenIds = getQuestionSlotTokenIds(question);
+  const normalizedSlotIndex = normalizeSentenceSlotIndex(slot.getAttribute?.("data-slot-index"), slotTokenIds.length);
+  const payload = activeSentenceTouchDrag?.payload || activeSentenceDrag;
+  if (normalizedSlotIndex === null || !canDropSentencePayload(question, normalizedSlotIndex, payload)) {
+    return null;
+  }
+
+  const slotIsOccupied = Boolean(slotTokenIds[normalizedSlotIndex]);
+  slot.classList.toggle("insert-target", slotIsOccupied);
+  slot.classList.toggle("drag-target", !slotIsOccupied);
+  if (activeSentenceTouchDrag) {
+    activeSentenceTouchDrag.slotIndex = normalizedSlotIndex;
+  }
+  return {
+    slot,
+    slotIndex: normalizedSlotIndex,
+  };
+}
+
+function startSentenceTouchDrag(question, payload, touchPoint) {
+  if (!question || question.locked || !payload) return;
+  clearQuestionSelection(question);
+  activeSentenceTouchDrag = {
+    payload: { ...payload },
+    slotIndex: null,
+  };
+  setSentenceDragPayload(payload);
+  updateSentenceTouchDragTarget(question, touchPoint);
+}
+
+function handleSentenceTouchMove(question, event) {
+  if (!activeSentenceTouchDrag?.payload) return;
+  const touchPoint = event?.touches?.[0];
+  if (!touchPoint) return;
+  const activeTarget = updateSentenceTouchDragTarget(question, touchPoint);
+  if (activeTarget) {
+    event.preventDefault?.();
+  }
+}
+
+function finishSentenceTouchDrag(question, event) {
+  if (!activeSentenceTouchDrag?.payload) return false;
+  const touchPoint = event?.changedTouches?.[0] || event?.touches?.[0] || null;
+  const activeTarget = updateSentenceTouchDragTarget(question, touchPoint);
+  const handled = activeTarget
+    ? sentenceBank.handleSlotDrop(activeTarget.slotIndex, activeSentenceTouchDrag.payload)
+    : false;
+  if (handled) {
+    event.preventDefault?.();
+    suppressSentenceTap();
+  } else {
+    clearSentenceDragState();
+  }
+  return handled;
 }
 
 function resolveSentenceDragPayload(event) {
@@ -1187,7 +1284,19 @@ sentenceBank.renderSentenceBankBoard = sentenceBank.renderSentenceBankBoard || f
           }
         });
         slot.addEventListener("dragend", () => {
-          clearSentenceDragPayload();
+          clearSentenceDragState();
+        });
+        slot.addEventListener("touchstart", (event) => {
+          startSentenceTouchDrag(question, { type: "slot", slotIndex: index, tokenId }, event?.touches?.[0]);
+        });
+        slot.addEventListener("touchmove", (event) => {
+          handleSentenceTouchMove(question, event);
+        });
+        slot.addEventListener("touchend", (event) => {
+          finishSentenceTouchDrag(question, event);
+        });
+        slot.addEventListener("touchcancel", () => {
+          clearSentenceDragState();
         });
       }
       slot.addEventListener("dragover", (event) => {
@@ -1271,7 +1380,19 @@ sentenceBank.renderSentenceBankBoard = sentenceBank.renderSentenceBankBoard || f
         }
       });
       btn.addEventListener("dragend", () => {
-        clearSentenceDragPayload();
+        clearSentenceDragState();
+      });
+      btn.addEventListener("touchstart", (event) => {
+        startSentenceTouchDrag(question, { type: "bank", tokenId: token.id }, event?.touches?.[0]);
+      });
+      btn.addEventListener("touchmove", (event) => {
+        handleSentenceTouchMove(question, event);
+      });
+      btn.addEventListener("touchend", (event) => {
+        finishSentenceTouchDrag(question, event);
+      });
+      btn.addEventListener("touchcancel", () => {
+        clearSentenceDragState();
       });
     }
     bankGrid.append(btn);
@@ -1338,7 +1459,7 @@ sentenceBank.movePlacedToken = sentenceBank.movePlacedToken || function movePlac
 sentenceBank.selectSentenceSlot = sentenceBank.selectSentenceSlot || function selectSentenceSlot(index) {
   const runtime = getRuntime();
   const question = normalizeQuestionState(runtime.state.sentenceBank.currentQuestion);
-  if (!question || question.locked) return;
+  if (!question || question.locked || shouldSuppressSentenceTap()) return;
 
   const slotTokenIds = getQuestionSlotTokenIds(question);
   const normalizedIndex = normalizeSentenceSlotIndex(index, slotTokenIds.length);
@@ -1405,7 +1526,7 @@ sentenceBank.handleSlotDrop = sentenceBank.handleSlotDrop || function handleSlot
   const runtime = getRuntime();
   const question = normalizeQuestionState(runtime.state.sentenceBank.currentQuestion);
   if (!question || question.locked) {
-    clearSentenceDragPayload();
+    clearSentenceDragState();
     return false;
   }
 
@@ -1421,7 +1542,7 @@ sentenceBank.handleSlotDrop = sentenceBank.handleSlotDrop || function handleSlot
   }
 
   clearQuestionSelection(question);
-  clearSentenceDragPayload();
+  clearSentenceDragState();
   if (handled) {
     sentenceBank.renderSentenceBankQuestion();
   }
@@ -1431,7 +1552,7 @@ sentenceBank.handleSlotDrop = sentenceBank.handleSlotDrop || function handleSlot
 sentenceBank.handleSentenceBankTokenKeydown = sentenceBank.handleSentenceBankTokenKeydown || function handleSentenceBankTokenKeydown(tokenId, event) {
   const runtime = getRuntime();
   const question = normalizeQuestionState(runtime.state.sentenceBank.currentQuestion);
-  if (!question || question.locked || getQuestionSlotTokenIds(question).includes(tokenId)) {
+  if (!question || question.locked || shouldSuppressSentenceTap() || getQuestionSlotTokenIds(question).includes(tokenId)) {
     return;
   }
 

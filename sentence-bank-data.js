@@ -653,8 +653,7 @@ const SENTENCE_BANK = [
       "didn't",
       "expect",
       "that",
-      "at",
-      "all",
+      "at all",
       "well",
       "done"
     ],
@@ -668,7 +667,7 @@ const SENTENCE_BANK = [
     "english_distractors": [
       "great",
       "wanted",
-      "really",
+      "for real",
       "shame",
       "thanks"
     ],

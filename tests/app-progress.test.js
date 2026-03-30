@@ -69,15 +69,25 @@ class FakeElement {
     this._textContent = "";
     this._innerHTML = "";
     this.disabled = false;
+    this.hidden = false;
     this.value = "";
     this.className = "";
+    this.parentElement = null;
   }
 
   append(...nodes) {
-    this.children.push(...nodes);
+    nodes.forEach((node) => {
+      if (node && typeof node === "object") {
+        node.parentElement = this;
+      }
+      this.children.push(node);
+    });
   }
 
   appendChild(node) {
+    if (node && typeof node === "object") {
+      node.parentElement = this;
+    }
     this.children.push(node);
     return node;
   }
@@ -123,6 +133,17 @@ class FakeElement {
     };
     visit(this.children);
     return matches;
+  }
+
+  closest(selector) {
+    let current = this;
+    while (current) {
+      if (matchesSelector(current, selector)) {
+        return current;
+      }
+      current = current.parentElement || null;
+    }
+    return null;
   }
 
   setAttribute(name, value) {
@@ -283,6 +304,9 @@ globalThis.__appTestExports = {
     },
     createElement(tagName) {
       return new FakeElement(tagName);
+    },
+    elementFromPoint() {
+      return this.__elementFromPointTarget || null;
     },
   };
   document.documentElement.style = {};
@@ -602,6 +626,37 @@ function simulateDragAndDrop(source, target) {
   }));
 }
 
+function simulateTouchDragAndDrop(document, source, target) {
+  const touchPoint = { clientX: 24, clientY: 24 };
+  document.__elementFromPointTarget = target;
+  const baseEvent = {
+    preventDefault() {},
+    stopPropagation() {},
+  };
+  (source.listeners.touchstart || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: source,
+    currentTarget: source,
+    touches: [touchPoint],
+    changedTouches: [touchPoint],
+  }));
+  (source.listeners.touchmove || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: source,
+    currentTarget: source,
+    touches: [touchPoint],
+    changedTouches: [touchPoint],
+  }));
+  (source.listeners.touchend || []).forEach((handler) => handler({
+    ...baseEvent,
+    target: source,
+    currentTarget: source,
+    touches: [],
+    changedTouches: [touchPoint],
+  }));
+  document.__elementFromPointTarget = null;
+}
+
 function dragSentenceTokenToSlot(document, tokenText, slotIndex) {
   const source = findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", tokenText);
   const target = getSentenceSlots(document)[slotIndex];
@@ -611,6 +666,12 @@ function dragSentenceTokenToSlot(document, tokenText, slotIndex) {
 function dragPlacedSentenceToken(document, fromIndex, toIndex) {
   const slots = getSentenceSlots(document);
   simulateDragAndDrop(slots[fromIndex], slots[toIndex]);
+}
+
+function touchDragSentenceTokenToSlot(document, tokenText, slotIndex) {
+  const source = findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", tokenText);
+  const target = getSentenceSlots(document)[slotIndex];
+  simulateTouchDragAndDrop(document, source, target);
 }
 
 function placeSentenceTokenByTap(document, tokenText, slotIndex) {
@@ -1342,6 +1403,46 @@ test("sentence builder lets you drag into any blank and still supports tap-to-pl
   assert.equal(document.querySelector("#nextBtn").disabled, false);
 });
 
+test("sentence builder supports touch dragging on mobile/tablet layouts", () => {
+  const sentenceBank = [
+    {
+      id: "sb-touch-drag",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { innerWidth: 768, sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "he2en")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  touchDragSentenceTokenToSlot(document, "tomorrow", 4);
+  touchDragSentenceTokenToSlot(document, "We", 0);
+
+  assert.equal(
+    JSON.stringify(Array.from(state.sentenceBank.currentQuestion.slotTokenIds)),
+    JSON.stringify([
+      "answer-0",
+      "",
+      "",
+      "",
+      "answer-4",
+    ])
+  );
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "We"), undefined);
+  assert.equal(findVisibleButtonByText(document.querySelector("#choiceContainer"), ".sentence-token", "tomorrow"), undefined);
+});
+
 test("sentence builder contracts the bank after a word is used instead of keeping placeholders", () => {
   const sentenceBank = [
     {
@@ -1640,6 +1741,27 @@ test("sentence builder filters about/on distractors as too close to be fair", ()
 
   assert.deepEqual(deck[0].englishDistractors, ["explanation", "that"]);
   assert.deepEqual(deck[0].hebrewDistractors, ["על", "הסבר", "ההוא"]);
+});
+
+test("sentence builder filters hold on/wait up distractors as too close to be fair", () => {
+  const harness = loadAppHarness([]);
+  const deck = harness.app.sentenceBank.prepareSentenceBankDeck([
+    {
+      id: "sb-hold-on-wait-up-filter",
+      category: "colloquial",
+      difficulty: 1,
+      english: "Bro hold on, I'll get back to you in a sec.",
+      hebrew: "אחי חכה, אני אענה לך בעוד שנייה.",
+      english_tokens: ["Bro", "hold on", "I'll get back", "to you", "in a sec"],
+      hebrew_tokens: ["אחי", "חכה", "אני אענה", "לך", "בעוד שנייה"],
+      english_distractors: ["wait up", "my friend", "right now"],
+      hebrew_distractors: ["חבר שלי", "כרגע", "עוד מעט"],
+      notes: "",
+    },
+  ]);
+
+  assert.deepEqual(deck[0].englishDistractors, ["my friend", "right now"]);
+  assert.deepEqual(deck[0].hebrewDistractors, ["חבר שלי", "כרגע", "עוד מעט"]);
 });
 
 test("sentence builder accepts a Hebrew here/very swap when the meaning stays the same", () => {
@@ -2676,6 +2798,66 @@ test("active gameplay shows the top-right time and combo pill and hides it outsi
   assert.equal(harness.document.querySelector("#shellHomeBtn").classList.contains("hidden"), false);
 });
 
+test("second-chance rounds reset the progress bar and track review progress specifically", () => {
+  const vocabulary = [
+    { id: "alpha", category: "core_advanced", en: "alpha", he: "אלפא", heNiqqud: "אַלְפָא", utility: 80, source: "test" },
+  ];
+  const sentenceBank = [
+    {
+      id: "sb-second-chance-progress",
+      category: "everyday",
+      difficulty: 1,
+      english: "We will see you tomorrow.",
+      hebrew: "נראה אותך מחר.",
+      english_tokens: ["We", "will", "see", "you", "tomorrow"],
+      hebrew_tokens: ["נראה", "אותך", "מחר"],
+      english_distractors: ["later", "them"],
+      hebrew_distractors: ["עכשיו", "אותם"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness(vocabulary, [], [], { sentenceBank });
+
+  harness.state.route = "home";
+  harness.state.mode = "lesson";
+  harness.state.lesson.active = true;
+  harness.state.lesson.inReview = true;
+  harness.state.lesson.secondChanceCurrent = 1;
+  harness.state.lesson.secondChanceTotal = 4;
+  harness.state.currentQuestion = {
+    locked: false,
+    word: vocabulary[0],
+    prompt: vocabulary[0].en,
+    promptIsHebrew: false,
+    optionsAreHebrew: true,
+    options: [{ id: "alpha", word: vocabulary[0] }],
+    selectedOptionId: null,
+  };
+  harness.app.ui.renderSessionHeader();
+
+  assert.equal(harness.document.querySelector("#lessonProgressFill").style.width, "25%");
+  assert.match(harness.document.querySelector("#lessonProgressBar").getAttribute("aria-label"), /Second chance: 1\/4/);
+
+  harness.state.mode = "sentenceBank";
+  harness.state.sentenceBank.active = true;
+  harness.state.sentenceBank.inReview = true;
+  harness.state.sentenceBank.secondChanceCurrent = 2;
+  harness.state.sentenceBank.secondChanceTotal = 5;
+  harness.state.sentenceBank.currentQuestion = {
+    prompt: "נראה אותך מחר.",
+    promptIsHebrew: true,
+    answerIsHebrew: false,
+    locked: false,
+    bankTokens: [],
+    targetTokens: ["We", "will", "see", "you", "tomorrow"],
+    slotTokenIds: ["", "", "", "", ""],
+  };
+  harness.app.ui.renderSessionHeader();
+
+  assert.equal(harness.document.querySelector("#lessonProgressFill").style.width, "40%");
+  assert.match(harness.document.querySelector("#lessonProgressBar").getAttribute("aria-label"), /Second chance: 2\/5/);
+});
+
 test("desktop widths keep review and settings visible even on results", () => {
   const harness = loadAppHarness([], [], [], { innerWidth: 1280 });
 
@@ -2698,34 +2880,57 @@ test("desktop widths keep review and settings visible even on results", () => {
   assert.equal(harness.document.querySelector("#reviewView").classList.contains("active"), true);
   assert.equal(harness.document.querySelector("#settingsView").classList.contains("active"), true);
   assert.equal(harness.document.querySelector("#resultsView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#resultsReviewBtn").hidden, true);
+});
+
+test("results keep the review performance button on mobile only", () => {
+  const harness = loadAppHarness([], [], [], { innerWidth: 400 });
+
+  harness.state.route = "results";
+  harness.state.summary.active = true;
+  harness.app.ui.renderRouteVisibility();
+
+  assert.equal(harness.document.body.getAttribute("data-desktop-hub-layout"), "false");
+  assert.equal(harness.document.querySelector("#resultsView").classList.contains("active"), true);
+  assert.equal(harness.document.querySelector("#resultsReviewBtn").hidden, false);
 });
 
 test("desktop hub cards collapse on desktop but stay expanded on mobile", () => {
   const desktopHarness = loadAppHarness([], [], [], { innerWidth: 1280 });
-  const desktopCard = desktopHarness.document.querySelector("#reviewPanelCard");
-  const desktopToggle = desktopHarness.document.querySelector("#reviewPanelToggle");
+  const desktopReviewCard = desktopHarness.document.querySelector("#reviewPanelCard");
+  const desktopReviewToggle = desktopHarness.document.querySelector("#reviewPanelToggle");
+  const desktopSettingsCard = desktopHarness.document.querySelector("#settingsCard");
+  const desktopSettingsToggle = desktopHarness.document.querySelector("#settingsToggle");
 
   assert.equal(desktopHarness.document.body.getAttribute("data-desktop-hub-layout"), "true");
-  assert.equal(desktopCard.getAttribute("data-collapsed"), "false");
-  assert.equal(desktopToggle.getAttribute("aria-expanded"), "true");
+  assert.equal(desktopReviewCard.getAttribute("data-collapsed"), "true");
+  assert.equal(desktopReviewToggle.getAttribute("aria-expanded"), "false");
+  assert.equal(desktopSettingsCard.getAttribute("data-collapsed"), "true");
+  assert.equal(desktopSettingsToggle.getAttribute("aria-expanded"), "false");
 
-  desktopToggle.click();
-  assert.equal(desktopCard.getAttribute("data-collapsed"), "true");
-  assert.equal(desktopToggle.getAttribute("aria-expanded"), "false");
+  desktopReviewToggle.click();
+  assert.equal(desktopReviewCard.getAttribute("data-collapsed"), "false");
+  assert.equal(desktopReviewToggle.getAttribute("aria-expanded"), "true");
 
-  desktopToggle.click();
-  assert.equal(desktopCard.getAttribute("data-collapsed"), "false");
-  assert.equal(desktopToggle.getAttribute("aria-expanded"), "true");
+  desktopSettingsToggle.click();
+  assert.equal(desktopSettingsCard.getAttribute("data-collapsed"), "false");
+  assert.equal(desktopSettingsToggle.getAttribute("aria-expanded"), "true");
 
   const mobileHarness = loadAppHarness([], [], [], { innerWidth: 400 });
-  const mobileCard = mobileHarness.document.querySelector("#reviewPanelCard");
-  const mobileToggle = mobileHarness.document.querySelector("#reviewPanelToggle");
+  const mobileReviewCard = mobileHarness.document.querySelector("#reviewPanelCard");
+  const mobileReviewToggle = mobileHarness.document.querySelector("#reviewPanelToggle");
+  const mobileSettingsCard = mobileHarness.document.querySelector("#settingsCard");
+  const mobileSettingsToggle = mobileHarness.document.querySelector("#settingsToggle");
 
   assert.equal(mobileHarness.document.body.getAttribute("data-desktop-hub-layout"), "false");
-  assert.equal(mobileCard.getAttribute("data-collapsed"), "false");
-  mobileToggle.click();
-  assert.equal(mobileCard.getAttribute("data-collapsed"), "false");
-  assert.equal(mobileToggle.getAttribute("aria-expanded"), "true");
+  assert.equal(mobileReviewCard.getAttribute("data-collapsed"), "false");
+  assert.equal(mobileSettingsCard.getAttribute("data-collapsed"), "false");
+  mobileReviewToggle.click();
+  mobileSettingsToggle.click();
+  assert.equal(mobileReviewCard.getAttribute("data-collapsed"), "false");
+  assert.equal(mobileReviewToggle.getAttribute("aria-expanded"), "true");
+  assert.equal(mobileSettingsCard.getAttribute("data-collapsed"), "false");
+  assert.equal(mobileSettingsToggle.getAttribute("aria-expanded"), "true");
 });
 
 test("all game summaries now use only score accuracy and time metrics", () => {

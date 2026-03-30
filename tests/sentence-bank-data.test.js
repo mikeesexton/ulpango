@@ -211,6 +211,7 @@ const PHRASE_COMPACTED_ENTRY_IDS = [
   "colloquial_01",
   "colloquial_04",
   "colloquial_07",
+  "colloquial_15",
   "colloquial_16",
   "colloquial_20",
   "everyday_04",
@@ -255,6 +256,11 @@ const CHUNKING_AUDIT_ENTRIES = [
     id: "colloquial_07",
     requiredTokens: ["Are you", "right now", "That sounds", "completely ridiculous", "to me"],
     forbiddenTokens: ["Are", "you", "right", "now", "That", "sounds", "completely", "ridiculous", "to", "me"],
+  },
+  {
+    id: "colloquial_15",
+    requiredTokens: ["at all"],
+    forbiddenTokens: ["at", "all"],
   },
   {
     id: "everyday_09",
@@ -375,6 +381,7 @@ test("sentence bank data compacts low-value English glue into selectable phrase 
   assert.deepEqual(englishTokens("colloquial_02"), ["I", "don't", "have", "energy", "for this", "right now", "we'll", "talk", "later"]);
 
   assert.deepEqual(englishTokens("colloquial_07"), ["Are you", "serious", "right now", "That sounds", "completely ridiculous", "to me"]);
+  assert.deepEqual(englishTokens("colloquial_15"), ["Amazing", "I", "didn't", "expect", "that", "at all", "well", "done"]);
   assert.deepEqual(englishTokens("everyday_09"), ["Can I get", "the bill", "please"]);
   assert.deepEqual(englishTokens("everyday_12"), ["How long", "does it take", "to get there", "by bus"]);
   assert.deepEqual(englishTokens("colloquial_20"), ["Bro", "hold on", "I'll get back", "to you", "in a sec"]);

@@ -153,6 +153,21 @@ ui.setPromptCardVisibility = ui.setPromptCardVisibility || function setPromptCar
   getRuntime().el?.promptCard?.classList.toggle("hidden", !visible);
 };
 
+ui.renderResultsActionsVisibility = ui.renderResultsActionsVisibility || function renderResultsActionsVisibility() {
+  const runtime = getRuntime();
+  const desktopHubActive = runtime.global.document.body?.getAttribute("data-desktop-hub-layout") === "true";
+  if (runtime.el?.resultsReviewBtn) {
+    runtime.el.resultsReviewBtn.hidden = desktopHubActive;
+    runtime.el.resultsReviewBtn.setAttribute("aria-hidden", desktopHubActive ? "true" : "false");
+  }
+  if (runtime.el?.resultsReviewBtn?.parentElement) {
+    runtime.el.resultsReviewBtn.parentElement.setAttribute(
+      "data-review-button-hidden",
+      desktopHubActive ? "true" : "false"
+    );
+  }
+};
+
 ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisibility() {
   const runtime = getRuntime();
   const viewportWidth = Math.max(0, Number(runtime.global?.innerWidth || 0));
@@ -169,6 +184,7 @@ ui.renderRouteVisibility = ui.renderRouteVisibility || function renderRouteVisib
   runtime.el?.resultsView?.classList.toggle("active", showResults);
   runtime.el?.reviewView?.classList.toggle("active", showReview);
   runtime.el?.settingsView?.classList.toggle("active", showSettings);
+  ui.renderResultsActionsVisibility();
   app.controller?.syncDesktopHubPanels?.();
 };
 
@@ -706,7 +722,9 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
       : translate("session.sentenceBankTitle");
     ui.updateLessonProgress(
       inReview
-        ? 100
+        ? (runtime.state.sentenceBank.secondChanceTotal
+            ? Math.round((runtime.state.sentenceBank.secondChanceCurrent / runtime.state.sentenceBank.secondChanceTotal) * 100)
+            : 0)
         : Math.round((runtime.state.sentenceBank.currentRound / Math.max(1, totalRounds)) * 100)
     );
     runtime.el.nextBtn.disabled = hasQuestion && !question?.locked ? !canCheck : false;
@@ -742,7 +760,9 @@ ui.renderSessionHeader = ui.renderSessionHeader || function renderSessionHeader(
     : translate("session.mixedTitle", { rounds: runtime.constants.LESSON_ROUNDS });
   ui.updateLessonProgress(
     inSecondChance
-      ? 100
+      ? (runtime.state.lesson.secondChanceTotal
+          ? Math.round((runtime.state.lesson.secondChanceCurrent / runtime.state.lesson.secondChanceTotal) * 100)
+          : 0)
       : Math.round((runtime.state.lesson.currentRound / runtime.constants.LESSON_ROUNDS) * 100)
   );
   runtime.el.nextBtn.disabled = ui.questionNeedsSelection(runtime.state.currentQuestion);

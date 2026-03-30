@@ -1747,6 +1747,27 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 **Requested:** Improve the light-mode appearance of the three gameplay status pills and make positive/negative feedback readable. Follow-up: cover the conjugation prompt box as part of the same light-mode cleanup.
 
+### 2026-03-29 18:05 — Default-collapse desktop side panels, fix touch drag, and reset second-chance progress bars
+
+**Requested:** Keep the desktop `Review` and `Settings` panels minimized by default, push the latest local batch, make sentence-builder dragging work on mobile/tablet, remove the desktop-only endgame `Review Performance` action, and reset the gameplay progress bar to track second-chance rounds specifically instead of staying full.
+
+**Files changed:**
+- `app/controller.js` — Changed desktop hub panel defaults so `Review` and `Settings` start collapsed on desktop until the user explicitly toggles them, while keeping mobile panels expanded.
+- `app/sentence-bank.js` — Added touch-driven sentence-builder drag/drop support using touch start/move/end with slot detection, plus tap-suppression after a successful touch drop so mobile/tablet dragging no longer falls back into accidental taps.
+- `app/ui.js` — Hid the results `Review Performance` action on desktop only and changed lesson/sentence-builder second-chance progress bars to use `current/total` review progress rather than forcing the bar to 100%.
+- `sentence-bank-data.js` — Compacted `at all` into a single chip for the `בכלל` entry and added a phrase-sized distractor.
+- `styles.css` — Kept the desktop results action row balanced when the review button is hidden.
+- `index.html` — Bumped cache-busting asset versions for the updated CSS, sentence-bank data, sentence-builder logic, UI, and controller files.
+- `tests/app-progress.test.js`, `tests/sentence-bank-data.test.js` — Added regressions for touch dragging, desktop-collapsed defaults, mobile-only review action visibility, second-chance progress tracking, `wait up` distractor filtering, and `at all` phrase chunking.
+
+**Behavior changed:** On desktop, the side panels now start minimized to reduce clutter, and the results screen keeps only `Play Again` and `Back to Home`. On mobile/tablet, sentence-builder words can now be dragged by touch into blanks and occupied slots the same way they can with a mouse. During second-chance review rounds, the progress bar resets and advances through the review queue instead of staying full. The English chip `at all` now appears as one selectable unit for `בכלל`, and `wait up` is no longer offered as a distractor against `חכה`.
+
+**Tests run:** `node --test tests/app-progress.test.js tests/sentence-bank-data.test.js tests/hebrew-verbs.test.js` — passed, 139/139. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** Manual QA should confirm touch dragging feels natural on an actual phone/tablet browser, especially when dragging onto occupied slots, and that the desktop collapsed-by-default panels still feel discoverable now that they open only on explicit user action.
+
+---
+
 **Files changed:**
 - `styles.css` — Added light-theme overrides for gameplay status pills, conjugation prompt-card surface, success/error card text, and the full feedback tray so light mode now uses pale tinted surfaces with dark readable text instead of inheriting dark-mode treatments.
 - `index.html`, `app.js` — Bumped frontend asset versions to `20260315o`.

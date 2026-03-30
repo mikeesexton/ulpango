@@ -155,6 +155,7 @@ controller.toggleDesktopHubPanel = controller.toggleDesktopHubPanel || function 
 
   const nextCollapsed = card.getAttribute("data-collapsed") !== "true";
   card.setAttribute("data-collapsed", nextCollapsed ? "true" : "false");
+  card.setAttribute("data-user-collapsed-set", "true");
   toggle.setAttribute("aria-expanded", String(!nextCollapsed));
 };
 
@@ -164,8 +165,9 @@ controller.syncDesktopHubPanels = controller.syncDesktopHubPanels || function sy
 
   getDesktopHubPanels(runtime).forEach(({ card, toggle }) => {
     if (!card || !toggle) return;
-    if (card.getAttribute("data-collapsed") !== "true" && card.getAttribute("data-collapsed") !== "false") {
-      card.setAttribute("data-collapsed", "false");
+    const userSetCollapsed = card.getAttribute("data-user-collapsed-set") === "true";
+    if (!userSetCollapsed) {
+      card.setAttribute("data-collapsed", desktopHubActive ? "true" : "false");
     }
     const expanded = card.getAttribute("data-collapsed") !== "true";
     toggle.setAttribute("aria-expanded", String(expanded));
