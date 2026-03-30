@@ -985,6 +985,7 @@ test("sentence builder prompt styles keep the prompt centered while answer rows 
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-content-row\s*\{[^}]*justify-content:\s*center;/s);
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\s*\{[^}]*text-align:\s*center;/s);
   assert.match(styles, /\.prompt-text\.english-prompt\s*\{[^}]*direction:\s*ltr;[^}]*unicode-bidi:\s*isolate;/s);
+  assert.match(styles, /\.prompt-text\.hebrew\s*\{[^}]*font-family:\s*"Assistant",\s*sans-serif;/s);
   assert.match(styles, /\.lesson-shell\.mode-sentence-bank \.prompt-text\.hebrew\s*\{[^}]*text-align:\s*center;/s);
   assert.match(styles, /\.sentence-answer-line\.english\s*\{[^}]*text-align:\s*left;/s);
   assert.match(styles, /\.sentence-answer-line\.hebrew\s*\{[^}]*text-align:\s*right;/s);
@@ -3562,7 +3563,7 @@ test("conjugation matches play correct, wrong, and streak sounds", async () => {
   streakHarness.goHome();
 });
 
-test("advanced conjugation English prompts disambiguate second-person singular vs plural possession", () => {
+test("advanced conjugation English prompts keep number cues while omitting unnecessary subject gender", () => {
   const idiom = {
     id: "ptihat_einayim",
     object_type: "l_dative",
@@ -3586,11 +3587,15 @@ test("advanced conjugation English prompts disambiguate second-person singular v
   assert.equal(pluralYou?.poss, "your (pl.)");
   assert.equal(
     buildAdvConjEnglishSentence(idiom, subj, singularYou, "past"),
-    "they (f.) opened your (sg.) eyes"
+    "they opened your (sg.) eyes"
   );
   assert.equal(
     buildAdvConjEnglishSentence(idiom, subj, pluralYou, "past"),
-    "they (f.) opened your (pl.) eyes"
+    "they opened your (pl.) eyes"
+  );
+  assert.equal(
+    buildAdvConjEnglishSentence(idiom, subj, singularYou, "present"),
+    "they (f.) open your (sg.) eyes"
   );
 });
 

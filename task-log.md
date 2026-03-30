@@ -1747,6 +1747,26 @@ Each entry records what was requested, what changed, what was tested, and what t
 
 **Requested:** Improve the light-mode appearance of the three gameplay status pills and make positive/negative feedback readable. Follow-up: cover the conjugation prompt box as part of the same light-mode cleanup.
 
+### 2026-03-30 14:25 — Relax unnecessary advanced-conjugation gender cues and fix Hebrew prompt font fallback
+
+**Requested:** In advanced conjugation, avoid specifying subject gender when the Hebrew conjugation does not actually distinguish it; also investigate a GitHub Pages glitch where Hebrew prompt text appears in the wrong font.
+
+**Files changed:**
+- `app/adv-conj.js` — Added subject-label collapsing so advanced-conjugation English prompts drop trailing gender qualifiers when another subject with the same stripped label shares the exact same Hebrew verb form for that tense.
+- `styles.css` — Explicitly set Hebrew prompt text to use `Assistant` so prompt headings no longer inherit the global `Alegreya` serif heading font and fall back inconsistently across operating systems.
+- `index.html` — Bumped the stylesheet and advanced-conjugation script asset versions so GitHub Pages serves the updated CSS/JS instead of a cached copy.
+- `tests/app-progress.test.js` — Updated advanced-conjugation expectations to preserve singular/plural object cues while omitting unnecessary subject gender, and added a style regression locking Hebrew prompt text to `Assistant`.
+
+**Behavior changed:** Advanced-conjugation prompts now say things like `they opened your (sg.) eyes` when the Hebrew past/future plural form is shared across masculine and feminine subjects, while still keeping gender when the present-tense conjugation actually distinguishes it. Hebrew prompts across the app now render with the same sans-serif Hebrew font consistently instead of picking up a system-dependent fallback from the serif heading stack.
+
+**Root cause found:** The font glitch was not a GitHub Pages-only issue. Prompt text is rendered in an `h3`, and the global `h1/h2/h3` rule assigned `Alegreya`. Hebrew prompts were not overriding that heading font, so browsers fell back to different Hebrew-capable fonts depending on platform. The explicit `Assistant` override fixes that inconsistency.
+
+**Tests run:** `node --test tests/app-progress.test.js` — passed, 102/102. `git diff --check -- . ':(exclude).claude'` — passed.
+
+**Risks / regressions to check:** Manual QA should confirm the live Pages build has picked up the new asset versions and that Hebrew prompts now match the rest of the interface visually on both macOS and Windows. For advanced conjugation, the main behavior to spot-check is plural past/future prompts where masculine/feminine forms collapse to the same Hebrew surface.
+
+---
+
 ### 2026-03-29 18:05 — Default-collapse desktop side panels, fix touch drag, and reset second-chance progress bars
 
 **Requested:** Keep the desktop `Review` and `Settings` panels minimized by default, push the latest local batch, make sentence-builder dragging work on mobile/tablet, remove the desktop-only endgame `Review Performance` action, and reset the gameplay progress bar to track second-chance rounds specifically instead of staying full.

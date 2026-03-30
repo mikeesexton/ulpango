@@ -78,6 +78,28 @@ function usesPresentBaseVerb(subject) {
   return label.startsWith("you") || label === "i" || label === "we" || label.startsWith("they");
 }
 
+function stripAdvConjEnglishQualifier(text) {
+  return String(text || "").replace(/\s\([^()]+\)$/, "");
+}
+
+function getAdvConjSubjectEnglishLabel(idiom, subj, tense) {
+  const label = sanitizeEnglishText(subj?.en);
+  const baseLabel = stripAdvConjEnglishQualifier(label);
+  if (!label || baseLabel === label) return label;
+
+  const tenseData = tense === "past" ? idiom?.past_tense : tense === "future" ? idiom?.future_tense : idiom?.present_tense;
+  const currentVerbForm = tenseData?.[subj?.form];
+  if (!currentVerbForm) return label;
+
+  const hasEquivalentSubject = advConj.getAdvConjSubjectsForTense(tense).some((candidate) => {
+    if (!candidate || candidate.form === subj?.form) return false;
+    return stripAdvConjEnglishQualifier(sanitizeEnglishText(candidate.en)) === baseLabel
+      && tenseData?.[candidate.form] === currentVerbForm;
+  });
+
+  return hasEquivalentSubject ? baseLabel : label;
+}
+
 advConj.buildAdvConjHebrewAnswer = advConj.buildAdvConjHebrewAnswer || function buildAdvConjHebrewAnswer(idiom, subjectForm, subjectPronoun, objectKey, tense) {
   const runtime = getRuntime();
   const obj = runtime.constants.ADV_CONJ_OBJECTS.find((entry) => entry.key === objectKey);
@@ -112,6 +134,7 @@ advConj.buildAdvConjEnglishSentence = advConj.buildAdvConjEnglishSentence || fun
   }
   if (!tpl) return "";
 
+  const subjectText = getAdvConjSubjectEnglishLabel(idiom, subj, tense);
   let objectText = obj.en;
   let possessiveText = obj.poss;
   let collapsedQualifier = "";
@@ -129,7 +152,7 @@ advConj.buildAdvConjEnglishSentence = advConj.buildAdvConjEnglishSentence || fun
 
   return sanitizeEnglishText(
     tpl
-    .replace(/\{s\}/g, subj.en)
+    .replace(/\{s\}/g, subjectText)
     .replace(/\{o\}/g, objectText)
     .replace(/\{p\}/g, possessiveText) + collapsedQualifier
   );

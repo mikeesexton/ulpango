@@ -1050,6 +1050,7 @@ body[data-theme="light"] .prompt-speech-btn:focus-visible {
 .prompt-text.hebrew {
   direction: rtl;
   unicode-bidi: isolate;
+  font-family: "Assistant", sans-serif;
   text-align: center;
 }
 
@@ -1127,6 +1128,7 @@ body[data-theme="light"] .lesson-shell.mode-sentence-bank .prompt-card {
 }
 
 .lesson-shell.mode-sentence-bank .prompt-text.hebrew {
+  font-family: "Assistant", sans-serif;
   text-align: center;
 }
 
