@@ -51,3 +51,15 @@ test("duplicate Hebrew glosses are collapsed into shared translations", () => {
   assert.deepEqual(entriesByHebrew.get("להקציף"), ["to beat / whip"]);
   assert.deepEqual(entriesByHebrew.get("לגרד"), ["to grate / scrape"]);
 });
+
+test("מוצאי שבת keeps its Saturday-night translation and custom Shabbat distractors", () => {
+  const vocabulary = loadVocabulary();
+  const entry = vocabulary.find((word) => word.he === "מוצאי שבת");
+
+  assert.ok(entry);
+  assert.equal(entry.en, "Saturday night");
+  assert.deepEqual(JSON.parse(JSON.stringify(entry.translationQuizDistractors)), {
+    english: ["Friday night", "Shabbat morning", "Shabbat afternoon"],
+    hebrew: ["ליל שבת", "שבת בבוקר", "שבת בלילה"],
+  });
+});

@@ -2017,6 +2017,17 @@ const ABBREVIATIONS = [
     "bucket": "Ideas, Science & Tech",
     "notes": "",
     "source": "manual"
+  },
+  {
+    "id": "abbr-208",
+    "abbr": "מוצ״ש",
+    "expansionHe": "מוצאי שבת",
+    "expansionHeNiqqud": "מוֹצָאֵי שַׁבָּת",
+    "expansionHeNiqqudSource": ACADEMY_DICTIONARY_URL,
+    "english": "Saturday night",
+    "bucket": "People, Health & Culture",
+    "notes": "Common shorthand for Saturday night / right after Shabbat.",
+    "source": "manual"
   }
 ];
 

@@ -1344,6 +1344,12 @@ const RAW = {
   culture_identity_expanded: [
     ["cultural reference", "רפרנס תרבותי", "רפרנס תרבותי"],
     ["holiday ritual", "טקס חג", "טקס חג"],
+    ["Saturday night", "מוצאי שבת", "מוֹצָאֵי שַׁבָּת", {
+      translationQuizDistractors: {
+        english: ["Friday night", "Shabbat morning", "Shabbat afternoon"],
+        hebrew: ["ליל שבת", "שבת בבוקר", "שבת בלילה"],
+      },
+    }],
     ["secular slang", "סלנג חילוני", "סְלֶנְג חִילּוֹנִי"],
     ["military service", "שירות צבאי", "שירות צבאי"],
     ["reserve duty", "שירות מילואים", "שירות מילואים"],
@@ -1518,7 +1524,7 @@ function getBaseVocabulary() {
   Object.entries(RAW).forEach(([category, rows], categoryIndex) => {
     const max = rows.length;
 
-    rows.forEach(([en, he, heNiqqud = ""], idx) => {
+    rows.forEach(([en, he, heNiqqud = "", meta = null], idx) => {
       const utility = Math.max(1, 100 - Math.floor((idx / max) * 45) - categoryIndex * 2);
       const id = `${category}-${String(idx + 1).padStart(3, "0")}-${slug(en)}`;
 
@@ -1530,6 +1536,16 @@ function getBaseVocabulary() {
         heNiqqud: heNiqqud || he,
         utility,
         availability: normalizeAvailability(LEXICON_AVAILABILITY_OVERRIDES.get(he) || AVAILABILITY_DEFAULTS),
+        translationQuizDistractors: meta?.translationQuizDistractors
+          ? {
+              english: Array.isArray(meta.translationQuizDistractors.english)
+                ? meta.translationQuizDistractors.english.map((value) => String(value || "").trim()).filter(Boolean)
+                : [],
+              hebrew: Array.isArray(meta.translationQuizDistractors.hebrew)
+                ? meta.translationQuizDistractors.hebrew.map((value) => String(value || "").trim()).filter(Boolean)
+                : [],
+            }
+          : null,
         source: "seed",
       });
     });
@@ -1542,6 +1558,6 @@ global.IvriQuestVocab = {
   CATEGORY_META,
   EXPANSION_TRACKS,
   getBaseVocabulary,
-  __build: "20260307b",
+  __build: "20260402a",
 };
 })(typeof window !== "undefined" ? window : globalThis);

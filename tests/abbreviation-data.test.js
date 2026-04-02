@@ -209,3 +209,15 @@ test("phase 4 abbreviation expansions use exact Academy-backed niqqud for the ne
     assert.equal(/[\u0591-\u05C7]/.test(String(entry.abbr || "")), false, `${entryId} abbreviation should not carry niqqud`);
   });
 });
+
+test("מוצ״ש is available as a playable shorthand for מוצאי שבת", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+  const deckIds = new Set(context.IvriQuestApp.abbreviation.prepareAbbreviationDeck(rows).map((entry) => entry.id));
+
+  assert.equal(byId.get("abbr-208")?.abbr, "מוצ״ש");
+  assert.equal(byId.get("abbr-208")?.expansionHe, "מוצאי שבת");
+  assert.equal(byId.get("abbr-208")?.english, "Saturday night");
+  assert.equal(deckIds.has("abbr-208"), true);
+});

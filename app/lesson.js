@@ -29,6 +29,49 @@ function getLessonOptionDisplayKey(word, optionLanguage) {
   return String(word?.he || "").trim();
 }
 
+function slugSyntheticLessonOptionPart(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0590-\u05ff]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80) || "option";
+}
+
+function buildSyntheticLessonOptionWord(baseWord, label, optionLanguage) {
+  const cleanLabel = String(label || "").trim();
+  if (!cleanLabel) return null;
+  const syntheticId = `${String(baseWord?.id || "lesson")}-${optionLanguage}-${slugSyntheticLessonOptionPart(cleanLabel)}`;
+
+  return optionLanguage === "english"
+    ? {
+        id: syntheticId,
+        category: baseWord?.category || "",
+        en: cleanLabel,
+        he: "",
+        heNiqqud: "",
+        utility: 0,
+        source: "synthetic-distractor",
+      }
+    : {
+        id: syntheticId,
+        category: baseWord?.category || "",
+        en: "",
+        he: cleanLabel,
+        heNiqqud: cleanLabel,
+        utility: 0,
+        source: "synthetic-distractor",
+      };
+}
+
+function getLessonCustomDistractorWords(word, optionLanguage) {
+  const distractors = word?.translationQuizDistractors;
+  if (!distractors) return [];
+  const labels = optionLanguage === "english" ? distractors.english : distractors.hebrew;
+  return (Array.isArray(labels) ? labels : [])
+    .map((label) => buildSyntheticLessonOptionWord(word, label, optionLanguage))
+    .filter(Boolean);
+}
+
 function translate(key, vars = {}) {
   return getHelpers().t ? getHelpers().t(key, vars) : key;
 }
@@ -488,6 +531,11 @@ lessonMode.buildOptions = lessonMode.buildOptions || function buildOptions(pool,
   }
 
   tryAddOption(word);
+
+  doShuffle(getLessonCustomDistractorWords(word, optionLanguage)).forEach((item) => {
+    if (options.length >= 4) return;
+    tryAddOption(item);
+  });
 
   doShuffle(sameCategoryCandidates).forEach((item) => {
     if (options.length >= 4) return;

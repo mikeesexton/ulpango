@@ -1914,6 +1914,47 @@ test("sentence builder accepts an alternate Hebrew speaker-gender form when the 
   assert.ok(getSentenceSlots(document).every((slot) => slot.classList.contains("correct") && !slot.classList.contains("wrong")));
 });
 
+test("sentence builder keeps מוצאי שבת split and accepts both כאילו orders", () => {
+  const sentenceBank = [
+    {
+      id: "sb-motzash",
+      category: "everyday",
+      difficulty: 2,
+      english: "He texted me Saturday night as if nothing happened.",
+      hebrew: "הוא שלח לי הודעה במוצאי שבת כאילו לא קרה כלום.",
+      hebrew_alternates: [
+        {
+          text: "הוא שלח לי הודעה במוצאי שבת כאילו כלום לא קרה.",
+          tokens: ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "כלום", "לא קרה"],
+        },
+      ],
+      english_tokens: ["He", "texted", "me", "Saturday", "night", "as if", "nothing", "happened"],
+      hebrew_tokens: ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "לא קרה", "כלום"],
+      english_distractors: ["called", "Friday", "morning"],
+      hebrew_distractors: ["בלילה", "מחר", "אחרי"],
+      notes: "",
+    },
+  ];
+  const harness = loadAppHarness([], [], [], { sentenceBank });
+  const { document, state } = harness;
+
+  harness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  state.mode = "sentenceBank";
+  state.sentenceBank.active = true;
+  harness.nextSentenceBankQuestion();
+
+  assert.ok(Array.from(state.sentenceBank.currentQuestion.targetTokens).includes("במוצאי"));
+  assert.ok(Array.from(state.sentenceBank.currentQuestion.targetTokens).includes("שבת"));
+  assert.equal(Array.from(state.sentenceBank.currentQuestion.targetTokens).includes("מוצאי שבת"), false);
+  assert.ok(Array.from(state.sentenceBank.currentQuestion.bankTokens).some((token) => token.text === "בלילה"));
+
+  fillSentenceAnswerByTap(document, ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "כלום", "לא קרה"]);
+  document.querySelector("#nextBtn").click();
+
+  assert.equal(state.sessionScore, 3);
+  assert.match(getFeedbackText(document), /^Correct\. The Hebrew sentence is הוא שלח לי הודעה במוצאי שבת כאילו כלום לא קרה\./);
+});
+
 test("sentence builder removes and moves placed words without collapsing the slot layout", () => {
   const sentenceBank = [
     {
@@ -2430,6 +2471,54 @@ test("translation answer banks dedupe identical visible labels in both direction
   assert.ok(forwardHarness.state.currentQuestion);
   const hebrewLabels = forwardHarness.state.currentQuestion.options.map((option) => option.word.he);
   assert.equal(new Set(hebrewLabels).size, hebrewLabels.length);
+});
+
+test("translation can use custom Shabbat-themed distractors for מוצאי שבת in both directions", () => {
+  const vocabulary = [
+    {
+      id: "motzash",
+      category: "culture_identity_expanded",
+      en: "Saturday night",
+      he: "מוצאי שבת",
+      heNiqqud: "מוֹצָאֵי שַׁבָּת",
+      utility: 90,
+      source: "test",
+      translationQuizDistractors: {
+        english: ["Friday night", "Shabbat morning", "Shabbat afternoon"],
+        hebrew: ["ליל שבת", "שבת בבוקר", "שבת בלילה"],
+      },
+    },
+    { id: "culture-2", category: "culture_identity_expanded", en: "holiday ritual", he: "טקס חג", heNiqqud: "טקס חג", utility: 70, source: "test" },
+    { id: "culture-3", category: "culture_identity_expanded", en: "religious practice", he: "פרקטיקה דתית", heNiqqud: "פרקטיקה דתית", utility: 65, source: "test" },
+    { id: "culture-4", category: "culture_identity_expanded", en: "synagogue community", he: "קהילת בית כנסת", heNiqqud: "קהילת בֵּית כנסת", utility: 60, source: "test" },
+  ];
+
+  const reverseHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.9,
+  });
+  reverseHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "motzash") || pool[0] || null;
+  reverseHarness.state.mode = "lesson";
+  reverseHarness.state.lesson.active = true;
+  reverseHarness.nextQuestion();
+
+  assert.equal(reverseHarness.state.currentQuestion.prompt, "מוצאי שבת");
+  assert.deepEqual(
+    new Set(reverseHarness.state.currentQuestion.options.map((option) => option.word.en)),
+    new Set(["Saturday night", "Friday night", "Shabbat morning", "Shabbat afternoon"])
+  );
+
+  const forwardHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.1,
+  });
+  forwardHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "motzash") || pool[0] || null;
+  forwardHarness.state.mode = "lesson";
+  forwardHarness.state.lesson.active = true;
+  forwardHarness.nextQuestion();
+
+  assert.equal(forwardHarness.state.currentQuestion.prompt, "Saturday night");
+  const hebrewLabels = forwardHarness.state.currentQuestion.options.map((option) => option.word.he);
+  assert.ok(hebrewLabels.includes("שבת בלילה"));
+  assert.ok(hebrewLabels.includes("מוצאי שבת"));
 });
 
 test("abbreviation answer banks dedupe identical visible English labels", () => {

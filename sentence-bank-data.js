@@ -1716,6 +1716,67 @@ const SENTENCE_BANK = [
     "notes": "אם (if) vs כש (when) — conditional vs temporal conjunction."
   },
   {
+    "id": "everyday_21",
+    "category": "everyday",
+    "style": null,
+    "difficulty": 2,
+    "hebrew": "הוא שלח לי הודעה במוצאי שבת כאילו לא קרה כלום.",
+    "english": "He texted me Saturday night as if nothing happened.",
+    "hebrew_tokens": [
+      "הוא",
+      "שלח",
+      "לי",
+      "הודעה",
+      "במוצאי",
+      "שבת",
+      "כאילו",
+      "לא קרה",
+      "כלום"
+    ],
+    "english_tokens": [
+      "He",
+      "texted",
+      "me",
+      "Saturday",
+      "night",
+      "as if",
+      "nothing",
+      "happened"
+    ],
+    "hebrew_alternates": [
+      {
+        "text": "הוא שלח לי הודעה במוצאי שבת כאילו כלום לא קרה.",
+        "tokens": [
+          "הוא",
+          "שלח",
+          "לי",
+          "הודעה",
+          "במוצאי",
+          "שבת",
+          "כאילו",
+          "כלום",
+          "לא קרה"
+        ]
+      }
+    ],
+    "hebrew_distractors": [
+      "בלילה",
+      "מחר",
+      "פתאום",
+      "אחרי",
+      "בבוקר",
+      "לא ענה"
+    ],
+    "english_distractors": [
+      "called",
+      "Friday",
+      "morning",
+      "like nothing",
+      "changed"
+    ],
+    "notes": "מוצאי שבת means Saturday night / right after Shabbat. כאילו לא קרה כלום and כאילו כלום לא קרה both mean 'as if nothing happened.'"
+  },
+  {
     "id": "professional_01",
     "category": "professional",
     "style": null,
@@ -2599,6 +2660,6 @@ global.IvriQuestSentenceBank = {
   getSentenceBank() {
     return SENTENCE_BANK.map(cloneSentence);
   },
-  __build: "20260329e",
+  __build: "20260402a",
 };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -324,15 +324,15 @@ const CHUNKING_AUDIT_ENTRIES = [
   },
 ];
 
-test("sentence bank data exposes 60 complete entries with notes, distractors, and tokens", () => {
+test("sentence bank data exposes 61 complete entries with notes, distractors, and tokens", () => {
   const api = loadSentenceBankApi();
   assert.ok(api);
   assert.equal(typeof api.getSentenceBank, "function");
 
   const entries = api.getSentenceBank();
-  assert.equal(entries.length, 60);
-  assert.equal(new Set(entries.map((entry) => entry.id)).size, 60);
-  assert.equal(entries.filter((entry) => String(entry.notes || "").trim()).length, 60);
+  assert.equal(entries.length, 61);
+  assert.equal(new Set(entries.map((entry) => entry.id)).size, 61);
+  assert.equal(entries.filter((entry) => String(entry.notes || "").trim()).length, 61);
 
   entries.forEach((entry) => {
     assert.ok(entry.id);
@@ -436,6 +436,23 @@ test("sentence bank data can mark alternate Hebrew answers for gender-ambiguous 
   assert.equal(entry.hebrew_alternates.length, 1);
   assert.equal(entry.hebrew_alternates[0].text, "היא עשתה לי קטע מסריח, אני לא סומכת עליה יותר.");
   assert.deepEqual(Array.from(entry.hebrew_alternates[0].tokens), ["היא", "עשתה", "לי", "קטע", "מסריח", "אני", "לא", "סומכת", "עליה", "יותר"]);
+});
+
+test("sentence bank data includes the מוצאי שבת texting sentence with a reordered alternate", () => {
+  const byId = new Map(loadSentenceBankApi().getSentenceBank().map((entry) => [entry.id, entry]));
+  const entry = byId.get("everyday_21");
+
+  assert.ok(entry);
+  assert.equal(entry.hebrew, "הוא שלח לי הודעה במוצאי שבת כאילו לא קרה כלום.");
+  assert.equal(entry.english, "He texted me Saturday night as if nothing happened.");
+  assert.deepEqual(Array.from(entry.hebrew_tokens), ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "לא קרה", "כלום"]);
+  assert.deepEqual(Array.from(entry.english_tokens), ["He", "texted", "me", "Saturday", "night", "as if", "nothing", "happened"]);
+  assert.equal(entry.hebrew_tokens.includes("מוצאי שבת"), false);
+  assert.ok(entry.hebrew_distractors.includes("בלילה"));
+  assert.ok(Array.isArray(entry.hebrew_alternates));
+  assert.equal(entry.hebrew_alternates.length, 1);
+  assert.equal(entry.hebrew_alternates[0].text, "הוא שלח לי הודעה במוצאי שבת כאילו כלום לא קרה.");
+  assert.deepEqual(Array.from(entry.hebrew_alternates[0].tokens), ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "כלום", "לא קרה"]);
 });
 
 test("sentence bank data preserves visible English or note cues for audited Hebrew nuance markers", () => {
