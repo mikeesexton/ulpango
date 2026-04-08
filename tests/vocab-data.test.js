@@ -36,6 +36,19 @@ test("basic standalone vocabulary stays in the lexicon but is unavailable for tr
   assert.equal(entriesByHebrew.get("מצקת")?.availability?.sentenceHints, true);
 });
 
+test("conjugation-first cooking verbs stay out of translation quiz while לצנן keeps curated distractors", () => {
+  const vocabulary = loadVocabulary();
+  const entriesByHebrew = new Map(vocabulary.map((word) => [word.he, word]));
+
+  assert.equal(entriesByHebrew.get("לסנן")?.availability?.translationQuiz, false);
+  assert.equal(entriesByHebrew.get("לקרר")?.availability?.translationQuiz, false);
+  assert.equal(entriesByHebrew.get("לצנן")?.availability?.translationQuiz, true);
+  assert.deepEqual(JSON.parse(JSON.stringify(entriesByHebrew.get("לצנן")?.translationQuizDistractors)), {
+    english: ["to refrigerate", "to freeze", "to defrost"],
+    hebrew: ["לקרר", "להקפיא", "להפשיר"],
+  });
+});
+
 test("duplicate Hebrew glosses are collapsed into shared translations", () => {
   const vocabulary = loadVocabulary();
   const entriesByHebrew = new Map();

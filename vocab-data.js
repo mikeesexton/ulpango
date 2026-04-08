@@ -600,7 +600,12 @@ const RAW = {
     ["to defrost", "להפשיר", "לְהַפְשִׁיר"],
     ["to freeze", "להקפיא", "לְהַקְפִּיא"],
     ["to refrigerate", "לקרר", "לְקָרֵר"],
-    ["to chill", "לצנן", "לְצַנֵּן"],
+    ["to chill", "לצנן", "לְצַנֵּן", {
+      translationQuizDistractors: {
+        english: ["to refrigerate", "to freeze", "to defrost"],
+        hebrew: ["לקרר", "להקפיא", "להפשיר"],
+      },
+    }],
     ["to garnish", "לקשט", "לְקַשֵּׁט"],
     ["to serve", "להגיש", "לְהַגִּישׁ"],
     ["to plate", "לסדר בצלחת", "לְסַדֵּר בַּצַּלַּחַת"],
@@ -1489,6 +1494,11 @@ const AVAILABILITY_DEFAULTS = Object.freeze({
   sentenceHints: true,
 });
 
+const CONJUGATION_FIRST_TRANSLATION_HEBREW = new Set([
+  "לסנן",
+  "לקרר",
+]);
+
 const LEXICON_AVAILABILITY_OVERRIDES = new Map([
   ["אחות", { translationQuiz: false }],
   ["בית חולים", { translationQuiz: false }],
@@ -1501,6 +1511,7 @@ const LEXICON_AVAILABILITY_OVERRIDES = new Map([
   ["פרויקט", { translationQuiz: false }],
   ["דרכון", { translationQuiz: false }],
   ["ויזה", { translationQuiz: false }],
+  ...Array.from(CONJUGATION_FIRST_TRANSLATION_HEBREW, (hebrew) => [hebrew, { translationQuiz: false }]),
 ]);
 
 function normalizeAvailability(availability) {

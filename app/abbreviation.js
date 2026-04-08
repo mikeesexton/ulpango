@@ -42,6 +42,15 @@ abbreviation.getExpansionText = abbreviation.getExpansionText || function getExp
   return withNiqqud && marked ? marked : plain;
 };
 
+abbreviation.getAbbreviationDirectionLabel = abbreviation.getAbbreviationDirectionLabel || function getAbbreviationDirectionLabel(question) {
+  if (!question?.direction) return "";
+  return translate(
+    question.direction === "he2en"
+      ? "prompt.abbreviationHeToEn"
+      : "prompt.abbreviationEnToHe"
+  );
+};
+
 abbreviation.getAbbreviationPromptSpeechPayload = abbreviation.getAbbreviationPromptSpeechPayload || function getAbbreviationPromptSpeechPayload(question = getRuntime().state.abbreviation.currentQuestion) {
   if (!question?.promptIsHebrew) return null;
   return app.speech?.buildSpeechPayload?.({
@@ -119,6 +128,11 @@ abbreviation.prepareAbbreviationDeck = abbreviation.prepareAbbreviationDeck || f
       speechHeNiqqud,
       english,
       bucket: String(entry?.bucket || "").trim(),
+      abbreviationQuizDistractorIds: Array.isArray(entry?.abbreviationQuizDistractorIds)
+        ? entry.abbreviationQuizDistractorIds
+            .map((value) => String(value || "").trim())
+            .filter(Boolean)
+        : [],
       notes: String(entry?.notes || "").trim(),
       source: String(entry?.source || "abbreviation"),
       availability: {
@@ -288,7 +302,7 @@ abbreviation.renderAbbreviationQuestion = abbreviation.renderAbbreviationQuestio
 
   if (!question) return;
 
-  app.ui?.renderPromptLabel?.("", false);
+  app.ui?.renderPromptLabel?.(abbreviation.getAbbreviationDirectionLabel(question), true);
   if (question.promptIsHebrew) {
     runtime.el.promptText.classList.add("hebrew");
     runtime.el.promptText.classList.remove("english-prompt");
@@ -317,15 +331,7 @@ abbreviation.renderAbbreviationChoices = abbreviation.renderAbbreviationChoices 
       btn.setAttribute("lang", "he");
     }
     btn.textContent = option.label;
-    btn.addEventListener("click", () => {
-      if (question.locked) return;
-      question.selectedOptionId = option.id;
-      runtime.el.choiceContainer.querySelectorAll(".choice-btn").forEach((button, index) => {
-        button.classList.toggle("selected", question.options[index]?.id === option.id);
-      });
-      getHelpers().renderSessionHeader?.();
-      app.speech?.speak?.(abbreviation.getAbbreviationSelectionSpeechPayload(question, option));
-    });
+    btn.addEventListener("click", () => abbreviation.selectAbbreviationOption(option.id, question));
     btn.classList.toggle("selected", question.selectedOptionId === option.id && !question.locked);
     runtime.el.choiceContainer.append(btn);
   });
@@ -333,6 +339,22 @@ abbreviation.renderAbbreviationChoices = abbreviation.renderAbbreviationChoices 
   if (question.locked) {
     abbreviation.markAbbreviationChoiceResults(question);
   }
+};
+
+abbreviation.selectAbbreviationOption = abbreviation.selectAbbreviationOption || function selectAbbreviationOption(optionId, question = getRuntime().state.abbreviation.currentQuestion) {
+  const runtime = getRuntime();
+  if (!question || question.locked) return false;
+
+  const option = question.options.find((candidate) => candidate.id === optionId);
+  if (!option) return false;
+
+  question.selectedOptionId = option.id;
+  Array.from(runtime.el?.choiceContainer?.querySelectorAll?.(".choice-btn") || []).forEach((button, index) => {
+    button.classList.toggle("selected", question.options[index]?.id === option.id);
+  });
+  getHelpers().renderSessionHeader?.();
+  app.speech?.speak?.(abbreviation.getAbbreviationSelectionSpeechPayload(question, option));
+  return true;
 };
 
 abbreviation.applyAbbreviationAnswer = abbreviation.applyAbbreviationAnswer || function applyAbbreviationAnswer(isCorrect, selectedId = null) {
@@ -429,6 +451,7 @@ abbreviation.buildAbbreviationQuestion = abbreviation.buildAbbreviationQuestion 
 
 abbreviation.buildAbbreviationOptions = abbreviation.buildAbbreviationOptions || function buildAbbreviationOptions(pool, entry, direction) {
   const shuffle = app.utils?.shuffle;
+  const byId = new Map(pool.map((item) => [item.id, item]));
   const sameBucketCandidates = pool.filter((item) => item.id !== entry.id && item.bucket === entry.bucket);
   const isHe2En = direction === "he2en";
   const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
@@ -445,6 +468,11 @@ abbreviation.buildAbbreviationOptions = abbreviation.buildAbbreviationOptions ||
   }
 
   tryAddOption(entry);
+
+  (Array.isArray(entry?.abbreviationQuizDistractorIds) ? entry.abbreviationQuizDistractorIds : []).forEach((distractorId) => {
+    if (options.length >= 4) return;
+    tryAddOption(byId.get(distractorId));
+  });
 
   doShuffle(sameBucketCandidates).forEach((item) => {
     if (options.length >= 4) return;

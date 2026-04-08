@@ -16,6 +16,10 @@ function getSession() {
   return app.session || {};
 }
 
+function isPlainShortcutEvent(event) {
+  return !(event.altKey || event.ctrlKey || event.metaKey);
+}
+
 function getDesktopHubPanels(runtime) {
   return [
     { card: runtime.el?.reviewPanelCard, toggle: runtime.el?.reviewPanelToggle },
@@ -91,16 +95,7 @@ controller.bindUi = controller.bindUi || function bindUi() {
       app.ui?.closeMasteredModal?.();
     }
   });
-  global.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    if (runtime.state.welcomeModalOpen) {
-      app.ui?.closeWelcomeModal?.();
-      return;
-    }
-    if (runtime.state.masteredModalOpen) {
-      app.ui?.closeMasteredModal?.();
-    }
-  });
+  global.addEventListener("keydown", controller.handleGlobalKeyDown);
   global.addEventListener("resize", controller.handleViewportResize);
 
   [runtime.el.lessonStartIntro, runtime.el.secondChanceIntro, runtime.el.sentenceBankIntro, runtime.el.verbMatchIntro, runtime.el.abbreviationIntro].forEach((overlay) => {
@@ -146,6 +141,51 @@ controller.handleViewportResize = controller.handleViewportResize || function ha
     h.renderAll?.();
     controller.syncDesktopHubPanels();
   }, 60);
+};
+
+controller.handleGlobalKeyDown = controller.handleGlobalKeyDown || function handleGlobalKeyDown(event) {
+  const runtime = getRuntime();
+
+  if (event.key === "Escape") {
+    if (runtime.state.welcomeModalOpen) {
+      app.ui?.closeWelcomeModal?.();
+      return;
+    }
+    if (runtime.state.masteredModalOpen) {
+      app.ui?.closeMasteredModal?.();
+    }
+    return;
+  }
+
+  if (!isPlainShortcutEvent(event)) return;
+  controller.handleAbbreviationShortcutKey?.(event);
+};
+
+controller.handleAbbreviationShortcutKey = controller.handleAbbreviationShortcutKey || function handleAbbreviationShortcutKey(event) {
+  const runtime = getRuntime();
+  const question = runtime.state.abbreviation?.currentQuestion;
+
+  if (runtime.state.mode !== "abbreviation") return false;
+  if (app.ui?.isUiLocked?.()) return false;
+  if (!runtime.state.abbreviation?.active || !question) return false;
+
+  if (/^[1-4]$/.test(event.key)) {
+    const option = question.options[Number(event.key) - 1];
+    if (!option) return false;
+    event.preventDefault?.();
+    return Boolean(app.abbreviation?.selectAbbreviationOption?.(option.id, question));
+  }
+
+  if (event.key === "Enter") {
+    const canAdvance = question.locked;
+    const canSubmit = !question.locked && Boolean(question.selectedOptionId);
+    if (!canAdvance && !canSubmit) return false;
+    event.preventDefault?.();
+    controller.handleNextAction?.();
+    return true;
+  }
+
+  return false;
 };
 
 controller.toggleDesktopHubPanel = controller.toggleDesktopHubPanel || function toggleDesktopHubPanel(card, toggle) {
