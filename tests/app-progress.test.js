@@ -2044,6 +2044,86 @@ test("sentence builder restores partially filled non-sequential slots from persi
   );
 });
 
+test("sentence builder drops stale restored questions when the live sentence entry changes", () => {
+  const oldSentenceBank = [
+    {
+      id: "sb-stale",
+      category: "colloquial",
+      difficulty: 1,
+      english: "Wow I saw it, cool. Send me the details",
+      hebrew: "וואלה ראיתי, מגניב. שלח לי את הפרטים",
+      english_tokens: ["Wow", "I", "saw", "it", "cool", "Send", "me", "the", "details"],
+      hebrew_tokens: ["וואלה", "ראיתי", "מגניב", "שלח", "לי", "את", "הפרטים"],
+      english_distractors: ["Maybe", "later"],
+      hebrew_distractors: ["אולי", "אחר כך"],
+      notes: "",
+    },
+  ];
+  const updatedSentenceBank = [
+    {
+      id: "sb-stale",
+      category: "colloquial",
+      difficulty: 1,
+      english: "Wow, I saw it. Cool. Send me the details.",
+      hebrew: "וואלה, ראיתי את זה. מגניב. שלח לי את הפרטים.",
+      english_tokens: ["Wow", "I", "saw", "it", "Cool", "Send", "me", "the", "details"],
+      hebrew_tokens: ["וואלה", "ראיתי", "את", "זה", "מגניב", "שלח", "לי", "הפרטים"],
+      english_distractors: ["Maybe", "later"],
+      hebrew_distractors: ["אולי", "אחר כך"],
+      notes: "",
+    },
+  ];
+
+  const firstHarness = loadAppHarness([], [], [], { sentenceBank: oldSentenceBank });
+  firstHarness.app.utils.weightedRandomWord = (items) => items.find((item) => item.word.direction === "en2he")?.word || items[0]?.word;
+  firstHarness.state.mode = "sentenceBank";
+  firstHarness.state.lastPlayedMode = "sentenceBank";
+  firstHarness.state.sentenceBank.active = true;
+  firstHarness.nextSentenceBankQuestion();
+  firstHarness.app.persistence.persistSessionState();
+
+  assert.equal(firstHarness.state.sentenceBank.currentQuestion.prompt, "Wow I saw it, cool. Send me the details");
+
+  const restoredHarness = loadAppHarness([], [], [], {
+    sentenceBank: updatedSentenceBank,
+    localStorageData: firstHarness.localStorage.__dump(),
+  });
+
+  assert.equal(restoredHarness.state.mode, "lesson");
+  assert.equal(restoredHarness.state.route, "home");
+  assert.equal(restoredHarness.state.lastPlayedMode, "sentenceBank");
+  assert.equal(restoredHarness.state.sentenceBank.active, false);
+  assert.equal(restoredHarness.state.sentenceBank.currentQuestion, null);
+});
+
+test("lesson restores still recover persisted current questions after sentence restore validation", () => {
+  const lessonVocabulary = [
+    { id: "lesson-1", category: "core", en: "hello", he: "שלום", heNiqqud: "שָׁלוֹם", utility: 90, source: "test" },
+    { id: "lesson-2", category: "core", en: "goodbye", he: "להתראות", heNiqqud: "לְהִתְרָאוֹת", utility: 80, source: "test" },
+    { id: "lesson-3", category: "core", en: "thanks", he: "תודה", heNiqqud: "תּוֹדָה", utility: 70, source: "test" },
+    { id: "lesson-4", category: "core", en: "please", he: "בבקשה", heNiqqud: "בְּבַקָּשָׁה", utility: 60, source: "test" },
+  ];
+  const firstHarness = loadAppHarness(lessonVocabulary, [], []);
+  firstHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "lesson-1") || pool[0] || null;
+  firstHarness.state.mode = "lesson";
+  firstHarness.state.lastPlayedMode = "lesson";
+  firstHarness.state.lesson.active = true;
+  firstHarness.nextQuestion();
+  firstHarness.app.persistence.persistSessionState();
+
+  assert.ok(firstHarness.state.currentQuestion);
+
+  const restoredHarness = loadAppHarness(lessonVocabulary, [], [], {
+    localStorageData: firstHarness.localStorage.__dump(),
+  });
+
+  assert.equal(restoredHarness.state.mode, "lesson");
+  assert.equal(restoredHarness.state.route, "home");
+  assert.equal(restoredHarness.state.lesson.active, true);
+  assert.ok(restoredHarness.state.currentQuestion);
+  assert.equal(restoredHarness.state.currentQuestion.prompt, firstHarness.state.currentQuestion.prompt);
+});
+
 test("sentence builder hides the translate label while keeping the prompt text and Hebrew speech button", () => {
   const sentenceBank = [
     {
@@ -2519,6 +2599,92 @@ test("translation can use custom Shabbat-themed distractors for מוצאי שב�
   const hebrewLabels = forwardHarness.state.currentQuestion.options.map((option) => option.word.he);
   assert.ok(hebrewLabels.includes("שבת בלילה"));
   assert.ok(hebrewLabels.includes("מוצאי שבת"));
+});
+
+test("translation shape-matches infinitive distractors in both directions", () => {
+  const vocabulary = [
+    { id: "target", category: "cooking_verbs", en: "to drift", he: "לשוטט", heNiqqud: "לְשׁוֹטֵט", utility: 90, source: "test" },
+    { id: "verb-1", category: "cooking_verbs", en: "to sprint", he: "לרוץ", heNiqqud: "לָרוּץ", utility: 80, source: "test" },
+    { id: "verb-2", category: "cooking_verbs", en: "to pause", he: "לעצור", heNiqqud: "לַעֲצוֹר", utility: 78, source: "test" },
+    { id: "verb-3", category: "cooking_verbs", en: "to stir", he: "לערבב", heNiqqud: "לְעַרְבֵּב", utility: 76, source: "test" },
+    { id: "noun-1", category: "cooking_verbs", en: "deadline", he: "מועד אחרון", heNiqqud: "מוֹעֵד אַחֲרוֹן", utility: 74, source: "test" },
+    { id: "noun-2", category: "cooking_verbs", en: "maintenance", he: "תחזוקה", heNiqqud: "תַּחְזוּקָה", utility: 72, source: "test" },
+  ];
+
+  const forwardHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.1,
+  });
+  forwardHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "target") || pool[0] || null;
+  forwardHarness.state.mode = "lesson";
+  forwardHarness.state.lesson.active = true;
+  forwardHarness.nextQuestion();
+
+  assert.equal(forwardHarness.state.currentQuestion.prompt, "to drift");
+  assert.ok(
+    forwardHarness.state.currentQuestion.options.every((option) => option.word.he.startsWith("ל"))
+  );
+
+  const reverseHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.9,
+  });
+  reverseHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "target") || pool[0] || null;
+  reverseHarness.state.mode = "lesson";
+  reverseHarness.state.lesson.active = true;
+  reverseHarness.nextQuestion();
+
+  assert.equal(reverseHarness.state.currentQuestion.prompt, "לשוטט");
+  assert.ok(
+    reverseHarness.state.currentQuestion.options.every((option) => option.word.en.toLowerCase().startsWith("to "))
+  );
+});
+
+test("translation can use custom cooling-themed distractors for לצנן in both directions", () => {
+  const vocabulary = [
+    {
+      id: "chill",
+      category: "cooking_verbs",
+      en: "to chill",
+      he: "לצנן",
+      heNiqqud: "לְצַנֵּן",
+      utility: 90,
+      source: "test",
+      translationQuizDistractors: {
+        english: ["to refrigerate", "to freeze", "to defrost"],
+        hebrew: ["לקרר", "להקפיא", "להפשיר"],
+      },
+    },
+    { id: "cooking-2", category: "cooking_verbs", en: "deadline", he: "מועד אחרון", heNiqqud: "מוֹעֵד אַחֲרוֹן", utility: 70, source: "test" },
+    { id: "cooking-3", category: "cooking_verbs", en: "maintenance", he: "תחזוקה", heNiqqud: "תַּחְזוּקָה", utility: 65, source: "test" },
+    { id: "cooking-4", category: "cooking_verbs", en: "customer complaint", he: "תלונת לקוח", heNiqqud: "תְּלוּנַת לָקוֹחַ", utility: 60, source: "test" },
+  ];
+
+  const reverseHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.9,
+  });
+  reverseHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "chill") || pool[0] || null;
+  reverseHarness.state.mode = "lesson";
+  reverseHarness.state.lesson.active = true;
+  reverseHarness.nextQuestion();
+
+  assert.equal(reverseHarness.state.currentQuestion.prompt, "לצנן");
+  assert.deepEqual(
+    new Set(reverseHarness.state.currentQuestion.options.map((option) => option.word.en)),
+    new Set(["to chill", "to refrigerate", "to freeze", "to defrost"])
+  );
+
+  const forwardHarness = loadAppHarness(vocabulary, [], [], {
+    mathRandom: () => 0.1,
+  });
+  forwardHarness.app.data.pickBestWord = (pool) => pool.find((word) => word.id === "chill") || pool[0] || null;
+  forwardHarness.state.mode = "lesson";
+  forwardHarness.state.lesson.active = true;
+  forwardHarness.nextQuestion();
+
+  assert.equal(forwardHarness.state.currentQuestion.prompt, "to chill");
+  assert.deepEqual(
+    new Set(forwardHarness.state.currentQuestion.options.map((option) => option.word.he)),
+    new Set(["לצנן", "לקרר", "להקפיא", "להפשיר"])
+  );
 });
 
 test("abbreviation answer banks dedupe identical visible English labels", () => {

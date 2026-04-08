@@ -206,6 +206,27 @@ const ALIGNMENT_GUARDRAILS = [
   },
 ];
 
+const EXPLICIT_HEBREW_IT_TOKEN_CUES = new Set([
+  "את",
+  "זה",
+  "זאת",
+  "אותו",
+  "אותה",
+  "אותם",
+  "אותן",
+  "הוא",
+  "היא",
+  "הם",
+  "הן",
+]);
+
+function hasExplicitHebrewItCue(tokens) {
+  return sanitizeTokenList(tokens).some((token) => {
+    if (EXPLICIT_HEBREW_IT_TOKEN_CUES.has(token)) return true;
+    return /^(?:[שובכלמ]?זה|[שובכלמ]?זאת)$/.test(token);
+  });
+}
+
 const PHRASE_COMPACTED_ENTRY_IDS = [
   "colloquial_02",
   "colloquial_01",
@@ -455,6 +476,18 @@ test("sentence bank data includes the מוצאי שבת texting sentence with a 
   assert.deepEqual(Array.from(entry.hebrew_alternates[0].tokens), ["הוא", "שלח", "לי", "הודעה", "במוצאי", "שבת", "כאילו", "כלום", "לא קרה"]);
 });
 
+test("sentence bank data rewrites colloquial_19 as a fully aligned punctuated WhatsApp line", () => {
+  const byId = new Map(loadSentenceBankApi().getSentenceBank().map((entry) => [entry.id, entry]));
+  const entry = byId.get("colloquial_19");
+
+  assert.ok(entry);
+  assert.equal(entry.hebrew, "וואלה, ראיתי את זה. מגניב. שלח לי את הפרטים.");
+  assert.equal(entry.english, "Wow, I saw it. Cool. Send me the details.");
+  assert.deepEqual(Array.from(entry.hebrew_tokens), ["וואלה", "ראיתי", "את", "זה", "מגניב", "שלח", "לי", "הפרטים"]);
+  assert.deepEqual(Array.from(entry.english_tokens), ["Wow", "I", "saw", "it", "Cool", "Send", "me", "the", "details"]);
+  assert.deepEqual(getStaticEnglishWordChunks(entry), []);
+});
+
 test("sentence bank data preserves visible English or note cues for audited Hebrew nuance markers", () => {
   const byId = new Map(loadSentenceBankApi().getSentenceBank().map((entry) => [entry.id, entry]));
 
@@ -515,6 +548,41 @@ test("sentence bank data keeps english answer rows fully blank except for punctu
       getStaticEnglishWordChunks(entry),
       [],
       `${entry.id} still leaves lexical English outside the selectable chips`
+    );
+  });
+});
+
+test("sentence bank data ends every current row with terminal punctuation on both sides", () => {
+  const entries = loadSentenceBankApi().getSentenceBank();
+  const terminalPunctuation = /[.!?…״׳”'»)]\s*$/;
+
+  entries.forEach((entry) => {
+    assert.match(
+      String(entry.english || ""),
+      terminalPunctuation,
+      `${entry.id} is missing terminal punctuation in English`
+    );
+    assert.match(
+      String(entry.hebrew || ""),
+      terminalPunctuation,
+      `${entry.id} is missing terminal punctuation in Hebrew`
+    );
+  });
+});
+
+test("sentence bank data only uses non-leading standalone English it when Hebrew has an explicit referent cue", () => {
+  const entries = loadSentenceBankApi().getSentenceBank();
+
+  entries.forEach((entry) => {
+    const englishTokens = Array.from(entry.english_tokens || []).map((token) => String(token || "").trim().toLowerCase());
+    const hasNonLeadingIt = englishTokens.some((token, index) => token === "it" && index > 0);
+    if (!hasNonLeadingIt) return;
+
+    const hebrewTokens = Array.from(entry.hebrew_tokens || []).map((token) => String(token || "").trim());
+    const hasExplicitObjectCue = hasExplicitHebrewItCue(hebrewTokens);
+    assert.ok(
+      hasExplicitObjectCue,
+      `${entry.id} uses standalone English "it" without an explicit Hebrew referent cue`
     );
   });
 });

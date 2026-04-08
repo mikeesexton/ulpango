@@ -29,6 +29,22 @@ function getLessonOptionDisplayKey(word, optionLanguage) {
   return String(word?.he || "").trim();
 }
 
+function getLessonOptionShapeKey(word, optionLanguage) {
+  const label = getLessonOptionDisplayKey(word, optionLanguage);
+  if (!label) return "";
+
+  if (optionLanguage === "english") {
+    if (/^to\s+/i.test(label)) return "english-infinitive";
+    return /\s/.test(label) ? "english-phrase" : "english-single";
+  }
+
+  const compact = String(label).replace(/[׳״"'`]/g, "");
+  if (/^ל[\u0590-\u05FF]/.test(compact)) {
+    return /\s/.test(compact) ? "hebrew-infinitive-phrase" : "hebrew-infinitive";
+  }
+  return /\s/.test(compact) ? "hebrew-phrase" : "hebrew-single";
+}
+
 function slugSyntheticLessonOptionPart(text) {
   return String(text || "")
     .toLowerCase()
@@ -515,9 +531,13 @@ lessonMode.buildOptions = lessonMode.buildOptions || function buildOptions(pool,
   const doShuffle = typeof shuffle === "function" ? shuffle : (items) => [...items];
   const forbiddenOptionIds = config.forbiddenOptionIds || new Set();
   const optionLanguage = config.optionLanguage === "english" ? "english" : "hebrew";
+  const targetShapeKey = getLessonOptionShapeKey(word, optionLanguage);
   const sameCategoryCandidates = pool.filter(
     (item) => item.id !== word.id && item.category === word.category && !forbiddenOptionIds.has(item.id)
   );
+  const sameShapeSameCategoryCandidates = targetShapeKey
+    ? sameCategoryCandidates.filter((item) => getLessonOptionShapeKey(item, optionLanguage) === targetShapeKey)
+    : [];
   const seenLabels = new Set();
   const options = [];
 
@@ -537,10 +557,29 @@ lessonMode.buildOptions = lessonMode.buildOptions || function buildOptions(pool,
     tryAddOption(item);
   });
 
+  doShuffle(sameShapeSameCategoryCandidates).forEach((item) => {
+    if (options.length >= 4) return;
+    tryAddOption(item);
+  });
+
   doShuffle(sameCategoryCandidates).forEach((item) => {
     if (options.length >= 4) return;
     tryAddOption(item);
   });
+
+  if (options.length < 4) {
+    doShuffle(
+      pool.filter(
+        (item) => item.id !== word.id
+          && !options.includes(item)
+          && !forbiddenOptionIds.has(item.id)
+          && getLessonOptionShapeKey(item, optionLanguage) === targetShapeKey
+      )
+    ).forEach((item) => {
+      if (options.length >= 4) return;
+      tryAddOption(item);
+    });
+  }
 
   if (options.length < 4) {
     doShuffle(

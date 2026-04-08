@@ -221,3 +221,37 @@ test("מוצ״ש is available as a playable shorthand for מוצאי שבת", ()
   assert.equal(byId.get("abbr-208")?.english, "Saturday night");
   assert.equal(deckIds.has("abbr-208"), true);
 });
+
+test("דוא״ל is available as a playable shorthand for דואר אלקטרוני", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+  const deckIds = new Set(context.IvriQuestApp.abbreviation.prepareAbbreviationDeck(rows).map((entry) => entry.id));
+
+  assert.equal(byId.get("abbr-209")?.abbr, "דוא״ל");
+  assert.equal(byId.get("abbr-209")?.expansionHe, "דואר אלקטרוני");
+  assert.equal(byId.get("abbr-209")?.expansionHeNiqqud, "דּוֹאַר אֶלֶקְטְרוֹנִי");
+  assert.match(String(byId.get("abbr-209")?.expansionHeNiqqudSource || ""), /^https?:\/\//);
+  assert.equal(byId.get("abbr-209")?.english, "email");
+  assert.equal(deckIds.has("abbr-209"), true);
+});
+
+test("contact-info abbreviations prefer each other as distractors", () => {
+  const context = loadAbbreviationContext();
+  const rows = context.IvriQuestAbbreviations.getAbbreviations();
+  const deck = context.IvriQuestApp.abbreviation.prepareAbbreviationDeck(rows);
+  const byId = new Map(deck.map((entry) => [entry.id, entry]));
+  const emailEntry = byId.get("abbr-209");
+
+  assert.ok(emailEntry, "abbr-209 should be present in the playable deck");
+
+  const options = context.IvriQuestApp.abbreviation.buildAbbreviationOptions(deck, emailEntry, "he2en");
+  const optionIds = options.map((option) => option.id);
+
+  assert.equal(options.length, 4);
+  assert.deepEqual(new Set(optionIds).size, 4);
+  assert.deepEqual(
+    new Set(optionIds),
+    new Set(["abbr-209", "abbr-093", "abbr-095", "abbr-096"])
+  );
+});

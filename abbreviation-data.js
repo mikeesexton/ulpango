@@ -928,6 +928,11 @@ const ABBREVIATIONS = [
     "expansionHeNiqqudSource": ACADEMY_DICTIONARY_URL,
     "english": "phone",
     "bucket": "Daily Life & Home",
+    "abbreviationQuizDistractorIds": [
+      "abbr-095",
+      "abbr-096",
+      "abbr-209"
+    ],
     "notes": "",
     "source": "abbreviations-xlsx"
   },
@@ -948,6 +953,11 @@ const ABBREVIATIONS = [
     "expansionHe": "תיבת דואר",
     "english": "P.O. Box",
     "bucket": "Daily Life & Home",
+    "abbreviationQuizDistractorIds": [
+      "abbr-093",
+      "abbr-096",
+      "abbr-209"
+    ],
     "notes": "also “traffic accident”",
     "source": "abbreviations-xlsx"
   },
@@ -959,6 +969,11 @@ const ABBREVIATIONS = [
     "expansionHeNiqqudSource": ACADEMY_DICTIONARY_URL,
     "english": "address",
     "bucket": "Daily Life & Home",
+    "abbreviationQuizDistractorIds": [
+      "abbr-093",
+      "abbr-095",
+      "abbr-209"
+    ],
     "notes": "",
     "source": "abbreviations-xlsx"
   },
@@ -2027,6 +2042,22 @@ const ABBREVIATIONS = [
     "english": "Saturday night",
     "bucket": "People, Health & Culture",
     "notes": "Common shorthand for Saturday night / right after Shabbat.",
+    "source": "manual"
+  },
+  {
+    "id": "abbr-209",
+    "abbr": "דוא״ל",
+    "expansionHe": "דואר אלקטרוני",
+    "expansionHeNiqqud": "דּוֹאַר אֶלֶקְטְרוֹנִי",
+    "expansionHeNiqqudSource": "https://hebrew-academy.org.il/wp-content/uploads/internet-terms.pdf",
+    "english": "email",
+    "bucket": "Daily Life & Home",
+    "abbreviationQuizDistractorIds": [
+      "abbr-093",
+      "abbr-095",
+      "abbr-096"
+    ],
+    "notes": "Common shorthand for electronic mail / email.",
     "source": "manual"
   }
 ];

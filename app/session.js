@@ -12,6 +12,63 @@ function getHelpers() {
   return getRuntime().helpers || {};
 }
 
+function sanitizeRestoreTokenList(tokens) {
+  return Array.isArray(tokens)
+    ? tokens.map((token) => String(token || "").trim())
+    : [];
+}
+
+function tokenListsMatch(left, right) {
+  const leftTokens = sanitizeRestoreTokenList(left);
+  const rightTokens = sanitizeRestoreTokenList(right);
+  if (leftTokens.length !== rightTokens.length) return false;
+  return leftTokens.every((token, index) => token === rightTokens[index]);
+}
+
+function buildLiveSentenceBankQuestionState(question) {
+  const runtime = getRuntime();
+  const sentenceId = String(question?.sentence?.id || "").trim();
+  const direction = question?.direction === "en2he" || question?.direction === "he2en"
+    ? question.direction
+    : "";
+  if (!sentenceId || !direction) return null;
+
+  const sentence = (runtime.sentenceBankDeck || []).find((entry) => entry.id === sentenceId);
+  if (!sentence) return null;
+
+  return {
+    direction,
+    sentence,
+    prompt: direction === "en2he" ? sentence.english : sentence.hebrew,
+    targetTokens: direction === "en2he" ? sentence.hebrewTokens : sentence.englishTokens,
+  };
+}
+
+function isStaleRestoredSentenceBankQuestion(question) {
+  if (!question) return false;
+
+  const liveState = buildLiveSentenceBankQuestionState(question);
+  if (!liveState) return true;
+
+  return (
+    String(question?.sentence?.english || "").trim() !== String(liveState.sentence.english || "").trim()
+    || String(question?.sentence?.hebrew || "").trim() !== String(liveState.sentence.hebrew || "").trim()
+    || String(question?.prompt || "").trim() !== String(liveState.prompt || "").trim()
+    || !tokenListsMatch(question?.targetTokens, liveState.targetTokens)
+  );
+}
+
+function invalidateRestoredSentenceBankState() {
+  const runtime = getRuntime();
+  const h = getHelpers();
+
+  h.resetSentenceBankState?.();
+  if (runtime.state.mode === "sentenceBank") {
+    runtime.state.mode = "lesson";
+  }
+  runtime.state.route = "home";
+}
+
 session.hasActiveLearnSession = session.hasActiveLearnSession || function hasActiveLearnSession() {
   const runtime = getRuntime();
   return Boolean(
@@ -140,6 +197,9 @@ session.restoreSessionState = session.restoreSessionState || function restoreSes
     });
     if (runtime.state.sentenceBank.currentQuestion) {
       runtime.state.sentenceBank.currentQuestion.locked = Boolean(snapshot.sentenceBank.currentQuestion?.locked);
+      if (isStaleRestoredSentenceBankQuestion(runtime.state.sentenceBank.currentQuestion)) {
+        invalidateRestoredSentenceBankState();
+      }
     }
   }
 
